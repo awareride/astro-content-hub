@@ -9,26 +9,27 @@
 // panel with spacious, large links (Anthropic-style) followed by the GitHub
 // CTA. The locale switcher stays in the header bar, left of the hamburger,
 // so it is reachable without opening the menu.
-import { localeFromPath, localizePath, t, siteName, products, type Locale } from '../lib/i18n';
+import { localeFromPath, localizePath, withBase, t, siteName, type Locale } from '../lib/i18n';
+import { products } from '../config/products';
 import LocaleSwitcher from './LocaleSwitcher.astro';
 
-interface Props {
+export interface Props {
   alternates?: Partial<Record<Locale, string>>;
 }
 const { alternates } = Astro.props;
 
 const locale = localeFromPath(Astro.url.pathname);
 const ui = t[locale];
-const homeHref = localizePath('/', locale);
-const projectsHref = localizePath('/#projects', locale);
-const postsHref = localizePath('/posts', locale);
+const homeHref = withBase(localizePath('/', locale));
+const projectsHref = withBase(localizePath('/#projects', locale));
+const postsHref = withBase(localizePath('/posts', locale));
 const githubHref = 'https://github.com';
 ---
 <header class="site-header" id="site-header">
   <div class="nav container">
     <a href={homeHref} class="logo" aria-label={`${siteName} home`}>
       <span class="logo-mark">
-        <img src="/images/logo.png" alt="" width="28" height="28" />
+        <img src={withBase('/images/logo.png')} alt="" width="28" height="28" />
       </span>
       <span class="logo-text">{siteName}</span>
     </a>
@@ -38,7 +39,7 @@ const githubHref = 'https://github.com';
           <li><a href={projectsHref}>{ui.projects}</a></li>
           <li><a href={postsHref}>{ui.posts}</a></li>
           {products.filter(p => p.nav === true).map((p) => (
-            <li><a href={localizePath(`/${p.slug}`, locale)}>{p.name}</a></li>
+            <li><a href={withBase(localizePath(`/${p.slug}`, locale))}>{p.name}</a></li>
           ))}
         </ul>
         <a href={githubHref} class="nav-cta" target="_blank" rel="noopener noreferrer">

@@ -6,7 +6,8 @@
 // On the hub, Astro's Markdown processor does NOT rewrite body markdown links, so
 // a raw `./getting-started.md` would render as `href="./getting-started.md"` and
 // 404. This plugin turns such links into the correct hub route
-// (e.g. `/vite/docs/getting-started`) at build time, with no source edits.
+// (e.g. `/astro-content-hub/vite/docs/getting-started` under a project-path base)
+// at build time, with no source edits.
 //
 // Scope (what gets rewritten):
 //   - Relative links whose target ends in `.md` (with optional `#anchor`).
@@ -15,7 +16,7 @@
 //     (src/content/{posts,docs}); otherwise the link is left unchanged (safe
 //     default - we never rewrite external/anchor/absolute links).
 //
-// How: at plugin init, scan src/content/**\/*.md once and build a
+// How: at first use, scan src/content/**\/*.md once and build a
 // Map<absolutePath, siteUrl>. For each rendered markdown file, resolve each
 // relative `.md` link against the current file's path (from ctx.fileURL) and
 // look it up. Mutations go through ctx.setProperty so Sätteri records them in
@@ -25,13 +26,18 @@
 // remark plugin - Astro 7 defaults to Sätteri and its plugins use a visitor
 // API keyed by node type, not the `(tree, file) => void` transformer shape.
 //
+// `base` is passed in from astro.config.mjs (where it is a literal). This
+// module is a plain .mjs loaded at config time, so it cannot read
+// `import.meta.env.BASE_URL` the way app code can.
+//
 // No new dependencies (pure Node stdlib). Keeps the single source of truth for
 // locales/defaultLocale in src/lib/i18n.ts.
 
 import { readdirSync, statSync, existsSync } from 'node:fs';
 import { join, relative, resolve, dirname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { locales, defaultLocale, products } from './i18n';
+import { locales, defaultLocale } from './i18n';
+import { products } from '../config/products';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 // src/lib -> project root (two levels up).
@@ -116,34 +122,6 @@ function listMdRel(base) {
   return out.map((p) => relative(base, p));
 }
 
-/** Build a Map<absolute path, siteUrl> for every content markdown file.
- * Scans src/content (standard posts + non-base products' docs) and, for any
- * product that overrides its docs location via `base`, the base directory
- * (e.g. repo-root `docs/`). */
-function buildUrlMap() {
-  const map = new Map();
-  for (const rel of listMdRel(CONTENT)) {
-    const url = urlForContentPath(rel);
-    if (url) map.set(resolve(CONTENT, rel), url);
-  }
-  // Products with a `base` (e.g. './docs') keep their docs outside src/content.
-  for (const product of products) {
-    if (!product.base) continue;
-    const baseDir = join(ROOT, product.base);
-    for (const rel of listMdRel(baseDir)) {
-      const url = urlForBaseDoc(product.slug, rel);
-      if (url) map.set(resolve(baseDir, rel), url);
-    }
-  }
-  return map;
-}
-
-let _urlMap;
-function getUrlMap() {
-  if (!_urlMap) _urlMap = buildUrlMap();
-  return _urlMap;
-}
-
 /** True if a link URL is a relative `.md` link we should try to rewrite. */
 function isRewritable(url) {
   if (typeof url !== 'string' || url === '') return false;
@@ -154,40 +132,76 @@ function isRewritable(url) {
 }
 
 /**
- * Rewrite one link/definition node's relative `.md` URL to its hub route.
- * Leaves the node untouched when the URL is not rewritable or the target is
- * not found in the content collections.
+ * Factory: build the Sätteri mdast plugin. `base` is the Astro `base` option
+ * (e.g. '/astro-content-hub/'), passed in from astro.config.mjs. The returned
+ * visitor rewrites relative `.md` links in markdown bodies to their hub
+ * routes, prefixed with `base`. The URL map is built lazily on first use and
+ * cached for the lifetime of the plugin instance.
  */
-function rewriteLinkNode(node, ctx) {
-  const raw = node.url;
-  if (!isRewritable(raw)) return;
-  if (!ctx.fileURL) return; // no source path -> can't resolve; leave unchanged
-  // Resolve the source dir against ROOT: ctx.fileURL may be absolute (standard
-  // src/content files) or relative to the project root (files loaded from a
-  // product's `base` dir, e.g. repo-root `docs/`). Normalizing to absolute
-  // keeps target resolution consistent with the url map's absolute keys.
-  const baseDir = resolve(ROOT, dirname(fileURLToPath(ctx.fileURL)));
-  const hashIdx = raw.indexOf('#');
-  const pathPart = hashIdx === -1 ? raw : raw.slice(0, hashIdx);
-  const hash = hashIdx === -1 ? '' : raw.slice(hashIdx);
-  const target = resolve(baseDir, pathPart);
-  const url = getUrlMap().get(target);
-  if (url) {
-    // Mutate through the context so Sätteri records it in its command buffer.
-    ctx.setProperty(node, 'url', url + hash);
-  }
-}
+export function rewriteRelativeMdLinks(base) {
+  const basePrefix = base.replace(/\/+$/, '');
+  const prefixBase = (url) => basePrefix + url;
 
-/**
- * Sätteri mdast plugin definition. A visitor object keyed by node type; each
- * handler receives (node, ctx) and may mutate the node via ctx methods.
- */
-export const rewriteRelativeMdLinks = {
-  name: 'content-hub-rewrite-relative-md-links',
-  link(node, ctx) {
-    rewriteLinkNode(node, ctx);
-  },
-  definition(node, ctx) {
-    rewriteLinkNode(node, ctx);
-  },
-};
+  /** Build a Map<absolute path, siteUrl> for every content markdown file.
+   *  Scans src/content (standard posts + non-base products' docs) and, for
+   *  any product that overrides its docs location via `base`, the base
+   *  directory (e.g. repo-root `docs/`). */
+  function buildUrlMap() {
+    const map = new Map();
+    for (const rel of listMdRel(CONTENT)) {
+      const url = urlForContentPath(rel);
+      if (url) map.set(resolve(CONTENT, rel), prefixBase(url));
+    }
+    // Products with a `base` (e.g. './docs') keep their docs outside src/content.
+    for (const product of products) {
+      if (!product.base) continue;
+      const baseDir = join(ROOT, product.base);
+      for (const rel of listMdRel(baseDir)) {
+        const url = urlForBaseDoc(product.slug, rel);
+        if (url) map.set(resolve(baseDir, rel), prefixBase(url));
+      }
+    }
+    return map;
+  }
+
+  let urlMap = null;
+  function getUrlMap() {
+    if (!urlMap) urlMap = buildUrlMap();
+    return urlMap;
+  }
+
+  /**
+   * Rewrite one link/definition node's relative `.md` URL to its hub route.
+   * Leaves the node untouched when the URL is not rewritable or the target is
+   * not found in the content collections.
+   */
+  function rewriteLinkNode(node, ctx) {
+    const raw = node.url;
+    if (!isRewritable(raw)) return;
+    if (!ctx.fileURL) return; // no source path -> can't resolve; leave unchanged
+    // Resolve the source dir against ROOT: ctx.fileURL may be absolute (standard
+    // src/content files) or relative to the project root (files loaded from a
+    // product's `base` dir, e.g. repo-root `docs/`). Normalizing to absolute
+    // keeps target resolution consistent with the url map's absolute keys.
+    const baseDir = resolve(ROOT, dirname(fileURLToPath(ctx.fileURL)));
+    const hashIdx = raw.indexOf('#');
+    const pathPart = hashIdx === -1 ? raw : raw.slice(0, hashIdx);
+    const hash = hashIdx === -1 ? '' : raw.slice(hashIdx);
+    const target = resolve(baseDir, pathPart);
+    const url = getUrlMap().get(target);
+    if (url) {
+      // Mutate through the context so Sätteri records it in its command buffer.
+      ctx.setProperty(node, 'url', url + hash);
+    }
+  }
+
+  return {
+    name: 'content-hub-rewrite-relative-md-links',
+    link(node, ctx) {
+      rewriteLinkNode(node, ctx);
+    },
+    definition(node, ctx) {
+      rewriteLinkNode(node, ctx);
+    },
+  };
+}

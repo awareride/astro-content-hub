@@ -1,6 +1,6 @@
 ---
 // src/components/PostCard.astro
-import { localizePath, t, localeCode, type Locale } from '../lib/i18n';
+import { localizePath, withBase, t, localeCode, type Locale } from '../lib/i18n';
 
 export interface Props {
   title: string;
@@ -32,7 +32,7 @@ const formattedDate = date.toLocaleDateString(localeCode[locale], {
   day: 'numeric',
 });
 
-const href = localizePath(`/posts/${slug}`, locale);
+const href = withBase(localizePath(`/posts/${slug}`, locale));
 ---
 
 <a href={href} class="post-card">

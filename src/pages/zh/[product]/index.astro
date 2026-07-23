@@ -4,7 +4,8 @@
 import Layout from '../../../components/Layout.astro';
 import Nav from '../../../components/Nav.astro';
 import Footer from '../../../components/Footer.astro';
-import { products, productCopy, localizePath, buildAlternates, type Locale } from '../../../lib/i18n';
+import { productCopy, localizePath, withBase, buildAlternates, type Locale } from '../../../lib/i18n';
+import { products } from '../../../config/products';
 
 export function getStaticPaths() {
   return products.map((p: typeof products[number]) => ({
@@ -15,7 +16,7 @@ export function getStaticPaths() {
 
 const { product, locale } = Astro.props;
 const c = productCopy[locale];
-const docsHref = localizePath(`/${product.slug}/docs`, locale);
+const docsHref = withBase(localizePath(`/${product.slug}/docs`, locale));
 const alternates = buildAlternates(`/${product.slug}`);
 ---
 

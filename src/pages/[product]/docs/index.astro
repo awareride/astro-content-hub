@@ -3,7 +3,8 @@
 // Generic product docs overview page (default locale: en).
 import DocsLayout from '../../../components/DocsLayout.astro';
 import { getLocalizedDocIndex } from '../../../lib/content';
-import { buildAlternates, products } from '../../../lib/i18n';
+import { buildAlternates, withBase } from '../../../lib/i18n';
+import { products } from '../../../config/products';
 
 export function getStaticPaths() {
   return products.map((p) => ({
@@ -15,7 +16,7 @@ export function getStaticPaths() {
 const { product } = Astro.props;
 const basePath = `/${product}/docs`;
 const page = await getLocalizedDocIndex(product, 'en', basePath);
-if (!page) return Astro.redirect(basePath);
+if (!page) return Astro.redirect(withBase(basePath));
 const { Content, title, description, navItems, isFallback } = page;
 const alternates = buildAlternates(basePath);
 ---

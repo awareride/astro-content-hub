@@ -5,7 +5,7 @@
 import Layout from './Layout.astro';
 import Nav from './Nav.astro';
 import Footer from './Footer.astro';
-import { t, type Locale, defaultLocale } from '../lib/i18n';
+import { t, type Locale, defaultLocale, withBase, stripBase } from '../lib/i18n';
 
 export interface NavItem {
   href: string;
@@ -38,11 +38,11 @@ const {
 } = Astro.props;
 
 const ui = t[locale];
-const currentPath = Astro.url.pathname.replace(/\/$/, '');
+const currentPath = stripBase(Astro.url.pathname).replace(/\/$/, '');
 
 // Localized home/product links.
-const homeHref = locale === defaultLocale ? '/' : `/${locale}/`;
-const localizedProductHref = locale === defaultLocale ? productHref : `/${locale}${productHref}`;
+const homeHref = withBase(locale === defaultLocale ? '/' : `/${locale}/`);
+const localizedProductHref = withBase(locale === defaultLocale ? productHref : `/${locale}${productHref}`);
 ---
 
 <Layout title={title} description={description} locale={locale} alternates={alternates}>
@@ -68,7 +68,7 @@ const localizedProductHref = locale === defaultLocale ? productHref : `/${locale
             navItems.length > 0 ? (
               navItems.map(item => (
                 <a
-                  href={item.href}
+                  href={withBase(item.href)}
                   class:list={[{ active: currentPath === item.href.replace(/\/$/, '') }]}
                 >
                   {item.label}

@@ -6,7 +6,8 @@ import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import PostCard from '../../components/PostCard.astro';
 import { getLocalizedPosts } from '../../lib/content';
-import { home, localizePath, buildAlternates, products } from '../../lib/i18n';
+import { home, localizePath, withBase, buildAlternates } from '../../lib/i18n';
+import { products } from '../../config/products';
 
 const c = home.zh;
 const items = await getLocalizedPosts('zh');
@@ -34,7 +35,7 @@ const alternates = buildAlternates('/');
           <a href="https://github.com" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
             {c.ctaGithub}
           </a>
-          <a href="/zh/astro-content-hub/docs" class="btn btn-secondary">{c.ctaProjects}</a>
+          <a href={withBase('/zh/astro-content-hub/docs')} class="btn btn-secondary">{c.ctaProjects}</a>
         </div>
       </div>
     </section>
@@ -63,7 +64,7 @@ const alternates = buildAlternates('/');
               ))}
             </div>
             <div style="text-align:center; margin-top:2rem;">
-              <a href={localizePath('/posts', 'zh')} class="btn btn-secondary">{c.allPosts}</a>
+              <a href={withBase(localizePath('/posts', 'zh'))} class="btn btn-secondary">{c.allPosts}</a>
             </div>
           </div>
         </section>
@@ -128,7 +129,7 @@ const alternates = buildAlternates('/');
                 </div>
                 <h3>{p.name}</h3>
                 <div class="project-actions">
-                  <a href={localizePath(`/${p.slug}`, 'zh')} class="btn btn-primary">{c.learnMore}</a>
+                  <a href={withBase(localizePath(`/${p.slug}`, 'zh'))} class="btn btn-primary">{c.learnMore}</a>
                   <a href={p.github} class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
                     GitHub
                   </a>

@@ -1,17 +1,18 @@
 ---
 // src/components/Footer.astro
 // Locale is inferred from the URL pathname, matching Nav.
-import { localeFromPath, localizePath, t, siteName, products } from '../lib/i18n';
+import { localeFromPath, localizePath, withBase, t, siteName } from '../lib/i18n';
+import { products } from '../config/products';
 
 const locale = localeFromPath(Astro.url.pathname);
 const ui = t[locale];
-const homeHref = localizePath('/', locale);
+const homeHref = withBase(localizePath('/', locale));
 ---
 <footer class="site-footer">
   <div class="container footer-grid">
     <div>
       <a href={homeHref} class="logo">
-        <span class="logo-mark"><img src="/images/logo.png" alt="" width="28" height="28" /></span>
+        <span class="logo-mark"><img src={withBase('/images/logo.png')} alt="" width="28" height="28" /></span>
         <span class="logo-text">{siteName}</span>
       </a>
       <p class="footer-tagline">{ui.footerTagline}</p>
@@ -27,7 +28,7 @@ const homeHref = localizePath('/', locale);
       <h4>{ui.projects}</h4>
       <ul class="footer-links">
         {products.map((p) => (
-          <li><a href={localizePath(`/${p.slug}`, locale)}>{p.name}</a></li>
+          <li><a href={withBase(localizePath(`/${p.slug}`, locale))}>{p.name}</a></li>
         ))}
       </ul>
     </div>

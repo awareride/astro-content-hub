@@ -5,7 +5,7 @@ import Layout from '../../../components/Layout.astro';
 import Nav from '../../../components/Nav.astro';
 import Footer from '../../../components/Footer.astro';
 import { getPostLocalizedPaths, renderLocalizedPost } from '../../../lib/content';
-import { buildAlternates, localeCode } from '../../../lib/i18n';
+import { buildAlternates, localeCode, withBase } from '../../../lib/i18n';
 
 export async function getStaticPaths() {
   return getPostLocalizedPaths('zh');
@@ -13,7 +13,7 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.props;
 const page = await renderLocalizedPost('zh', slug);
-if (!page) return Astro.redirect('/zh/posts');
+if (!page) return Astro.redirect(withBase('/zh/posts'));
 const { Content, data, isFallback } = page;
 const { title, date, description, tags, author, source } = data;
 const alternates = buildAlternates(`/posts/${slug}`);
@@ -30,7 +30,7 @@ const formattedDate = date.toLocaleDateString(localeCode.zh, {
 
   <main>
     <article class="article">
-      <a href="/zh/posts" class="article-back">← 全部文章</a>
+      <a href={withBase('/zh/posts')} class="article-back">← 全部文章</a>
 
       <header class="article-header">
         <time class="article-date" datetime={date.toISOString()}>{formattedDate}</time>

@@ -7,7 +7,7 @@ import Layout from '../../components/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import { renderLocalizedPost } from '../../lib/content';
-import { buildAlternates, localeCode } from '../../lib/i18n';
+import { buildAlternates, localeCode, withBase } from '../../lib/i18n';
 
 export async function getStaticPaths() {
   const { getPostLocalizedPaths } = await import('../../lib/content');
@@ -16,7 +16,7 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.props;
 const page = await renderLocalizedPost('en', slug);
-if (!page) return Astro.redirect('/posts');
+if (!page) return Astro.redirect(withBase('/posts'));
 const { Content, data } = page;
 const { title, date, description, tags, author, source } = data;
 const alternates = buildAlternates(`/posts/${slug}`);
@@ -33,7 +33,7 @@ const formattedDate = date.toLocaleDateString(localeCode.en, {
 
   <main>
     <article class="article">
-      <a href="/posts" class="article-back">← All Posts</a>
+      <a href={withBase('/posts')} class="article-back">← All Posts</a>
 
       <header class="article-header">
         <time class="article-date" datetime={date.toISOString()}>{formattedDate}</time>

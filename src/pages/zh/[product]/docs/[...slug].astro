@@ -3,7 +3,8 @@
 // Catch-all route for product docs (locale: zh). URL: /zh/<slug>/docs/<slug>
 import DocsLayout from '../../../../components/DocsLayout.astro';
 import { getLocalizedPaths, renderLocalizedPage } from '../../../../lib/content';
-import { buildAlternates, localizePath, products } from '../../../../lib/i18n';
+import { buildAlternates, localizePath, withBase } from '../../../../lib/i18n';
+import { products } from '../../../../config/products';
 
 export async function getStaticPaths() {
   const paths: { params: { product: string; slug: string }; props: { product: string } }[] = [];
@@ -22,7 +23,7 @@ const { product } = Astro.props;
 const { slug } = Astro.params;
 const basePath = localizePath(`/${product}/docs`, 'zh');
 const page = await renderLocalizedPage(product, 'zh', slug, basePath);
-if (!page) return Astro.redirect(basePath);
+if (!page) return Astro.redirect(withBase(basePath));
 const { Content, title, description, navItems, isFallback } = page;
 // buildAlternates expects the default-locale (en) path.
 const alternates = buildAlternates(`/${product}/docs/${slug}`);

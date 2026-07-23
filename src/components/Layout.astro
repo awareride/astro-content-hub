@@ -1,7 +1,7 @@
 ---
 // src/components/Layout.astro
 import '../styles/global.css';
-import { defaultLocale, siteName, type Locale } from '../lib/i18n';
+import { defaultLocale, siteName, withBase, type Locale } from '../lib/i18n';
 
 export interface Props {
   title: string;
@@ -44,7 +44,7 @@ const abs = (p: string) => (p.startsWith('http') ? p : `${site}${p}`);
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
   <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="icon" type="image/x-icon" href={withBase('/favicon.ico')} />
 </head>
 <body>
   <slot />
