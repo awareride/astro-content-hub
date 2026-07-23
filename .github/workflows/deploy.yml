@@ -1,5 +1,10 @@
 name: Deploy
 
+# Template deploy config — NOT wired to any live target.
+# Replace the <CF_PROJECT> project name and the CLOUDFLARE_* secrets with your
+# own before enabling. The GitHub Pages job works once Pages is enabled on the
+# repo. Run manually via the Actions tab ("Run workflow").
+
 on:
   # Manual only - no longer triggers on push to main. Run via the Actions
   # tab ("Run workflow") when a deploy is desired.
@@ -64,13 +69,13 @@ jobs:
           path: dist
 
       - name: Create Pages project if not exists
-        run: npx wrangler pages project create awareride --production-branch=main 2>/dev/null || true
+        run: npx wrangler pages project create <CF_PROJECT> --production-branch=main 2>/dev/null || true
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Deploy to Cloudflare Pages
-        run: npx wrangler pages deploy dist --project-name=awareride --branch=main
+        run: npx wrangler pages deploy dist --project-name=<CF_PROJECT> --branch=main
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

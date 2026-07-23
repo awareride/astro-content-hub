@@ -58,8 +58,10 @@ When in doubt, ask. "I think this is safe" is not authorization.
 
 ## Project architecture
 
-AwareRide's website is a static site built with **Astro 7** (static output),
+`astro-content-hub` is a static site built with **Astro 7** (static output),
 deployed to GitHub Pages and Cloudflare Pages from `main` via GitHub Actions.
+It is a **content-hub template**: the site aggregates docs and posts from many
+repositories, synced in via pull requests.
 
 ### Tech stack
 - **Framework**: Astro (`output: 'static'`), TypeScript, no UI framework.
@@ -81,17 +83,26 @@ src/
   styles/global.css
 .astro/            Generated types (do not edit)
 .github/workflows/ CI: build + deploy to GH Pages & Cloudflare Pages
-awareride-content-sync/  Content-sync skill for external projects; sync
-                         workflow templates live in its templates/
+examples/          Sample external repos that sync INTO the hub:
+                   my-posts/ (posts) and vite-docs/ astro-docs/
+                   json-server-docs/ (one docs repo per product). Each carries a
+                   skills/site-content-sync/ skill and sync workflow templates.
+skills/site-content/  Per-hub authoring skill (docs in this repo).
 public/            Static assets served as-is (favicon, images, CNAME)
 ```
 
 ### Pages & routing
 - `/` — landing page (`src/pages/index.astro`).
 - `/posts`, `/posts/[...slug]` — blog listing + catch-all article route.
-- `/packscope` — product page.
-- `/packscope/docs`, `/packscope/docs/[...slug]` — docs index + catch-all route
-  rendering Markdown from the `packscopeDocs` collection.
+- `/<product>` — product landing page, served dynamically from the `products`
+  array in `src/lib/i18n.ts` (`src/pages/[product]/index.astro`).
+- `/<product>/docs`, `/<product>/docs/[...slug]` — docs index + catch-all route
+  rendering Markdown from the `<product>Docs<Locale>` collections. The `zh`
+  mirror lives under `src/pages/zh/`.
+
+Products are data-driven: add an entry to `products` in `src/lib/i18n.ts` and
+content under `src/content/docs/<product>/<locale>/`; no per-product route
+files are required.
 
 ### Layout composition
 - `Layout.astro` owns the document shell (`<html>/<head>/<body>`, fonts, meta,
@@ -108,7 +119,8 @@ Defined in `src/content.config.ts` with zod schemas:
 - `posts` — `src/content/posts/**/*.md`. Schema: `title`, `date`, `description`,
   `tags`, `author?`, `source?`, `draft?`. Nested dirs are supported (id is the
   path relative to the collection base).
-- `packscopeDocs` — `src/content/docs/packscope/**/*.md`. Schema: `title`,
+- `<product>Docs<Locale>` — `src/content/docs/<product>/<locale>/**/*.md`,
+  auto-generated per product in the `products` array. Schema: `title`,
   `description?`, `order` (controls sidebar sort, `index` always first).
 
 Markdown is rendered via `render(entry)` from `astro:content`; pages pass
@@ -128,7 +140,8 @@ Markdown is rendered via `render(entry)` from `astro:content`; pages pass
 - `.github/workflows/deploy.yml` is triggered manually (workflow_dispatch):
   it builds, then deploys `dist/` to GitHub Pages and (via wrangler) Cloudflare
   Pages. It no longer runs automatically on push to `main`.
-- The site domain is `open.awareride.com` (`public/CNAME`).
+- The site domain is a placeholder `example.com` (`public/CNAME`); set it to
+  your domain in `astro.config.mjs` `site` and `public/CNAME`.
 
 ## Coding conventions
 - Keep components small and composable; prefer passing props over globals.
