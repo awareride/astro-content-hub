@@ -1,6 +1,6 @@
 # my-posts (example content repo)
 
-This is a **sample external repo** for the [`astro-content-hub`](https://github.com/example/astro-content-hub)
+This is a **sample external repo** for the [`astro-content-hub`](https://github.com/awareride/astro-content-hub)
 template. It shows how to author blog posts in a separate repository and sync
 them into the hub via a pull request.
 

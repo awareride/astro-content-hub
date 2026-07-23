@@ -10,13 +10,26 @@ infrastructure.
 
 ## Before you deploy
 
-1. **Set your domain.** In `astro.config.mjs`, change `site` from
-   `https://example.com` to your real domain. This value is used to build
-   absolute URLs and `hreflang` alternates.
-2. **Set the site name.** In `src/lib/i18n.ts`, change `siteName` from
-   `SiteName` to your project's name. It appears in `<title>`, nav, and footer.
-3. **Set the CNAME.** Replace `example.com` in `public/CNAME` with your domain
-   (only needed for GitHub Pages custom domains).
+1. **Set your site URL.** In `astro.config.mjs`, set `site` to your deployed
+   origin - for example `https://your-name.github.io/astro-content-hub` (a
+   GitHub Pages project site) or `https://your-domain.com` (a custom domain).
+   It drives canonical, Open Graph, and `hreflang` absolute URLs. The
+   template ships with the awareride project URL as a sample.
+2. **Set the site name.** In `src/lib/i18n.ts`, set `siteName` (default
+   `'Astro Content Hub'`) to your project's name. It appears in `<title>`, the
+   nav, and the footer.
+3. **Match your deploy target to your URL.** The template builds
+   **root-absolute** links and asset paths (`/posts`, `/_astro/...`,
+   `/favicon.ico`), so it works out of the box at a **site root**:
+   - **Cloudflare Pages** (`<project>.pages.dev`) or a **custom domain** on
+     GitHub Pages - no extra path config. For a GitHub Pages custom domain,
+     add a `public/CNAME` file containing your domain (the template ships
+     none by default).
+   - **GitHub Pages project path** (`https://<owner>.github.io/<repo>/`) is a
+     **sub-path** deploy: set `base: '/<repo>/'` in `astro.config.mjs` and
+     prefix every root-absolute link and asset with `import.meta.env.BASE_URL`.
+     (The template uses root-absolute paths by default, so a root or
+     custom-domain deploy is the simplest path.)
 4. **Replace sample content.** Delete the sample posts and docs under
    `src/content/` and add your own (see
    [Authoring](./authoring.md)).
@@ -40,7 +53,10 @@ The workflow has three jobs:
 - In the repo **Settings → Pages**, set the source to "GitHub Actions".
 - Run the workflow from the Actions tab ("Run workflow").
 - The live URL is `https://<owner>.github.io/<repo>/` unless you've set a
-  custom domain via `public/CNAME`.
+  custom domain via `public/CNAME`. The project path is a sub-path deploy -
+  see step 3 above: it needs `base: '/<repo>/'` and base-aware links. A
+  custom domain (with `public/CNAME`) deploys at the root and needs no
+  `base`.
 
 ## Enable Cloudflare Pages
 

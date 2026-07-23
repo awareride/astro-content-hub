@@ -28,9 +28,6 @@
 name: Sync Docs to AwareRide Hub
 
 on:
-  push:
-    branches: [main]
-    paths: ['docs/**']
   workflow_dispatch:
 
 jobs:

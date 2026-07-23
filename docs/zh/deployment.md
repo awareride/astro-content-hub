@@ -9,13 +9,21 @@ Pages**。本页介绍如何将该模板指向你自己的基础设施。
 
 ## 部署前
 
-1. **设置你的域名。** 在 `astro.config.mjs` 中,将 `site` 从
-   `https://example.com` 改为你的真实域名。该值用于构建绝对 URL 与 `hreflang`
-   备用链接。
-2. **设置站点名称。** 在 `src/lib/i18n.ts` 中,将 `siteName` 从 `SiteName` 改为
-   你的项目名称。它会出现在 `<title>`、导航与页脚中。
-3. **设置 CNAME。** 将 `public/CNAME` 中的 `example.com` 替换为你的域名
-   (仅在使用 GitHub Pages 自定义域名时需要)。
+1. **设置站点 URL。** 在 `astro.config.mjs` 中,将 `site` 设为你的部署源 -- 例如
+   GitHub Pages 项目站点 `https://your-name.github.io/astro-content-hub`,或自定义域名
+   `https://your-domain.com`。该值用于构建规范链接、Open Graph 与 `hreflang`
+   绝对 URL。模板默认填入 awareride 项目地址作为示例。
+2. **设置站点名称。** 在 `src/lib/i18n.ts` 中,将 `siteName`(默认
+   `'Astro Content Hub'`)改为你的项目名称。它会出现在 `<title>`、导航与页脚中。
+3. **按你的 URL 选择部署目标。** 模板生成**根绝对**链接与资源路径
+   (`/posts`、`/_astro/...`、`/favicon.ico`),因此在**站点根目录**下可直接使用:
+   - **Cloudflare Pages**(`<project>.pages.dev`)或 GitHub Pages 的**自定义域名**
+     -- 无需额外路径配置。若使用 GitHub Pages 自定义域名,请新建 `public/CNAME`
+     文件并写入你的域名(模板默认不提供该文件)。
+   - **GitHub Pages 项目路径**(`https://<owner>.github.io/<repo>/`)属于**子路径**
+     部署:需在 `astro.config.mjs` 中设置 `base: '/<repo>/'`,并将所有根绝对链接与
+     资源路径加上 `import.meta.env.BASE_URL` 前缀。(模板默认使用根绝对路径,因此根
+     或自定义域名部署最为简单。)
 4. **替换示例内容。** 删除 `src/content/` 下的示例文章与文档,添加你自己的
    内容(参见[编写内容](./authoring.md))。
 
@@ -37,7 +45,9 @@ Pages**。本页介绍如何将该模板指向你自己的基础设施。
 - 在仓库 **Settings → Pages** 中,将来源设为 "GitHub Actions"。
 - 从 Actions 选项卡运行工作流("Run workflow")。
 - 除非你通过 `public/CNAME` 设置了自定义域名,否则线上地址为
-  `https://<owner>.github.io/<repo>/`。
+  `https://<owner>.github.io/<repo>/`。项目路径属于子路径部署 -- 参见上方第 3
+  步:需要设置 `base: '/<repo>/'` 并使用 base 感知的链接。自定义域名(配合
+  `public/CNAME`)部署在根目录,无需 `base`。
 
 ## 启用 Cloudflare Pages
 

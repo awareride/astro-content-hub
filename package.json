@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/example/astro-content-hub.git"
+    "url": "git+https://github.com/awareride/astro-content-hub.git"
   },
   "keywords": [
     "astro",
@@ -22,9 +22,9 @@
     "documentation",
     "blog"
   ],
-  "author": "",
+  "author": "awareride",
   "license": "MIT",
-  "homepage": "https://example.com",
+  "homepage": "https://awareride.github.io/astro-content-hub/",
   "dependencies": {
     "astro": "^7.1.3"
   },

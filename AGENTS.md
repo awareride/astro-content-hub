@@ -140,8 +140,12 @@ Markdown is rendered via `render(entry)` from `astro:content`; pages pass
 - `.github/workflows/deploy.yml` is triggered manually (workflow_dispatch):
   it builds, then deploys `dist/` to GitHub Pages and (via wrangler) Cloudflare
   Pages. It no longer runs automatically on push to `main`.
-- The site domain is a placeholder `example.com` (`public/CNAME`); set it to
-  your domain in `astro.config.mjs` `site` and `public/CNAME`.
+- The deployed origin is set in `astro.config.mjs` `site` (sample:
+  `https://awareride.github.io/astro-content-hub`). The template uses
+  root-absolute links, so a root deploy (custom domain / Cloudflare Pages)
+  needs no `base`; a GitHub Pages project path (`/<repo>/`) requires
+  `base: '/<repo>/'` plus base-aware link/asset helpers. A GitHub Pages custom
+  domain uses `public/CNAME` (not shipped by default).
 
 ## Coding conventions
 - Keep components small and composable; prefer passing props over globals.
