@@ -54,8 +54,9 @@ Pages**。本页介绍如何将该模板指向你自己的基础设施。
 1. 在仓库(**Settings → Secrets and variables → Actions**)中创建 API token 与
    account ID 密钥:`CLOUDFLARE_API_TOKEN`(具有 Pages 部署权限)与
    `CLOUDFLARE_ACCOUNT_ID`。
-2. 在 `deploy.yml` 中,将 `<CF_PROJECT>` 替换为你的 Cloudflare Pages 项目名
-   (在 `project create` 与 `pages deploy` 两步中都要替换)。
+2. 将仓库变量 `CF_PROJECT` 设为你的 Cloudflare Pages 项目名
+   (**Settings -> Secrets and variables -> Actions -> Variables**)。`deploy-cf-pages`
+   作业以它为开关:若不设置,则仅部署到 GitHub Pages。
 3. 运行工作流。`wrangler pages project create` 步骤是幂等的(`|| true`),因此
    重复运行是安全的。
 

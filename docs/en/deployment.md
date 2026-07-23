@@ -64,8 +64,10 @@ The workflow has three jobs:
    (**Settings → Secrets and variables → Actions**):
    `CLOUDFLARE_API_TOKEN` (with Pages deploy permission) and
    `CLOUDFLARE_ACCOUNT_ID`.
-2. In `deploy.yml`, replace `<CF_PROJECT>` with your Cloudflare Pages project
-   name (in both the `project create` and `pages deploy` steps).
+2. Set a repository variable `CF_PROJECT` to your Cloudflare Pages project name
+   (**Settings -> Secrets and variables -> Actions -> Variables**). The
+   `deploy-cf-pages` job is gated on it: leave it unset to deploy to GitHub
+   Pages only.
 3. Run the workflow. The `wrangler pages project create` step is idempotent
    (`|| true`), so re-runs are safe.
 
