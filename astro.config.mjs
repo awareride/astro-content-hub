@@ -13,7 +13,7 @@ export default defineConfig({
   // Full deployed URL (origin + sub-path, no trailing slash) for canonical,
   // Open Graph, and hreflang absolute URLs. For a project-path deploy the
   // sub-path here must match `base` below.
-  site: 'https://awareride.github.io',
+  site: 'https://awareride.github.io/astro-content-hub',
   base,
   output: 'static',
 
