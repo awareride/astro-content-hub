@@ -1,0 +1,51 @@
+---
+// src/components/PostCard.astro
+import { localizePath, t, localeCode, type Locale } from '../lib/i18n';
+
+export interface Props {
+  title: string;
+  date: Date;
+  description: string;
+  tags: string[];
+  slug: string;
+  source?: string | null;
+  locale?: Locale;
+  isFallback?: boolean;
+}
+
+const {
+  title,
+  date,
+  description,
+  tags,
+  slug,
+  source,
+  locale = 'en',
+  isFallback = false,
+} = Astro.props;
+
+const ui = t[locale];
+
+const formattedDate = date.toLocaleDateString(localeCode[locale], {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+const href = localizePath(`/posts/${slug}`, locale);
+---
+
+<a href={href} class="post-card">
+  {source && <span class="post-card-source">{source}</span>}
+  <time class="post-card-date" datetime={date.toISOString()}>{formattedDate}</time>
+  <h3>
+    {title}
+    {isFallback && <span class="post-card-fallback" title={ui.noTranslation}>EN</span>}
+  </h3>
+  <p>{description}</p>
+  {tags.length > 0 && (
+    <div class="post-card-tags">
+      {tags.map(tag => <span class="tag">{tag}</span>)}
+    </div>
+  )}
+</a>

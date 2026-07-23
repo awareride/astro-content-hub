@@ -1,0 +1,121 @@
+---
+// src/components/DocsLayout.astro
+// Layout for documentation pages — reuses site shell (Layout/Nav/Footer)
+// and adds a sidebar + content region. Markdown uses the shared .prose styles.
+import Layout from './Layout.astro';
+import Nav from './Nav.astro';
+import Footer from './Footer.astro';
+import { t, type Locale, defaultLocale } from '../lib/i18n';
+
+export interface NavItem {
+  href: string;
+  label: string;
+}
+
+export interface Props {
+  title: string;
+  description?: string;
+  sidebarTitle?: string;
+  productName?: string;
+  productHref?: string;
+  navItems?: NavItem[];
+  basePath?: string;
+  locale?: Locale;
+  isFallback?: boolean;
+  alternates?: Partial<Record<Locale, string>>;
+}
+
+const {
+  title,
+  description,
+  sidebarTitle,
+  productName = 'Packscope',
+  productHref = '/packscope',
+  navItems = [],
+  locale = defaultLocale,
+  isFallback = false,
+  alternates,
+} = Astro.props;
+
+const ui = t[locale];
+const currentPath = Astro.url.pathname.replace(/\/$/, '');
+
+// Localized home/product links.
+const homeHref = locale === defaultLocale ? '/' : `/${locale}/`;
+const localizedProductHref = locale === defaultLocale ? productHref : `/${locale}${productHref}`;
+---
+
+<Layout title={title} description={description} locale={locale} alternates={alternates}>
+  <Nav alternates={alternates} />
+
+  <main>
+    <div class="docs-page">
+      <aside class="docs-sidebar" id="docs-sidebar">
+        <button
+          class="docs-nav-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="docs-sidebar-nav"
+        >
+          <span>{sidebarTitle}</span>
+          <svg class="docs-nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
+        </button>
+        <nav class="docs-sidebar-nav" id="docs-sidebar-nav">
+          <h4>{sidebarTitle}</h4>
+          {
+            navItems.length > 0 ? (
+              navItems.map(item => (
+                <a
+                  href={item.href}
+                  class:list={[{ active: currentPath === item.href.replace(/\/$/, '') }]}
+                >
+                  {item.label}
+                </a>
+              ))
+            ) : (
+              <p style="color: var(--color-text-muted); font-size: 0.85rem;">{ui.noPages}</p>
+            )
+          }
+        </nav>
+      </aside>
+
+      <div class="docs-main">
+        <div class="docs-breadcrumb">
+          <a href={homeHref}>{ui.home}</a> / <a href={localizedProductHref}>{productName}</a> / <span>{title}</span>
+        </div>
+
+        <article class="prose">
+          <h1>{title}</h1>
+          {isFallback && ui.fallbackNotice && (
+            <p class="fallback-notice" role="note">{ui.fallbackNotice}</p>
+          )}
+          <slot />
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
+
+<script>
+  // Collapsible docs sidebar (mobile only). On desktop the sidebar is always
+  // visible and the toggle button is hidden.
+  const sidebar = document.getElementById('docs-sidebar');
+  const toggle = sidebar?.querySelector<HTMLButtonElement>('.docs-nav-toggle');
+  if (sidebar && toggle) {
+    const setOpen = (open: boolean) => {
+      sidebar.classList.toggle('open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+    };
+    toggle.addEventListener('click', () => {
+      setOpen(!sidebar.classList.contains('open'));
+    });
+    // Collapse after navigating via a sidebar link (full page load follows).
+    sidebar.querySelectorAll('.docs-sidebar-nav a').forEach((a) => {
+      a.addEventListener('click', () => setOpen(false));
+    });
+  }
+</script>
