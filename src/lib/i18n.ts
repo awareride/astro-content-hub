@@ -23,7 +23,7 @@ export interface Product {
 }
 
 export const products: Product[] = [
-  { slug: 'astro-content-hub', name: 'Astro Content Hub', github: 'https://github.com/awareride/astro-content-hub', badges: ['Astro', 'ContentHub'], nav: false, base: '.docs' },
+  { slug: 'astro-content-hub', name: 'Astro Content Hub', github: 'https://github.com/awareride/astro-content-hub', badges: ['Astro', 'ContentHub'], nav: false, base: './docs' },
   { slug: 'vite', name: 'Vite', github: 'https://github.com/vitejs/vite', badges: ['Build Tool', 'JavaScript'], nav: false },
   { slug: 'astro', name: 'Astro', github: 'https://github.com/withastro/astro', badges: ['Web Framework', 'JavaScript'], nav: false },
   { slug: 'json-server', name: 'JSON Server', github: 'https://github.com/typicode/json-server', badges: ['Mock API', 'Node'], nav: false },

@@ -7,9 +7,9 @@ import { locales, cap, products } from './lib/i18n';
 // array in lib/i18n.ts so the landing page and content collections stay in
 // sync. Adding a product there auto-generates `<product>Docs<Locale>`
 // collections for every locale. A product may set `base` to point its docs
-// collection at a non-default directory (e.g. '.docs' => ./docs/<locale>/,
-// used by content synced in from an external repo); otherwise docs live under
-// ./src/content/docs/<slug>/<locale>/.
+// collection at a non-default directory (a path relative to the repo root,
+// e.g. './docs' => ./docs/<locale>/, used by content synced in from an
+// external repo); otherwise docs live under ./src/content/docs/<slug>/<locale>/.
 
 const docSchema = z.object({
   title: z.string(),
@@ -21,13 +21,9 @@ function makeDocCollections(): Record<string, ReturnType<typeof defineCollection
   const out: Record<string, ReturnType<typeof defineCollection>> = {};
   for (const product of products) {
     // Default docs location is src/content/docs/<slug>/<locale>; a product may
-    // override it via `base` (relative to the repo root, e.g. '.docs' =>
-    // ./docs/<locale>/, used by content synced in from an external repo). A
-    // leading '.' or '/' in `base` is normalized away.
-    const baseSegment = product.base ? product.base.replace(/^[./]+/, '') : product.slug;
-    const baseDir = product.base
-      ? `./${baseSegment}`
-      : `./src/content/docs/${product.slug}`;
+    // override it via `base` (a path relative to the repo root, e.g. './docs'
+    // => ./docs/<locale>/, used by content synced in from an external repo).
+    const baseDir = product.base ?? `./src/content/docs/${product.slug}`;
     for (const locale of locales) {
       out[`${product.slug}Docs${cap(locale)}`] = defineCollection({
         loader: glob({ pattern: '**/*.md', base: `${baseDir}/${locale}` }),

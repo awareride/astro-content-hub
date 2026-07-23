@@ -80,7 +80,7 @@ function urlForContentPath(rel) {
 
 /**
  * Compute the hub site URL for a doc file that lives in a product's `base`
- * directory (e.g. `base: '.docs'` => `<repo>/docs/<locale>/<slug>.md`). Unlike
+ * directory (e.g. `base: './docs'` => `<repo>/docs/<locale>/<slug>.md`). Unlike
  * the standard src/content layout, the <product> segment is NOT in the path;
  * it is supplied by the owning product. Same index special-casing applies.
  */
@@ -126,10 +126,10 @@ function buildUrlMap() {
     const url = urlForContentPath(rel);
     if (url) map.set(resolve(CONTENT, rel), url);
   }
-  // Products with a `base` (e.g. '.docs') keep their docs outside src/content.
+  // Products with a `base` (e.g. './docs') keep their docs outside src/content.
   for (const product of products) {
     if (!product.base) continue;
-    const baseDir = join(ROOT, product.base.replace(/^[./]+/, ''));
+    const baseDir = join(ROOT, product.base);
     for (const rel of listMdRel(baseDir)) {
       const url = urlForBaseDoc(product.slug, rel);
       if (url) map.set(resolve(baseDir, rel), url);
