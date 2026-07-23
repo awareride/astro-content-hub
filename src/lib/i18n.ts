@@ -56,9 +56,11 @@ export function buildAlternates(defaultLocalePath: string): Partial<Record<Local
   return out;
 }
 
-/** Infer the current locale from a URL pathname (default locale if no prefix matches). */
+/** Infer the current locale from a URL pathname (default locale if no prefix matches).
+ *  Strips the deploy base prefix first so locale detection works under a sub-path
+ *  deploy (e.g. /astro-content-hub/zh/ -> zh). */
 export function localeFromPath(pathname: string): Locale {
-  const m = pathname.match(/^\/([a-z]{2})(?:\/|$)/i);
+  const m = stripBase(pathname).match(/^\/([a-z]{2})(?:\/|$)/i);
   if (m && isLocale(m[1])) return m[1];
   return defaultLocale;
 }
