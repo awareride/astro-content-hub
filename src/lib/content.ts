@@ -1,6 +1,6 @@
 // Shared, locale-aware helpers for localized docs collections.
 // All product × locale collections follow the naming `<product>Docs<Locale>`
-// (e.g. `packscopeDocsZh`), generated in content.config.ts. Route files stay
+// (e.g. `viteDocsZh`), generated in content.config.ts. Route files stay
 // thin by delegating path generation and fallback rendering to these helpers.
 
 import { getCollection, render } from 'astro:content';

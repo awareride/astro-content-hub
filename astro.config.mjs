@@ -3,7 +3,9 @@ import { satteri } from '@astrojs/markdown-satteri';
 import { rewriteRelativeMdLinks } from './src/lib/remark-rewrite-links.mjs';
 
 export default defineConfig({
-  site: 'https://open.awareride.com',
+  // Set this to your deployed domain (e.g. https://your-domain.com).
+  // Used for absolute URLs in meta tags and sitemaps.
+  site: 'https://example.com',
   output: 'static',
 
   markdown: {

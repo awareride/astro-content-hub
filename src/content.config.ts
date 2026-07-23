@@ -1,11 +1,13 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
-import { locales, cap } from './lib/i18n';
+import { locales, cap, products } from './lib/i18n';
 
-// Products that ship a localized docs collection. Adding a product here
-// auto-generates `<product>Docs<Locale>` collections for every locale.
-const products = ['packscope'] as const;
+// Products that ship a localized docs collection. Driven by the `products`
+// array in lib/i18n.ts so the landing page and content collections stay in
+// sync. Adding a product there auto-generates `<product>Docs<Locale>`
+// collections for every locale.
+const productSlugs = products.map((p) => p.slug) as string[];
 
 const docSchema = z.object({
   title: z.string(),
@@ -15,7 +17,7 @@ const docSchema = z.object({
 
 function makeDocCollections(): Record<string, ReturnType<typeof defineCollection>> {
   const out: Record<string, ReturnType<typeof defineCollection>> = {};
-  for (const product of products) {
+  for (const product of productSlugs) {
     for (const locale of locales) {
       out[`${product}Docs${cap(locale)}`] = defineCollection({
         loader: glob({ pattern: '**/*.md', base: `./src/content/docs/${product}/${locale}` }),

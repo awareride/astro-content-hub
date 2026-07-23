@@ -1,8 +1,8 @@
 {
-  "name": "awareride.github.io",
+  "name": "astro-content-hub",
   "version": "1.0.0",
   "type": "module",
-  "description": "AwareRide open source hub — landing page, product showcase, and technical docs.",
+  "description": "A content hub template: aggregate docs and posts from many open-source repos into one localized, auto-deployed static site.",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -12,17 +12,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/awareride/awareride.github.io.git"
+    "url": "git+https://github.com/example/astro-content-hub.git"
   },
   "keywords": [
-    "open-source",
-    "perception",
-    "spatial-intelligence",
-    "wellness"
+    "astro",
+    "content-hub",
+    "static-site",
+    "i18n",
+    "documentation",
+    "blog"
   ],
-  "author": "AwareRide",
+  "author": "",
   "license": "MIT",
-  "homepage": "https://open.awareride.com",
+  "homepage": "https://example.com",
   "dependencies": {
     "astro": "^7.1.3"
   },

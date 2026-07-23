@@ -6,7 +6,7 @@
 // On the hub, Astro's Markdown processor does NOT rewrite body markdown links, so
 // a raw `./getting-started.md` would render as `href="./getting-started.md"` and
 // 404. This plugin turns such links into the correct hub route
-// (e.g. `/packscope/docs/getting-started`) at build time, with no source edits.
+// (e.g. `/vite/docs/getting-started`) at build time, with no source edits.
 //
 // Scope (what gets rewritten):
 //   - Relative links whose target ends in `.md` (with optional `#anchor`).
@@ -146,7 +146,7 @@ function rewriteLinkNode(node, ctx) {
  * handler receives (node, ctx) and may mutate the node via ctx methods.
  */
 export const rewriteRelativeMdLinks = {
-  name: 'awareride-rewrite-relative-md-links',
+  name: 'content-hub-rewrite-relative-md-links',
   link(node, ctx) {
     rewriteLinkNode(node, ctx);
   },
