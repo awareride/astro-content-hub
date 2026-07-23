@@ -4,8 +4,6 @@ description: "Get a full fake REST API with zero coding in seconds."
 order: 0
 ---
 
-# JSON Server
-
 JSON Server lets you create a fake REST API from a JSON file with essentially no
 code. It is commonly used for prototyping and for front-end development when the
 real backend is not ready yet.

@@ -4,8 +4,6 @@ description: "Type-safe Markdown and data loading in Astro."
 order: 2
 ---
 
-# Content Collections
-
 Content collections let you organize Markdown and data files with a schema. Astro
 validates frontmatter at build time and gives you typed entries.
 

@@ -4,8 +4,6 @@ description: "创建新的 Astro 项目并启动开发服务器。"
 order: 1
 ---
 
-# 快速开始
-
 初始化新项目:
 
 ```bash

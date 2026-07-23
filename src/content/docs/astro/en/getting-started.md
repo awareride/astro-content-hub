@@ -4,8 +4,6 @@ description: "Create a new Astro project and run the dev server."
 order: 1
 ---
 
-# Getting Started
-
 Scaffold a new project:
 
 ```bash

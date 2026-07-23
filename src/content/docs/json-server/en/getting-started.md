@@ -4,8 +4,6 @@ description: "Spin up a mock REST API from a JSON file."
 order: 1
 ---
 
-# Getting Started
-
 Create a `db.json` with some data:
 
 ```json

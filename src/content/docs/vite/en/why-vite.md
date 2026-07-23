@@ -4,8 +4,6 @@ description: "The problems Vite solves compared to traditional bundler-based too
 order: 2
 ---
 
-# Why Vite
-
 Traditional bundlers process the entire application before the browser can load a
 single page. As the project grows, startup and hot-reload get slower.
 

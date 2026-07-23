@@ -4,8 +4,6 @@ description: "JSON Server 提供的路由、关系与查询特性。"
 order: 2
 ---
 
-# 构建假 API
-
 JSON Server 从 `db.json` 的结构推断路由。每个顶层数组都成为一个支持完整 CRUD 的资源。
 
 常用查询特性:

@@ -4,8 +4,6 @@ description: "The web framework for content-driven websites."
 order: 0
 ---
 
-# Astro
-
 Astro is the web framework for building content-driven websites like blogs,
 marketing sites, and documentation. It ships **zero JavaScript by default** and
 lets you use components from React, Vue, Svelte, and more — only hydrating the

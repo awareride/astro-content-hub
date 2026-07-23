@@ -4,8 +4,6 @@ description: "Astro 中带类型安全的 Markdown 与数据加载。"
 order: 2
 ---
 
-# 内容集合
-
 内容集合让你用 schema 来组织 Markdown 与数据文件。Astro 在构建时校验 frontmatter,
 并为你提供带类型的条目。
 

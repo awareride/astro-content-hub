@@ -4,8 +4,6 @@ description: "Next-generation frontend tooling — a dev server and build tool."
 order: 0
 ---
 
-# Vite
-
 Vite (French for "fast", pronounced `/vit/`) is a build tool that aims to provide a
 faster and leaner development experience for modern web projects.
 

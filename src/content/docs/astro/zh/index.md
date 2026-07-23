@@ -4,8 +4,6 @@ description: "面向内容驱动型网站的 Web 框架。"
 order: 0
 ---
 
-# Astro
-
 Astro 是构建内容驱动型网站(如博客、营销站与文档)的 Web 框架。它**默认不发送任何
 JavaScript**,并允许你使用 React、Vue、Svelte 等组件 —— 仅对需要交互的部分进行水合。
 

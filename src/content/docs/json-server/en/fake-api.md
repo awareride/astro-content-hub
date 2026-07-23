@@ -4,8 +4,6 @@ description: "Routes, relationships, and query features JSON Server provides."
 order: 2
 ---
 
-# Building a fake API
-
 JSON Server infers routes from the shape of your `db.json`. Each top-level array
 becomes a resource with full CRUD support.
 

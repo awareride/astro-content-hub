@@ -4,8 +4,6 @@ description: "从一个 JSON 文件启动一个模拟 REST API。"
 order: 1
 ---
 
-# 快速开始
-
 创建一个包含数据的 `db.json`:
 
 ```json

@@ -4,8 +4,6 @@ description: "几秒钟内获得一个无需编码的完整假 REST API。"
 order: 0
 ---
 
-# JSON Server
-
 JSON Server 让你用几乎零代码,从一个 JSON 文件创建假的 REST API。它常用于原型设计,
 以及后端尚未就绪时的前端开发。
 
