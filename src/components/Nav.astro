@@ -37,7 +37,7 @@ const githubHref = 'https://github.com';
         <ul class="nav-menu-primary">
           <li><a href={projectsHref}>{ui.projects}</a></li>
           <li><a href={postsHref}>{ui.posts}</a></li>
-          {products.map((p) => (
+          {products.filter(p => p.nav === true).map((p) => (
             <li><a href={localizePath(`/${p.slug}`, locale)}>{p.name}</a></li>
           ))}
         </ul>

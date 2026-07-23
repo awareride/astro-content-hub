@@ -18,12 +18,15 @@ export interface Product {
   name: string;
   github: string;
   badges: string[];
+  base?: string;
+  nav: boolean;
 }
 
 export const products: Product[] = [
-  { slug: 'vite', name: 'Vite', github: 'https://github.com/vitejs/vite', badges: ['Build Tool', 'JavaScript'] },
-  { slug: 'astro', name: 'Astro', github: 'https://github.com/withastro/astro', badges: ['Web Framework', 'JavaScript'] },
-  { slug: 'json-server', name: 'JSON Server', github: 'https://github.com/typicode/json-server', badges: ['Mock API', 'Node'] },
+  { slug: 'astro-content-hub', name: 'Astro Content Hub', github: 'https://github.com/awareride/astro-content-hub', badges: ['Astro', 'ContentHub'], nav: false, base: '.docs' },
+  { slug: 'vite', name: 'Vite', github: 'https://github.com/vitejs/vite', badges: ['Build Tool', 'JavaScript'], nav: false },
+  { slug: 'astro', name: 'Astro', github: 'https://github.com/withastro/astro', badges: ['Web Framework', 'JavaScript'], nav: false },
+  { slug: 'json-server', name: 'JSON Server', github: 'https://github.com/typicode/json-server', badges: ['Mock API', 'Node'], nav: false },
 ];
 
 export function isLocale(x: string): x is Locale {
@@ -117,7 +120,7 @@ export const home = {
     heroTitleB: 'docs and posts.',
     heroLead: 'Publish documentation and blog posts from many repositories into a single, fast, localized static site. Content ships through pull requests, so nothing lands on main without review.',
     ctaGithub: 'View on GitHub',
-    ctaProjects: 'View Projects',
+    ctaProjects: 'Documentation',
     latestEyebrow: 'Latest',
     latestTitle: 'From the blog',
     allPosts: 'All Posts →',
@@ -155,7 +158,7 @@ export const home = {
     heroTitleB: '文档与文章的中心。',
     heroLead: '将多个仓库中的文档与博客文章发布到同一个快速、本地化的静态站点。内容通过拉取请求进入,任何内容在上线前都经过人工审阅。',
     ctaGithub: '在 GitHub 上查看',
-    ctaProjects: '查看项目',
+    ctaProjects: '文档',
     latestEyebrow: '最新',
     latestTitle: '来自博客',
     allPosts: '全部文章 →',

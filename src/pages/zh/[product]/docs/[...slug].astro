@@ -3,12 +3,13 @@
 // Catch-all route for product docs (locale: zh). URL: /zh/<slug>/docs/<slug>
 import DocsLayout from '../../../../components/DocsLayout.astro';
 import { getLocalizedPaths, renderLocalizedPage } from '../../../../lib/content';
-import { buildAlternates, products } from '../../../../lib/i18n';
+import { buildAlternates, localizePath, products } from '../../../../lib/i18n';
 
 export async function getStaticPaths() {
   const paths: { params: { product: string; slug: string }; props: { product: string } }[] = [];
   for (const p of products) {
-    const basePath = `/${p.slug}/docs`;
+    // Locale-aware base path so the sidebar nav links stay in the /zh shell.
+    const basePath = localizePath(`/${p.slug}/docs`, 'zh');
     const localized = await getLocalizedPaths(p.slug, basePath, 'zh');
     for (const lp of localized) {
       paths.push({ params: { product: p.slug, slug: lp.params.slug }, props: { product: p.slug } });
@@ -19,11 +20,12 @@ export async function getStaticPaths() {
 
 const { product } = Astro.props;
 const { slug } = Astro.params;
-const basePath = `/${product}/docs`;
+const basePath = localizePath(`/${product}/docs`, 'zh');
 const page = await renderLocalizedPage(product, 'zh', slug, basePath);
 if (!page) return Astro.redirect(basePath);
 const { Content, title, description, navItems, isFallback } = page;
-const alternates = buildAlternates(`${basePath}/${slug}`);
+// buildAlternates expects the default-locale (en) path.
+const alternates = buildAlternates(`/${product}/docs/${slug}`);
 ---
 
 <DocsLayout

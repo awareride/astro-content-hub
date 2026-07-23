@@ -32,8 +32,34 @@ astro-content-hub/        <- this repo (the hub, at the root)
 │   ├── astro-docs/       <- astro docs example (PRODUCT=astro)
 │   └── json-server-docs/ <- json-server docs example (PRODUCT=json-server)
 ├── skills/site-content/  <- per-hub authoring skill
-└── docs/plan.md          <- the template's design plan
+└── docs/                  <- this template's documentation (plan, architecture,
+                          authoring, content-sync, deployment)
 ```
+
+## Documentation
+
+This repo's documentation renders **on this site** at
+`/astro-content-hub/docs/...` (and `/zh/astro-content-hub/docs/...` for Chinese).
+It lives in [`src/content/docs/astro-content-hub/<locale>/`](./src/content/docs/astro-content-hub)
+and is registered as a product in `src/lib/i18n.ts`, so the routes and sidebar
+are generated automatically (see [`skills/site-content`](./skills/site-content)).
+
+The same content is also mirrored under [`docs/<locale>/`](./docs) and **synced
+into the external content hub** (via `.github/workflows/sync-docs.yml`, using the
+`awareride-content-sync` skill) as the `astro-content-hub` product. Pages:
+
+- **Architecture** — the Astro site layout, routing, content collections, and
+  key modules.
+- **Authoring content** — write posts and docs directly in the hub (i18n, slug
+  contract, fallback, adding a product/locale).
+- **Content sync** — contribute content from a separate repository via the
+  PR-based sync Action.
+- **Deployment** — point the template at GitHub Pages and/or Cloudflare Pages.
+
+The design plan is internal agent documentation, kept under
+[`.agents/plan/plan.md`](./.agents/plan/plan.md) (not user-facing). Agent-facing
+guidance for coding assistants lives in [`AGENTS.md`](./AGENTS.md) and the
+`skills/` directory.
 
 ## Quick start
 

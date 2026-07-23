@@ -31,7 +31,7 @@
 import { readdirSync, statSync, existsSync } from 'node:fs';
 import { join, relative, resolve, dirname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { locales, defaultLocale } from './i18n';
+import { locales, defaultLocale, products } from './i18n';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 // src/lib -> project root (two levels up).
@@ -78,7 +78,29 @@ function urlForContentPath(rel) {
   return null;
 }
 
-/** Recursively list .md files under `base`, returning paths relative to CONTENT. */
+/**
+ * Compute the hub site URL for a doc file that lives in a product's `base`
+ * directory (e.g. `base: '.docs'` => `<repo>/docs/<locale>/<slug>.md`). Unlike
+ * the standard src/content layout, the <product> segment is NOT in the path;
+ * it is supplied by the owning product. Same index special-casing applies.
+ */
+function urlForBaseDoc(productSlug, rel) {
+  const p = rel.split(sep).join('/');
+  const m = p.match(/^([^/]+)\/(.+)\.md$/);
+  if (!m) return null;
+  const locale = m[1];
+  if (!locales.includes(locale)) return null;
+  const slug = m[2];
+  if (slug === 'index') return `${localePrefix(locale)}/${productSlug}/docs`;
+  return `${localePrefix(locale)}/${productSlug}/docs/${slug}`;
+}
+
+/** Recursively list .md files under `base`, returning paths relative to `base`.
+ *  Callers pass their own root: the standard scan uses src/content, while a
+ *  product with `base` passes its base dir (e.g. repo-root docs/). Returning
+ *  paths relative to `base` (not the fixed CONTENT dir) keeps the regex in
+ *  urlForContentPath / urlForBaseDoc matching `<locale>/<slug>.md` regardless
+ *  of where the collection physically lives. */
 function listMdRel(base) {
   if (!existsSync(base)) return [];
   const out = [];
@@ -91,16 +113,27 @@ function listMdRel(base) {
     }
   };
   walk(base);
-  return out.map((p) => relative(CONTENT, p));
+  return out.map((p) => relative(base, p));
 }
 
-/** Build a Map<absolute path, siteUrl> for every content markdown file. */
+/** Build a Map<absolute path, siteUrl> for every content markdown file.
+ * Scans src/content (standard posts + non-base products' docs) and, for any
+ * product that overrides its docs location via `base`, the base directory
+ * (e.g. repo-root `docs/`). */
 function buildUrlMap() {
   const map = new Map();
   for (const rel of listMdRel(CONTENT)) {
     const url = urlForContentPath(rel);
-    if (!url) continue;
-    map.set(resolve(CONTENT, rel), url);
+    if (url) map.set(resolve(CONTENT, rel), url);
+  }
+  // Products with a `base` (e.g. '.docs') keep their docs outside src/content.
+  for (const product of products) {
+    if (!product.base) continue;
+    const baseDir = join(ROOT, product.base.replace(/^[./]+/, ''));
+    for (const rel of listMdRel(baseDir)) {
+      const url = urlForBaseDoc(product.slug, rel);
+      if (url) map.set(resolve(baseDir, rel), url);
+    }
   }
   return map;
 }
@@ -129,7 +162,11 @@ function rewriteLinkNode(node, ctx) {
   const raw = node.url;
   if (!isRewritable(raw)) return;
   if (!ctx.fileURL) return; // no source path -> can't resolve; leave unchanged
-  const baseDir = dirname(fileURLToPath(ctx.fileURL));
+  // Resolve the source dir against ROOT: ctx.fileURL may be absolute (standard
+  // src/content files) or relative to the project root (files loaded from a
+  // product's `base` dir, e.g. repo-root `docs/`). Normalizing to absolute
+  // keeps target resolution consistent with the url map's absolute keys.
+  const baseDir = resolve(ROOT, dirname(fileURLToPath(ctx.fileURL)));
   const hashIdx = raw.indexOf('#');
   const pathPart = hashIdx === -1 ? raw : raw.slice(0, hashIdx);
   const hash = hashIdx === -1 ? '' : raw.slice(hashIdx);

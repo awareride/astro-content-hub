@@ -3,7 +3,7 @@
 // Generic product docs overview page (locale: zh). URL: /zh/<slug>/docs
 import DocsLayout from '../../../../components/DocsLayout.astro';
 import { getLocalizedDocIndex } from '../../../../lib/content';
-import { buildAlternates, products } from '../../../../lib/i18n';
+import { buildAlternates, localizePath, products } from '../../../../lib/i18n';
 
 export function getStaticPaths() {
   return products.map((p) => ({
@@ -13,11 +13,13 @@ export function getStaticPaths() {
 }
 
 const { product } = Astro.props;
-const basePath = `/${product}/docs`;
+// Locale-aware base path for the sidebar nav (adds the /zh prefix for zh).
+const basePath = localizePath(`/${product}/docs`, 'zh');
 const page = await getLocalizedDocIndex(product, 'zh', basePath);
 if (!page) return Astro.redirect(basePath);
 const { Content, title, description, navItems, isFallback } = page;
-const alternates = buildAlternates(basePath);
+// buildAlternates expects the default-locale (en) path.
+const alternates = buildAlternates(`/${product}/docs`);
 ---
 
 <DocsLayout

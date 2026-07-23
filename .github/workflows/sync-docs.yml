@@ -1,0 +1,97 @@
+# Sync this repo's docs/ into the AwareRide content hub (open.awareride.com).
+#
+# Place at: .github/workflows/sync-docs.yml
+#
+# Required secret in THIS repo:
+#   DOCS_CENTRAL_HUB_TOKEN  - a fine-grained PAT on
+#                             awareride/awareride.github.io with
+#                             "Contents: write" (push the sync branch) and
+#                             "Pull requests: write" (open the PR).
+#
+# Sync pushes to a dedicated branch (sync-docs-<repo>-<run>) and opens a
+# pull request against the hub's main, so a human reviews content before it
+# ships. No commit lands on main directly.
+#
+# Directory mapping:
+#   <this-repo>/docs/   ->  awareride.github.io/src/content/docs/${PRODUCT}/
+#
+# The docs/ tree is flat by locale: docs/<locale>/<slug>.md
+# (e.g. docs/en/index.md, docs/zh/index.md). The product dimension is NOT in
+# this repo - it is injected by sync from the PRODUCT env var below, so the hub
+# ends up with src/content/docs/${PRODUCT}/<locale>/<slug>.md. Keeping this
+# repo flat lets relative markdown links resolve against docs/ on GitHub.
+#
+# IMPORTANT: PRODUCT must be a name listed in the hub's
+# src/content.config.ts `products` array, otherwise the synced content won't
+# have a collection. Here PRODUCT = astro-content-hub.
+
+name: Sync Docs to AwareRide Hub
+
+on:
+  push:
+    branches: [main]
+    paths: ['docs/**']
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate content
+        run: node .agents/skills/awareride-content-sync/scripts/validate.mjs
+
+      - name: Sync docs/ to central hub via PR
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.DOCS_CENTRAL_HUB_TOKEN }}
+          SOURCE_REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+          # Must be registered in the hub's src/content.config.ts products[].
+          PRODUCT: astro-content-hub
+        run: |
+          set -euo pipefail
+          if [ -z "${PRODUCT:-}" ]; then
+            echo 'PRODUCT env var is not set. Set it in the workflow env: block.' >&2
+            exit 1
+          fi
+          HUB=awareride/awareride.github.io
+          SRC=$(printf '%s' "${SOURCE_REPO}" | tr '/' '-')
+          BRANCH="sync-docs-${SRC}-${RUN_ID}-${RUN_ATTEMPT}"
+          CLONE_DIR=$(mktemp -d)
+
+          git config --global user.email 'syncbot@awareride.com'
+          git config --global user.name 'DocSyncBot'
+          git clone --single-branch --branch main \
+            "https://x-access-token:${API_TOKEN_GITHUB}@github.com/${HUB}.git" "$CLONE_DIR"
+
+          DEST="$CLONE_DIR/src/content/docs/${PRODUCT}"
+          mkdir -p "$DEST"
+          rsync -a docs/ "$DEST/"
+
+          node .agents/skills/awareride-content-sync/scripts/apply-delete-list.mjs \
+            "$DEST" docs
+
+          cd "$CLONE_DIR"
+          git checkout -b "$BRANCH"
+          git add .
+          if git diff --cached --quiet; then
+            echo "No changes to sync."
+          else
+            git commit -m "docs: sync from ${SOURCE_REPO}"
+            git push -u origin "$BRANCH"
+
+            export GH_TOKEN="${API_TOKEN_GITHUB}"
+            PR_BODY="$(printf 'Automated sync of `docs/` from `%s`.\n\nTriggered by workflow run [#%s](https://github.com/%s/actions/runs/%s).' \
+              "${SOURCE_REPO}" "${RUN_ID}" "${SOURCE_REPO}" "${RUN_ID}")"
+            gh pr create --repo "${HUB}" --base main --head "${BRANCH}" \
+              --title "docs: sync from ${SOURCE_REPO}" \
+              --body "${PR_BODY}"
+          fi
