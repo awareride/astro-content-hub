@@ -35,4 +35,5 @@ _archive/
 .wrangler/
 
 # Agents
-.agents/
+# .agents/ is tracked (holds the template's plan). If you later want to ignore
+# agent working files, add specific entries here instead of the whole dir.
