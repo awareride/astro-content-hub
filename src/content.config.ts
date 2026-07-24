@@ -58,7 +58,35 @@ function makePostCollections(): Record<string, ReturnType<typeof defineCollectio
   return out;
 }
 
+// Product landing info - one structured Markdown file per product + locale
+// at src/content/product-info/<locale>/<slug>.md (locale-outer, matching the
+// posts layout so the glob entry id is the product slug). The frontmatter
+// drives the auto-generated landing; the body is an optional curated overview
+// rendered as .prose. Adding a locale auto-generates a `productInfo<Locale>`
+// collection. A hand-written landing override at
+// src/components/product-landing/<slug>.astro still takes precedence over this.
+const productInfoSchema = z.object({
+  tagline: z.string(),
+  description: z.string(),
+  features: z.array(z.object({ title: z.string(), body: z.string() })).default([]),
+  install: z.string().optional(),
+  highlights: z.array(z.object({ label: z.string(), value: z.string() })).default([]),
+  links: z.array(z.object({ label: z.string(), href: z.string() })).default([]),
+});
+
+function makeProductInfoCollections(): Record<string, ReturnType<typeof defineCollection>> {
+  const out: Record<string, ReturnType<typeof defineCollection>> = {};
+  for (const locale of locales) {
+    out[`productInfo${collectionSuffix(locale)}`] = defineCollection({
+      loader: glob({ pattern: '**/*.md', base: `./src/content/product-info/${locale}` }),
+      schema: productInfoSchema,
+    });
+  }
+  return out;
+}
+
 export const collections = {
   ...makePostCollections(),
   ...makeDocCollections(),
+  ...makeProductInfoCollections(),
 };
