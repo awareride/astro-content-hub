@@ -27,10 +27,11 @@ repos is covered in [Content sync](./content-sync.md).
 astro-content-hub/            <- the hub (Astro site) at the repo root
 ├── astro.config.mjs          <- set `site` to your domain
 ├── src/
-│   ├── components/           <- Layout, Nav, Footer, DocsLayout, PostCard, LocaleSwitcher
+│   ├── components/           <- Layout, Nav, Footer, DocsLayout, PostCard, LocaleSwitcher, ProductLandingDefault
+│   ├── components/product-landing/  <- optional per-product landing overrides (one file per product, keyed by slug)
 │   ├── content/              <- markdown collections (posts + docs)
 │   ├── content.config.ts     <- collection schemas + glob loaders
-│   ├── lib/                  <- i18n.ts, content.ts, docs.ts, remark-rewrite-links.mjs
+│   ├── lib/                  <- i18n.ts, content.ts, docs.ts, product-landing.ts, remark-rewrite-links.mjs
 │   ├── pages/                <- file-based routes (+ [locale]/ universal routes)
 │   └── styles/global.css
 ├── public/                   <- favicon, CNAME
@@ -55,6 +56,18 @@ Routes are file-based under `src/pages/`:
 Because product and locale pages are data-driven, **you do not create
 per-product or per-locale route files.** Add an entry to `products` and the
 routes + docs collections are generated automatically.
+
+**Per-product landing overrides.** A product can ship a custom landing page
+(distinct `<main>` sections) by adding
+`src/components/product-landing/<slug>.astro`. `src/lib/product-landing.ts`
+eagerly globs that directory at build time and returns the component for a
+slug (or `undefined`); both landing routes render the override when present,
+otherwise the shared fallback `src/components/ProductLandingDefault.astro`.
+The override renders only the `<main>` sections - the route still owns
+`Layout` + `Nav` + `Footer` and the `<head>`. The override and fallback share
+one prop contract (`product`, `locale`, `c`, `docsHref`). See
+[Authoring - Customize a product landing](./authoring.md#customize-a-product-landing).
+Docs subroutes (`/<product>/docs...`) are unaffected.
 
 ## Layout composition
 
@@ -109,9 +122,10 @@ Markdown is rendered via `render(entry)` from `astro:content`; pages pass
 | File | Responsibility |
 |------|----------------|
 | `i18n.ts` | Single source of truth: `locales`, `defaultLocale`, `t` (UI strings), `home` (landing copy), `productCopy`, and path/locale helpers. |
-`config/products.ts` | Product registry (`products` array) — the list of products that ship docs + a landing card. |
+| `config/products.ts` | Product registry (`products` array) — the list of products that ship docs + a landing card. |
 | `content.ts` | Localized path generation + fallback render helpers (docs + posts). |
 | `docs.ts` | `buildNav` — sidebar construction (index → base path, sort by `order`). |
+| `product-landing.ts` | Per-product landing override resolver - eager-globs `components/product-landing/*.astro` keyed by slug; returns the override or `undefined` (falls back to `ProductLandingDefault.astro`). |
 | `remark-rewrite-links.mjs` | Rewrites doc links so `docs/<product>/<locale>/` resolves to `/<product>/docs`. |
 
 ## Build & deploy

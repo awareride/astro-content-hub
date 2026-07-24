@@ -75,7 +75,11 @@ repositories, synced in via pull requests.
 ### Directory layout
 ```
 src/
-  components/      Astro components (Layout, Nav, Footer, DocsLayout, PostCard)
+  components/      Astro components (Layout, Nav, Footer, DocsLayout, PostCard,
+                   ProductLandingDefault)
+  components/product-landing/  Per-product landing overrides, one file per
+                   product, filename = product `slug` (e.g. `vite.astro`);
+                   auto-discovered, optional - see "Pages & routing".
   content/         Markdown collections (see "Content collections" below)
   content.config.ts  Collection schemas (zod) + glob loaders
   lib/             Shared helpers (e.g. docs.ts — sidebar nav builder)
@@ -104,6 +108,23 @@ public/            Static assets served as-is (favicon, images, CNAME)
 Products are data-driven: add an entry to `products` in `src/config/products.ts`
 and content under `src/content/docs/<product>/<locale>/`; no per-product or
 per-locale route files are required.
+
+**Per-product landing overrides.** A product can ship a custom landing page
+(distinct `<main>` sections) by adding `src/components/product-landing/<slug>.astro`.
+`src/lib/product-landing.ts` eagerly globs that directory at build time and
+returns the component for a slug (or `undefined`); both landing routes
+(`src/pages/[product]/index.astro` and its `src/pages/[locale]/[product]/index.astro`
+twin) render the override when present, otherwise the shared fallback
+`src/components/ProductLandingDefault.astro`. The override renders **only the
+`<main>` sections** (hero, custom sections, CTA) - the route still owns
+`Layout` + `Nav` + `Footer` and the `<head>` (no second document shell). The
+override and fallback share one prop contract: `product` (Product), `locale`
+(Locale), `c` (ProductCopy, locale-resolved UI strings), and `docsHref`
+(base-aware, locale-prefixed docs link). To localize custom copy, the override
+branches on `locale` internally; v1 ships one override per product used across
+all locales. Per-locale override files (e.g. `vite.zh-Hans.astro`) are a future
+extension. Docs subroutes (`/<product>/docs...`) are unaffected and remain
+fully data-driven.
 
 ### Layout composition
 - `Layout.astro` owns the document shell (`<html>/<head>/<body>`, fonts, meta,

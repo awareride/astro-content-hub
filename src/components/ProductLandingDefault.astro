@@ -1,0 +1,49 @@
+---
+// Generic product landing content (hero + CTA), rendered by the `[product]`
+// route when a product has no override at
+// `src/components/product-landing/<slug>.astro`. Shares the same prop
+// contract as an override, so the route can swap them freely.
+import type { Product } from '../config/products';
+import type { Locale, ProductCopy } from '../lib/i18n';
+import type { ProductLandingProps } from '../lib/product-landing';
+
+interface Props extends ProductLandingProps {}
+const { product, c, docsHref } = Astro.props as Props;
+// `locale` is part of the override contract but unused by the generic landing
+// (it consumes the already-locale-resolved `c`). Declared for symmetry.
+void ({} as Locale);
+---
+
+<section class="product-hero">
+  <div class="container">
+    <div class="hero-badge" style="display:inline-block; font-size:0.85rem; font-weight:600; padding:0.25rem 0.9rem; border-radius:100px; background:var(--color-accent-subtle); color:var(--color-accent); margin-bottom:1.25rem;">
+      {c.heroBadge}
+    </div>
+    <h1>{product.name}</h1>
+    <div class="hero-actions">
+      <a href={product.github} class="btn btn-primary" target="_blank" rel="noopener">{c.viewSource}</a>
+      <a href={docsHref} class="btn btn-secondary">{c.documentation}</a>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-header">
+      <p class="eyebrow">{c.docsEyebrow}</p>
+      <h2>{c.docsTitle}</h2>
+    </div>
+    <div class="cta-box">
+      <h2>{c.ctaTitle}</h2>
+      <p>{c.ctaBody}</p>
+      <div class="cta-actions">
+        <a href={product.github} class="btn btn-primary btn-large" target="_blank" rel="noopener">
+          {c.ctaPrimary}
+        </a>
+        <a href={docsHref} class="btn btn-secondary btn-large">
+          {c.readDocs}
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
