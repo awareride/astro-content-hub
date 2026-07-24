@@ -5,6 +5,8 @@
 
 /* --- CSS Custom Properties --- */
 :root {
+  color-scheme: light;
+
   /* Colors */
   --color-bg: #faf9f7;
   --color-bg-alt: #f2f0eb;
@@ -44,6 +46,35 @@
 
   /* Transitions */
   --transition: 200ms ease;
+}
+
+/* --- Dark theme ---
+   Activated by `data-theme="dark"` on <html>, set by a no-FOUC inline
+   script in Layout.astro (<head>, runs before paint) that reads
+   localStorage('theme') and falls back to prefers-color-scheme. Only page-
+   level tokens are overridden; --color-bg-dark stays as the fixed dark surface
+   for code blocks, primary buttons, and the CTA box (intentionally dark in
+   both themes). */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-bg: #141413;
+  --color-bg-alt: #1c1b19;
+  --color-surface: #1e1d1b;
+  --color-border: #2e2c29;
+  --color-border-light: #262421;
+
+  --color-text: #f0ede7;
+  --color-text-secondary: #a8a59d;
+  --color-text-muted: #7a766e;
+
+  --color-accent: #e0b85e;
+  --color-accent-hover: #ecc676;
+  --color-accent-subtle: rgba(224, 184, 94, 0.14);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.4);
 }
 
 /* --- Reset & Base --- */
@@ -164,7 +195,7 @@ pre.astro-code code {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(250, 249, 247, 0.85);
+  background: color-mix(in srgb, var(--color-bg) 85%, transparent);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--color-border-light);
 }
@@ -325,6 +356,41 @@ pre.astro-code code {
   font-weight: 600;
   color: var(--color-text);
   background: var(--color-accent-subtle);
+}
+
+/* --- Theme toggle (in nav) --- */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--nav-control-h);
+  width: calc(var(--nav-control-h) + 0.4rem);
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 100px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition);
+}
+
+.theme-toggle:hover {
+  color: var(--color-text);
+  border-color: var(--color-text-muted);
+}
+
+.theme-toggle .icon {
+  display: none;
+  align-items: center;
+}
+
+/* Show moon in light mode, sun in dark mode (CSS-driven, no flash). */
+:root[data-theme='light'] .theme-toggle .icon-moon,
+:root:not([data-theme='dark']) .theme-toggle .icon-moon {
+  display: inline-flex;
+}
+:root[data-theme='dark'] .theme-toggle .icon-sun {
+  display: inline-flex;
 }
 
 /* --- Hero --- */

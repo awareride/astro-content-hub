@@ -30,6 +30,23 @@ const canonical = abs(stripBase(Astro.url.pathname));
   <meta name="description" content={description || 'Open source exploring human perception, spatial intelligence, and wellness.'} />
   <meta name="theme-color" content="#faf9f7" />
 
+  <!-- Set the color theme before first paint to prevent a flash of the wrong
+       theme (FOUC). Runs synchronously in <head> before <body> renders: reads
+       the user's saved choice, falling back to the OS prefers-color-scheme.
+       Also keeps <meta name="theme-color"> in sync for mobile browser UI. -->
+  <script is:inline>
+    (function () {
+      try {
+        var stored = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = stored || (prefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', theme === 'dark' ? '#141413' : '#faf9f7');
+      } catch (e) { /* localStorage unavailable - default light */ }
+    })();
+  </script>
+
   <!-- Open Graph -->
   <meta property="og:title" content={fullTitle} />
   <meta property="og:description" content={description || ''} />

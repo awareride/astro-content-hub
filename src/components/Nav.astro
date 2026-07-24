@@ -12,6 +12,7 @@
 import { localeFromPath, localizePath, withBase, t, siteName, type Locale } from '../lib/i18n';
 import { products } from '../config/products';
 import LocaleSwitcher from './LocaleSwitcher.astro';
+import ThemeToggle from './ThemeToggle.astro';
 
 export interface Props {
   alternates?: Partial<Record<Locale, string>>;
@@ -49,6 +50,7 @@ const githubHref = 'https://github.com';
       <div class="nav-locale">
         <LocaleSwitcher alternates={alternates} current={locale} />
       </div>
+      <ThemeToggle />
       <button
         class="nav-toggle"
         type="button"
