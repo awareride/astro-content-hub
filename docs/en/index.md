@@ -33,6 +33,13 @@ for how that works.
   repos, and nothing lands on `main` without review.
 - **i18n with per-page fallback.** Default locale `en` (no URL prefix); `zh`
   lives under `/zh/...`. A missing translation renders the default-language
-  body inside the localized shell — never a 404.
+  body inside the localized shell - never a 404.
+- **Modern reading UX.** Dark mode, docs table of contents with
+  active-section highlighting, prev/next pagination, copy-code buttons, and
+  heading anchor links.
+- **Content discovery.** Tag pages, clickable tags, related posts, and post
+  breadcrumbs.
+- **SEO out of the box.** Canonical URLs, sitemap with `hreflang`, RSS feed,
+  `robots.txt`, and a custom 404.
 - **Free auto-deploy.** Static output publishes to GitHub Pages and
   Cloudflare Pages at no cost.

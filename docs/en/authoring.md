@@ -69,10 +69,17 @@ Steps:
 3. Internal links in a `zh` post should target `/zh/...` paths.
 4. Run `npm run build`. No route changes needed.
 
+Tags on a post automatically become browseable: each tag links to a
+tag page at `/posts/tags/<tag>/` (and `/zh/posts/tags/<tag>/` for `zh`),
+which lists every post carrying that tag. Tag slugs are ASCII-normalized
+(kebab-case), so an `en` tag and a `zh` tag that share text land on the same
+page. Heading anchors (`id` attributes on h1-h4) are generated automatically,
+so you can deep-link to any section.
+
 ## Docs for an existing product
 
 Docs live in `src/content/docs/<product>/<locale>/`. Products come from the
-`products` array (`src/lib/i18n.ts`; samples: vite, astro, json-server).
+`products` array (`src/config/products.ts`; samples: vite, astro, json-server).
 
 **Frontmatter** (`docSchema`):
 
@@ -95,7 +102,7 @@ order: 2                     # optional, controls sidebar sort (default 0)
 
 The only authoring task that touches config:
 
-1. Register the product in `src/lib/i18n.ts`:
+1. Register the product in `src/config/products.ts`:
 
    ```ts
    export const products: Product[] = [

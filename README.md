@@ -84,6 +84,32 @@ site looks complete out of the box. Replace it with your own.
 - **Free auto-deploy.** A manual workflow builds `dist/` and publishes to
   GitHub Pages and (optionally) Cloudflare Pages at no cost.
 
+### SEO & discoverability
+
+- **Canonical URLs** on every page (correct under a sub-path deploy).
+- **Sitemap** (`/sitemap-index.xml`) via `@astrojs/sitemap`, with `hreflang`
+  `en`/`zh` grouping.
+- **RSS feed** at `/rss.xml` (en) and `/zh/rss.xml` (zh), with feed-discovery
+  `<link>` in the `<head>`.
+- **`robots.txt`** pointing at the sitemap.
+- **Custom 404 page** (excluded from the sitemap).
+
+### Reading UX
+
+- **Dark mode** with system-preference default and a manual toggle persisted
+  to `localStorage`; no flash of the wrong theme on load.
+- **Docs table of contents** - a right-rail TOC from heading anchors, with
+  active-section highlighting.
+- **Prev/next pagination** on docs, **copy-code buttons** on every code block,
+  and **heading anchor links** (`#` beside each heading) across docs and posts.
+
+### Content discovery
+
+- **Tag pages** at `/posts/tags/[tag]` (+ `/zh/` twin), with a tag chip row on
+  the posts listing and clickable tags on every post card.
+- **Related posts** on article pages (by shared tags).
+- **Post breadcrumbs** (`Home / Posts / <title>`).
+
 ## Architecture
 
 The hub is an Astro 7 static site (`output: 'static'`). Everything is
@@ -296,11 +322,11 @@ For the full flow - frontmatter schemas, the deletion manifest
 astro-content-hub/                 <- the hub (Astro site) at the repo root
 ├── astro.config.mjs              <- set `site`/`base` to your domain
 ├── src/
-│   ├── components/              <- Layout, Nav, Footer, DocsLayout, PostCard, LocaleSwitcher
+│   ├── components/              <- Layout, Nav, Footer, DocsLayout, PostCard, LocaleSwitcher, ThemeToggle, TableOfContents, TagPage
 │   ├── config/products.ts       <- the products registry (add a product here)
 │   ├── content/                 <- markdown collections (posts + docs)
 │   ├── content.config.ts        <- collection schemas (zod) + glob loaders
-│   ├── lib/                     <- i18n.ts, content.ts, docs.ts, remark-rewrite-links.mjs
+│   ├── lib/                     <- i18n.ts, content.ts, docs.ts, feed.ts, remark-rewrite-links.mjs, heading-ids.mjs
 │   ├── pages/                   <- file-based routes (+ zh/ mirror)
 │   └── styles/global.css        <- design tokens + .prose typography
 ├── public/                      <- favicon, images, CNAME
