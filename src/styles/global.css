@@ -1239,6 +1239,14 @@ a.docs-prev-next-item:hover {
   .docs-toc {
     display: block;
   }
+  /* When the TOC rail is visible, .docs-main is full-width flex (no longer
+     the centered 760px column it was without a TOC), so .docs-content's
+     flex:1 grows flush against the sidebar border. Add a left gap that matches
+     the 2rem gap between content and TOC, restoring the breathing room the
+     pre-TOC centering used to provide. */
+  .docs-main {
+    padding-left: 2rem;
+  }
 }
 
 @media (max-width: 768px) {
