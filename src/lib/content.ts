@@ -13,7 +13,14 @@ import { buildNav, type NavItem } from './docs';
 export interface DocEntryLike {
   id: string;
   data: { title: string; description?: string; order: number };
-  render(): Promise<{ Content: any }>;
+  render(): Promise<{ Content: any; headings: MarkdownHeading[] }>;
+}
+
+/** Minimal shape of a heading returned by Astro's render(). */
+export interface MarkdownHeading {
+  depth: number;
+  slug: string;
+  text: string;
 }
 export interface PostEntryLike {
   id: string;
@@ -39,6 +46,7 @@ export interface RenderedPage {
   title: string;
   description?: string;
   navItems: NavItem[];
+  headings: MarkdownHeading[];
 }
 
 function collectionName(productName: string, locale: Locale): string {
@@ -121,10 +129,11 @@ export async function renderLocalizedPage(
     : primary;
   const navItems = buildNav(navSource, basePath);
 
-  const { Content } = await render(entry as any);
+  const { Content, headings } = await render(entry as any);
   return {
     entry,
     Content,
+    headings,
     locale,
     isFallback,
     title: entry.data.title,
@@ -159,10 +168,11 @@ export async function getLocalizedDocIndex(
     : primary;
   const navItems = buildNav(navSource, basePath);
 
-  const { Content } = await render(entry as any);
+  const { Content, headings } = await render(entry as any);
   return {
     entry,
     Content,
+    headings,
     locale,
     isFallback,
     title: entry.data.title,

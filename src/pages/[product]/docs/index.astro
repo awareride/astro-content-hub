@@ -17,7 +17,7 @@ const { product } = Astro.props;
 const basePath = `/${product}/docs`;
 const page = await getLocalizedDocIndex(product, 'en', basePath);
 if (!page) return Astro.redirect(withBase(basePath));
-const { Content, title, description, navItems, isFallback } = page;
+const { Content, title, description, navItems, isFallback, headings } = page;
 const alternates = buildAlternates(basePath);
 ---
 
@@ -30,8 +30,8 @@ const alternates = buildAlternates(basePath);
   navItems={navItems}
   locale="en"
   isFallback={isFallback}
-  basePath={basePath}
   alternates={alternates}
+  headings={headings}
 >
   <Content />
 </DocsLayout>

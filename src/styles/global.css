@@ -1052,9 +1052,16 @@ pre.astro-code code {
 .docs-main {
   flex: 1;
   min-width: 0;
+  display: flex;
+  gap: 2rem;
+  padding: 2.5rem 0 5rem;
+}
+
+.docs-content {
+  flex: 1;
+  min-width: 0;
   max-width: 760px;
   margin: 0 auto;
-  padding: 2.5rem 0 5rem;
 }
 
 .docs-breadcrumb {
@@ -1072,9 +1079,166 @@ pre.astro-code code {
   color: var(--color-text);
 }
 
+/* --- Table of contents (right rail) --- */
+/* Hidden by default; shown on wide screens via min-width media query below. */
+.docs-toc {
+  display: none;
+  width: 220px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 80px;
+  align-self: flex-start;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+
+.docs-toc-title {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.docs-toc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-left: 2px solid var(--color-border-light);
+}
+
+.docs-toc-item {
+  margin: 0;
+}
+
+.docs-toc-item a {
+  display: block;
+  padding: 0.25rem 0 0.25rem 0.85rem;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  border-left: 2px solid transparent;
+  margin-left: -2px;
+  transition: color var(--transition), border-color var(--transition);
+  line-height: 1.4;
+}
+
+.docs-toc-item.depth-3 a {
+  padding-left: 1.7rem;
+  font-size: 0.78rem;
+}
+
+.docs-toc-item a:hover {
+  color: var(--color-text);
+}
+
+.docs-toc-item a.active {
+  color: var(--color-accent-hover);
+  border-left-color: var(--color-accent);
+  font-weight: 500;
+}
+
+/* --- Prev/next docs pagination --- */
+.docs-prev-next {
+  display: flex;
+  gap: 1rem;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.docs-prev-next-item {
+  flex: 1;
+  min-width: 0;
+}
+
+.docs-prev-next-item:not(.docs-prev):not(.docs-next) {
+  /* empty spacer keeps the layout balanced when only one side exists */
+}
+
+a.docs-prev-next-item {
+  display: block;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--transition), background var(--transition);
+}
+
+a.docs-prev-next-item:hover {
+  border-color: var(--color-text-muted);
+  background: var(--color-bg-alt);
+}
+
+.docs-next {
+  text-align: right;
+}
+
+.docs-prev-next-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.15rem;
+}
+
+.docs-prev-next-title {
+  display: block;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --- Copy-code button --- */
+.prose pre {
+  position: relative;
+}
+
+.copy-code-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.55rem;
+  font-size: 0.72rem;
+  font-family: var(--font-sans);
+  color: #f0ede7;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--transition), background var(--transition);
+}
+
+.prose pre:hover .copy-code-btn,
+.copy-code-btn:focus-visible {
+  opacity: 1;
+}
+
+.copy-code-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.copy-code-btn.copied {
+  opacity: 1;
+  color: #6fcf6f;
+}
+
 /* Mobile docs sidebar: collapses into a disclosure above the content. */
 .docs-nav-toggle {
   display: none; /* shown only on mobile */
+}
+
+/* Show the TOC right rail only on wide screens. The 240px sidebar + 760px
+   content already fill the 1200px container, so the rail needs room. */
+@media (min-width: 1180px) {
+  .docs-toc {
+    display: block;
+  }
 }
 
 @media (max-width: 768px) {
