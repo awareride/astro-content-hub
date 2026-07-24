@@ -1,6 +1,6 @@
 # New Features Plan - astro-content-hub
 
-Status: Phase 1 COMPLETE (committed locally, not yet pushed/deployed)
+Status: Phases 1-3 COMPLETE and merged. Phase 4 (selective) pending.
 Last updated: 2026-07-24
 
 This document audits the current feature set, identifies the gaps a typical
@@ -181,9 +181,9 @@ Goal: help readers find more content.
 
 **Deliverable:** tag browsing, related posts, anchor links.
 
-### Phase 4 - Polish & advanced (selective)
+### Phase 4 - Polish & advanced (selective, REMAINING)
 
-Pick what's worth the cost; these are lower ROI.
+Pick what's worth the cost; these are lower ROI. Phases 1-3 are all merged.
 
 15. **D1 Admonitions** - GitHub-style `> [!note]` / `[!warning]` callouts via a
     custom mdast plugin. Nice for docs, medium effort.
@@ -247,8 +247,9 @@ All resolved during Phase 1 (see "Phase 1 outcome" below):
 1. **Sitemap/RSS deps** - RESOLVED. Used official integrations `@astrojs/sitemap`
    + `@astrojs/rss` (per the human's tip to leverage official extensions when
    justified). Both build clean and are base-path correct.
-2. **Dark mode default** - PENDING (Phase 2). Will implement: follow system
-   `prefers-color-scheme` with a manual toggle persisted in `localStorage`.
+2. **Dark mode default** - RESOLVED (Phase 2, merged #3). Implemented: follows
+   system `prefers-color-scheme` with a manual toggle persisted in
+   `localStorage`; no-FOUC inline `<head>` script sets `data-theme` before paint.
 3. **Search** - DEFERRED to Phase 4 (only if content grows).
 4. **Analytics** - NONE for now.
 5. **Scope** - Phases 1-3 confirmed as this round; Phase 4 selective.
@@ -281,3 +282,51 @@ a separate trivial PR.
 
 Next: Phase 2 (Reading UX) - dark mode, heading anchor IDs, TOC, copy-code,
 prev/next.
+
+---
+
+## 7. Phase 2 & 3 outcome (Reading UX + Content discovery)
+
+All shipped and merged. `npm run build` passes with 0 errors / 0 warnings
+across all of these; the site is now 63 pages (was 50 at the start).
+
+**Phase 2 part 1 - dark mode (merged #3):**
+- `:root[data-theme='dark']` token block overrides page-level colors; intentional
+  dark surfaces (code blocks, buttons, CTA) stay dark via the untouched
+  `--color-bg-dark`.
+- No-FOUC inline `<head>` script sets `data-theme` before paint from
+  `localStorage`, falling back to `prefers-color-scheme`.
+- `ThemeToggle.astro` (CSS-driven icon swap, no flash) in the Nav; header bg
+  switched from hard-coded rgba to `color-mix()`.
+
+**Phase 2 part 2 - reading UX (merged #5, padding fix #6):**
+- Heading anchor IDs via a Sätteri hast plugin (`src/lib/heading-ids.mjs`);
+  the built-in heading-ids plugin populates `render().headings` (TOC data) and
+  reuses these ids.
+- `TableOfContents.astro` right rail from `render().headings` (h2/h3), with
+  IntersectionObserver active-section highlight; shown >=1180px. A follow-up
+  fix (#6) restored the content's left gap when the rail is visible.
+- Prev/next docs pagination from the ordered sidebar `navItems`.
+- Copy-code button (progressive enhancement) on each `<pre>` in `.prose`.
+
+**Phase 3 - content discovery (merged #7):**
+- Tag pages `/posts/tags/[tag]` (+ `/zh/` twin); `tagSlug()` normalizes to
+  ASCII kebab-case so en/zh tags sharing text collapse onto one page.
+- Tag chip row on the posts listing (top 12, with counts).
+- Clickable tags (PostCard + article header link to tag pages). Restructured
+  PostCard to the stretched-link `<article>` pattern so tag `<a>` are valid
+  (nested `<a>` was invalid HTML and broke the grid layout).
+- Related posts (3, by shared tags) on article pages.
+- Post breadcrumbs (Home / Posts / title).
+- Heading anchor `#` links (Layout client script) beside each h2-h4 in `.prose`.
+
+**Loose-end cleanup (this PR):**
+- Removed the unused root `favicon.ico` (the site serves `public/favicon.ico`).
+- Removed the stray root `logo.png` (byte-identical duplicate of
+  `public/images/logo.png`, which the site + README use).
+- Flagged (not removed): `assets/` is referenced nowhere - likely leftover from
+  an old static site; `.agents/plan/plan.md` is the pre-plan agent file.
+
+**Remaining for Phase 4 (selective):** admonitions (D1), OG image + JSON-LD
+(A5/A6), reading time (B7), search via Pagefind (C4, the only expensive one),
+analytics (E1), about page (E2).
