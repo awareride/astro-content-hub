@@ -1,6 +1,7 @@
 ---
 // src/components/PostCard.astro
 import { localizePath, withBase, t, localeCode, type Locale } from '../lib/i18n';
+import { tagSlug } from '../lib/content';
 
 export interface Props {
   title: string;
@@ -45,7 +46,9 @@ const href = withBase(localizePath(`/posts/${slug}`, locale));
   <p>{description}</p>
   {tags.length > 0 && (
     <div class="post-card-tags">
-      {tags.map(tag => <span class="tag">{tag}</span>)}
+      {tags.map(tag => (
+        <a class="tag" href={withBase(localizePath(`/posts/tags/${tagSlug(tag)}`, locale))}>{tag}</a>
+      ))}
     </div>
   )}
 </a>

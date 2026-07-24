@@ -1,0 +1,23 @@
+---
+// src/pages/zh/posts/tags/[tag].astro
+// Tag listing page (locale: zh). Same tag set as en (slugs are ASCII-normalized
+// so en/zh tags that share text collapse onto the same page), but posts come
+// from the zh localized set (with en fallback), and the shell is localized.
+import TagPage from '../../../../components/TagPage.astro';
+import { getAllTags, getPostsByTag } from '../../../../lib/content';
+import { buildAlternates } from '../../../../lib/i18n';
+
+export async function getStaticPaths() {
+  const tags = await getAllTags('zh');
+  return tags.map((tag) => ({
+    params: { tag: tag.slug },
+    props: { tag },
+  }));
+}
+
+const { tag } = Astro.props;
+const posts = await getPostsByTag('zh', tag.label);
+const alternates = buildAlternates(`/posts/tags/${tag.slug}`);
+---
+
+<TagPage tag={tag} posts={posts} locale="zh" alternates={alternates} />

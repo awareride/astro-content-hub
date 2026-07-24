@@ -4,8 +4,9 @@
 import Layout from '../../../components/Layout.astro';
 import Nav from '../../../components/Nav.astro';
 import Footer from '../../../components/Footer.astro';
-import { getPostLocalizedPaths, renderLocalizedPost } from '../../../lib/content';
-import { buildAlternates, localeCode, withBase } from '../../../lib/i18n';
+import { getPostLocalizedPaths, renderLocalizedPost, getRelatedPosts, tagSlug } from '../../../lib/content';
+import PostCard from '../../../components/PostCard.astro';
+import { buildAlternates, localeCode, localizePath, withBase } from '../../../lib/i18n';
 
 export async function getStaticPaths() {
   return getPostLocalizedPaths('zh');
@@ -17,6 +18,7 @@ if (!page) return Astro.redirect(withBase('/zh/posts'));
 const { Content, data, isFallback } = page;
 const { title, date, description, tags, author, source } = data;
 const alternates = buildAlternates(`/posts/${slug}`);
+const related = await getRelatedPosts('zh', slug, 3);
 
 const formattedDate = date.toLocaleDateString(localeCode.zh, {
   year: 'numeric',
@@ -29,6 +31,11 @@ const formattedDate = date.toLocaleDateString(localeCode.zh, {
   <Nav alternates={alternates} />
 
   <main>
+    <div class="container" style="padding-top: 1.5rem;">
+      <div class="docs-breadcrumb">
+        <a href={withBase(localizePath('/', 'zh'))}>首页</a> / <a href={withBase(localizePath('/posts', 'zh'))}>博客</a> / <span>{title}</span>
+      </div>
+    </div>
     <article class="article">
       <a href={withBase('/zh/posts')} class="article-back">← 全部文章</a>
 
@@ -41,7 +48,9 @@ const formattedDate = date.toLocaleDateString(localeCode.zh, {
         <div class="article-meta" style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
           {tags.length > 0 && (
             <div class="article-tags">
-              {tags.map(tag => <span class="tag">{tag}</span>)}
+              {tags.map(tag => (
+                <a class="tag" href={withBase(localizePath(`/posts/tags/${tagSlug(tag)}`, 'zh'))}>{tag}</a>
+              ))}
             </div>
           )}
           {author && <span style="font-size:0.85rem; color:var(--color-text-muted);">作者:{author}</span>}
@@ -57,6 +66,30 @@ const formattedDate = date.toLocaleDateString(localeCode.zh, {
         <Content />
       </div>
     </article>
+
+    {related.length > 0 && (
+      <section class="section" style="padding-top: 1rem;">
+        <div class="container">
+          <div class="section-header" style="margin-bottom: 1.5rem;">
+            <h2 style="font-size: 1.4rem;">相关文章</h2>
+          </div>
+          <div class="posts-grid">
+            {related.map(({ entry, isFallback }) => (
+              <PostCard
+                title={entry.data.title}
+                date={entry.data.date}
+                description={entry.data.description}
+                tags={entry.data.tags}
+                slug={entry.id}
+                source={null}
+                isFallback={isFallback}
+                locale="zh"
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
   </main>
 
   <Footer />

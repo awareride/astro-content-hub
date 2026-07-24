@@ -7,12 +7,14 @@ import Nav from '../../../components/Nav.astro';
 import Footer from '../../../components/Footer.astro';
 import PostCard from '../../../components/PostCard.astro';
 import { getLocalizedPosts } from '../../../lib/content';
-import { buildAlternates } from '../../../lib/i18n';
+import { getAllTags } from '../../../lib/content';
+import { buildAlternates, localizePath, withBase } from '../../../lib/i18n';
 
 const items = await getLocalizedPosts('zh');
 const sorted = items.sort(
   (a, b) => b.entry.data.date.getTime() - a.entry.data.date.getTime(),
 );
+const tags = (await getAllTags('zh')).slice(0, 12);
 const alternates = buildAlternates('/posts');
 
 function dirname(id: string) {
@@ -42,6 +44,15 @@ function dirname(id: string) {
 
     <section class="section" style="padding-top: 1rem;">
       <div class="container">
+        {tags.length > 0 && (
+          <div class="posts-tag-row">
+            {tags.map(tag => (
+              <a class="tag tag-link" href={withBase(localizePath(`/posts/tags/${tag.slug}`, 'zh'))}>
+                {tag.label}<span class="tag-count">{tag.count}</span>
+              </a>
+            ))}
+          </div>
+        )}
         {
           sorted.length === 0 ? (
             <p style="text-align:center; color:var(--color-text-muted);">
