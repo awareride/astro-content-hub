@@ -12,4 +12,4 @@ order: 1
 npx json-server --watch db.json
 ```
 
-本文件同步后,内容中心会在 `/zh/json-server/docs/getting-started/` 提供中文版本。
+本文件同步后,内容中心会在 `/zh-Hans/json-server/docs/getting-started/` 提供中文版本。

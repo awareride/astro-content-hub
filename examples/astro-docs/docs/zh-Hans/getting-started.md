@@ -18,4 +18,4 @@ npm create astro@latest
 npm run dev
 ```
 
-本文件同步后,内容中心会在 `/zh/astro/docs/getting-started/` 提供中文版本。
+本文件同步后,内容中心会在 `/zh-Hans/astro/docs/getting-started/` 提供中文版本。

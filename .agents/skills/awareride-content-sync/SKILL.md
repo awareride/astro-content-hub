@@ -1,6 +1,6 @@
 ---
 name: awareride-content-sync
-description: Organize blog posts and product docs in this external project and sync them into the AwareRide content hub (awareride.github.io). Use when authoring markdown content under posts/ or docs/, adding translations, or setting up the GitHub Action that pushes content to the hub. Covers the en-default + zh i18n layout, slug contracts, per-page fallback, local validation, and sync workflow setup.
+description: Organize blog posts and product docs in this external project and sync them into the AwareRide content hub (awareride.github.io). Use when authoring markdown content under posts/ or docs/, adding translations, or setting up the GitHub Action that pushes content to the hub. Covers the en-default + zh-Hans i18n layout, slug contracts, per-page fallback, local validation, and sync workflow setup.
 ---
 
 # AwareRide Content Sync
@@ -12,7 +12,7 @@ sync it into the hub via a GitHub Action.
 
 The hub is an Astro 7 static site whose content lives under `src/content/`
 with a locale-prefixed i18n layout: default locale `en` (no URL prefix) and
-`zh` under `/zh/...`. The external project mirrors the **locale** layout
+`zh-Hans` under `/zh-Hans/...`. The external project mirrors the **locale** layout
 (`posts/<locale>/...`, `docs/<locale>/...`). For docs, the product dimension
 is injected at sync time from the `PRODUCT` env var (see "Syncing"), so the
 external repo stays flat - `docs/en/foo.md`, not `docs/<product>/en/foo.md`.
@@ -28,13 +28,13 @@ This keeps relative markdown links working on GitHub: they resolve against
       hello-world.md            <- /posts/hello-world/ on the hub
       packscope/
         2025-07-20-why-packscope.md   <- nested dirs become path segments
-    zh/
+    zh-Hans/
       hello-world.md            <- SAME filename as en/ (slug contract)
   docs/
     en/                         <- product is set via PRODUCT env var in sync-docs.yml
       index.md                <- the product's docs landing page
       getting-started.md
-    zh/
+    zh-Hans/
       index.md                <- optional; falls back to en if absent
   .agents/skills/awareride-content-sync/      <- this skill (copied in)
     SKILL.md
@@ -87,14 +87,14 @@ A file's **slug** is its path relative to the locale dir, without `.md`:
 | File | Slug |
 |------|------|
 | `posts/en/hello-world.md` | `hello-world` |
-| `posts/zh/hello-world.md` | `hello-world` |
+| `posts/zh-Hans/hello-world.md` | `hello-world` |
 | `posts/en/packscope/2025-07-20-why-packscope.md` | `packscope/2025-07-20-why-packscope` |
 | `docs/en/getting-started.md` | `getting-started` |
-| `docs/zh/getting-started.md` | `getting-started` |
+| `docs/zh-Hans/getting-started.md` | `getting-started` |
 
 **The slug must be byte-identical across locales.** The hub's fallback renders
-the `en` body when a `zh` page is missing, matched by slug. `en/getting-started.md`
-and `zh/Getting-Started.md` would break fallback. Keep filenames identical.
+the `en` body when a `zh-Hans` page is missing, matched by slug. `en/getting-started.md`
+and `zh-Hans/Getting-Started.md` would break fallback. Keep filenames identical.
 
 When you add a localized page, always add the `en` version first - the default
 locale is the source of truth and must contain every slug.
@@ -103,11 +103,11 @@ locale is the source of truth and must contain every slug.
 
 Fallback is **per-page and content-level** - never a redirect:
 
-- A `zh` page that exists renders the Chinese body, in a Chinese shell
-  (`<html lang="zh">`, Chinese nav/breadcrumb).
-- A `zh` page that is missing still has a URL (`/zh/.../`) on the hub; that URL
+- A `zh-Hans` page that exists renders the Chinese body, in a Chinese shell
+  (`<html lang="zh-Hans">`, Chinese nav/breadcrumb).
+- A `zh-Hans` page that is missing still has a URL (`/zh-Hans/.../`) on the hub; that URL
   renders the `en` body inside the Chinese shell, with a visible notice
-  ("此页暂无中文翻译,以下显示英文原文。"). Post cards on `/zh/posts/`
+  ("此页暂无中文翻译,以下显示英文原文。"). Post cards on `/zh-Hans/posts/`
   show an `EN` badge for fallback entries.
 
 So you can ship `en` first and translate incrementally - the site never 404s
@@ -117,8 +117,8 @@ on a missing translation, it just shows English with a notice.
 
 - In an `en` post/doc, link to other pages with their default paths:
   `/posts/foo/`, `/packscope/docs/bar/`.
-- In a `zh` post/doc, use the `/zh/` prefix so readers stay in the Chinese
-  shell: `/zh/posts/foo/`, `/zh/packscope/docs/bar/`.
+- In a `zh-Hans` post/doc, use the `/zh-Hans/` prefix so readers stay in the Chinese
+  shell: `/zh-Hans/posts/foo/`, `/zh-Hans/packscope/docs/bar/`.
 - Links to the marketing/product pages follow the same rule.
 - External links (https://github.com/...) are locale-agnostic.
 
@@ -134,7 +134,7 @@ node .agents/skills/awareride-content-sync/scripts/validate.mjs
 It exits non-zero on any error, so it can gate the sync workflow. It reports:
 - missing required frontmatter fields
 - invalid `date` / `order` values
-- a `zh` file with no matching `en` file (broken fallback)
+- a `zh-Hans` file with no matching `en` file (broken fallback)
 - missing `en/` locale dir (the default locale must exist)
 
 Run it whenever you add or rename content files.
@@ -199,7 +199,7 @@ use `sync-delete.list` at the external project root:
 # sync-delete.list - one path per line, relative to the repo root.
 # Blank lines and '#' comments are ignored.
 posts/en/old-post.md
-posts/zh/old-post.md
+posts/zh-Hans/old-post.md
 docs/en/legacy-page.md
 docs/en/legacy/        # trailing slash = drop the whole directory
 ```
@@ -228,21 +228,25 @@ human still reviews what is removed before it ships.
 ## Registering a new product (docs only)
 
 A product's docs only render on the hub if the product is registered in the
-hub's `src/content.config.ts` `products` array:
+hub's `src/config/products.ts` `products` array:
 
 ```ts
-const products = ['packscope', 'mytool'] as const;
+export const products: Product[] = [
+  { slug: 'packscope', name: 'Packscope', github: 'https://github.com/awareride/packscope', badges: ['Tool'], nav: false },
+  { slug: 'mytool', name: 'MyTool', github: 'https://github.com/owner/mytool', badges: ['Tool'], nav: false },
+];
 ```
 
 This is a **one-time setup on the hub side**, not something this external
 project can do via sync. When you introduce a new product:
 
 1. Open a PR (or issue) against `awareride/awareride.github.io` adding the
-   product name to `products` and creating the four route files (en + zh,
-   index + catch-all) under `src/pages/<product>/docs/` and
-   `src/pages/zh/<product>/docs/`. The hub's own
-   `.pi/skills/awareride-content/SKILL.md` documents this for whoever owns the
-   hub repo.
+   product entry to `src/config/products.ts`. **No route files are needed** -
+   the hub uses universal dynamic routes (`src/pages/[product]/...` for the
+   default locale and `src/pages/[locale]/[product]/...` for non-default
+   locales), so one set of route files serves every product and every locale.
+   The hub's own `skills/site-content/SKILL.md` documents this for whoever
+   owns the hub repo.
 2. Once merged, set `PRODUCT` to that name in your `sync-docs.yml` and your
    `docs/` content will sync and render.
 
@@ -258,7 +262,7 @@ Your content can break the hub build if:
   number, `tags` not an array of strings. `validate.mjs` catches most of these.
 - **Duplicate slugs within a locale**: two files resolve to the same route.
   Astro errors on this.
-- **A `zh`-only slug with no `en` file**: not a build error, but the page
+- **A `zh-Hans`-only slug with no `en` file**: not a build error, but the page
   renders an empty/fallback body and the slug contract is violated.
   `validate.mjs` flags it.
 - **Internal links to non-existent pages**: produces a build warning (broken
@@ -277,9 +281,9 @@ node .agents/skills/awareride-content-sync/scripts/validate.mjs
 node .agents/skills/awareride-content-sync/scripts/apply-delete-list.mjs \
   <hub-collection-dir> <posts|docs>
 
-# Add a post (en + zh)
+# Add a post (en + zh-Hans)
 #   posts/en/my-post.md
-#   posts/zh/my-post.md   (same slug; omit to fall back to en)
+#   posts/zh-Hans/my-post.md   (same slug; omit to fall back to en)
 
 # Retire content: list it in sync-delete.list at the repo root
 #   posts/en/old-post.md
@@ -287,7 +291,7 @@ node .agents/skills/awareride-content-sync/scripts/apply-delete-list.mjs \
 
 # Add a doc page for product PRODUCT (set in sync-docs.yml; must be registered on the hub)
 #   docs/en/my-page.md
-#   docs/zh/my-page.md   (optional)
+#   docs/zh-Hans/my-page.md   (optional)
 
 # Workflows live at .github/workflows/sync-{posts,docs}.yml
 # Secret on THIS repo: DOCS_CENTRAL_HUB_TOKEN

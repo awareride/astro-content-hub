@@ -76,5 +76,5 @@ npm run build   # 必须 0 错误(astro check + build)
 ```bash
 ls dist/
 ls dist/vite/docs/   # 示例产品文档
-ls dist/zh/          # 本地化镜像
+ls dist/zh-Hans/     # 本地化路由
 ```

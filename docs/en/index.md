@@ -31,8 +31,8 @@ for how that works.
 - **Hub + content-sync model.** External projects author `posts/` and `docs/`
   and sync them in via a GitHub Action that opens a PR. One hub, many source
   repos, and nothing lands on `main` without review.
-- **i18n with per-page fallback.** Default locale `en` (no URL prefix); `zh`
-  lives under `/zh/...`. A missing translation renders the default-language
+- **i18n with per-page fallback.** Default locale `en` (no URL prefix); `zh-Hans`
+  lives under `/zh-Hans/...`. A missing translation renders the default-language
   body inside the localized shell - never a 404.
 - **Modern reading UX.** Dark mode, docs table of contents with
   active-section highlighting, prev/next pagination, copy-code buttons, and

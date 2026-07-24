@@ -24,12 +24,12 @@ GitHub Action 校验内容,并向中心的 `main` 分支发起一个**拉取请�
 <external-project>/
   posts/
     en/hello-world.md          <- 中心上的 /posts/hello-world/
-    zh/hello-world.md          <- 与 en 文件名相同(slug 约定)
+    zh-Hans/hello-world.md     <- 与 en 文件名相同(slug 约定)
     en/my-product/foo.md       <- 嵌套目录成为路径片段
   docs/
     en/index.md                <- 产品文档落地页
     en/getting-started.md
-    zh/index.md                <- 可选;缺失时回退到 en
+    zh-Hans/index.md           <- 可选;缺失时回退到 en
   .agents/skills/awareride-content-sync/   <- 同步 skill(已复制)
   sync-delete.list             <- 可选删除清单(见下文)
 ```
@@ -70,21 +70,21 @@ order: 2                     # 可选,侧边栏排序(默认 0)
 ## Slug 约定
 
 文件的 slug 是其相对于 locale 目录、去掉 `.md` 后的路径。slug **必须在各语言
-间逐字节一致**,回退才能生效(`en/foo.md` 与 `zh/foo.md` 的 slug 都是 `foo`)。
+间逐字节一致**,回退才能生效(`en/foo.md` 与 `zh-Hans/foo.md` 的 slug 都是 `foo`)。
 务必先写 `en` 版本。
 
 ## 回退
 
-回退是逐页、内容级别的,绝不是重定向。缺失的 `zh` 页面会在 `zh` 外壳中渲染
-`en` 正文并显示提示;`/zh/posts/` 上的文章卡片会显示 `EN` 徽章。先发布 `en`,
+回退是逐页、内容级别的,绝不是重定向。缺失的 `zh-Hans` 页面会在 `zh-Hans` 外壳中渲染
+`en` 正文并显示提示;`/zh-Hans/posts/` 上的文章卡片会显示 `EN` 徽章。先发布 `en`,
 再逐步翻译 —— 站点永远不会因缺失翻译而返回 404。
 
 ## 内部链接
 
 - 在 `en` 文章/文档中,使用默认路径链接:`/posts/foo/`、
   `/<product>/docs/bar/`。
-- 在 `zh` 文章/文档中,使用 `/zh/` 前缀让读者留在中文外壳中:
-  `/zh/posts/foo/`、`/zh/<product>/docs/bar/`。
+- 在 `zh-Hans` 文章/文档中,使用 `/zh-Hans/` 前缀让读者留在中文外壳中:
+  `/zh-Hans/posts/foo/`、`/zh-Hans/<product>/docs/bar/`。
 
 ## 本地校验
 
@@ -95,7 +95,7 @@ node .agents/skills/awareride-content-sync/scripts/validate.mjs
 ```
 
 它遇到任何错误都会以非零状态退出,因此可以作为同步工作流的把关。它会捕获
-缺失/无效的 frontmatter、没有对应 `en` 文件的 `zh` 文件,以及缺失的 `en/`
+缺失/无效的 frontmatter、没有对应 `en` 文件的 `zh-Hans` 文件,以及缺失的 `en/`
 locale 目录。每当你新增或重命名内容文件时都应运行它。
 
 ## 同步到中心
@@ -120,7 +120,7 @@ locale 目录。每当你新增或重命名内容文件时都应运行它。
 ```text
 # 每行一个路径,相对于仓库根目录;'#' 与空行会被忽略
 posts/en/old-post.md
-posts/zh/old-post.md
+posts/zh-Hans/old-post.md
 docs/en/legacy/        # 尾部斜杠 = 删除整个目录
 ```
 
@@ -132,13 +132,13 @@ docs/en/legacy/        # 尾部斜杠 = 删除整个目录
 
 ## 注册新产品(仅文档)
 
-只有当产品注册在中心的 `products` 数组(`src/lib/i18n.ts`)中时,其文档才会在
+只有当产品注册在中心的 `products` 数组(`src/config/products.ts`)中时,其文档才会在
 中心渲染。这是所有者通过 PR 完成的**一次性中心侧变更** —— 外部仓库无法通过
 同步完成。合并后,在你的 `sync-docs.yml` 中设置 `PRODUCT`。文章无需注册。
 
 ## 什么会破坏中心的构建
 
 中心运行 `npm run build`(Astro + `astro check`,预期零错误)。你的内容可能因
-以下原因破坏构建:frontmatter 类型不匹配、同语言内 slug 重复、只有 `zh` 而没有
+以下原因破坏构建:frontmatter 类型不匹配、同语言内 slug 重复、只有 `zh-Hans` 而没有
 对应 `en` 文件的 slug,或指向不存在页面的内部链接。`validate.mjs` 能捕获其中
 大部分;推送前请运行它。

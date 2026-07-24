@@ -36,7 +36,7 @@
 - [ ] `npm run build` passes locally
 - [ ] Spot-checked the affected route(s) in `dist/` (if a rendering change)
 - [ ] For content: `en` version written first; slugs are byte-identical across
-      locales; internal links in localized pages use the `/zh/...` prefix
+      locales; internal links in localized pages use the `/zh-Hans/...` prefix
 
 ## Notes for reviewers
 

@@ -62,7 +62,7 @@ site looks complete out of the box. Replace it with your own.
   projects author content and sync it in via a GitHub Action that opens a PR.
   One hub, many source repos, nothing on `main` without review.
 - **i18n with per-page fallback.** Default locale `en` has no URL prefix;
-  other locales live under `/<locale>/...` (currently `zh`). A missing
+  other locales live under `/<locale>/...` (currently `zh-Hans`). A missing
   translation renders the default-language body inside the localized shell -
   never a 404. Ship `en` first, translate incrementally.
 - **Data-driven products.** Products come from the `products` array in
@@ -88,8 +88,8 @@ site looks complete out of the box. Replace it with your own.
 
 - **Canonical URLs** on every page (correct under a sub-path deploy).
 - **Sitemap** (`/sitemap-index.xml`) via `@astrojs/sitemap`, with `hreflang`
-  `en`/`zh` grouping.
-- **RSS feed** at `/rss.xml` (en) and `/zh/rss.xml` (zh), with feed-discovery
+  `en`/`zh-Hans` grouping.
+- **RSS feed** at `/rss.xml` (en) and `/zh-Hans/rss.xml` (zh-Hans), with feed-discovery
   `<link>` in the `<head>`.
 - **`robots.txt`** pointing at the sitemap.
 - **Custom 404 page** (excluded from the sitemap).
@@ -105,7 +105,7 @@ site looks complete out of the box. Replace it with your own.
 
 ### Content discovery
 
-- **Tag pages** at `/posts/tags/[tag]` (+ `/zh/` twin), with a tag chip row on
+- **Tag pages** at `/posts/tags/[tag]` (+ `/zh-Hans/` twin), with a tag chip row on
   the posts listing and clickable tags on every post card.
 - **Related posts** on article pages (by shared tags).
 - **Post breadcrumbs** (`Home / Posts / <title>`).
@@ -117,8 +117,8 @@ prerendered to `dist/` and served as plain static files.
 
 ```mermaid
 flowchart TD
-    A["source repo: my-posts<br/>posts/en · posts/zh"]
-    B["source repo: vite-docs<br/>docs/en · docs/zh"]
+    A["source repo: my-posts<br/>posts/en · posts/zh-Hans"]
+    B["source repo: vite-docs<br/>docs/en · docs/zh-Hans"]
 
     A -->|"GitHub Action<br/>validate + open PR"| HUB
     B -->|"GitHub Action<br/>validate + open PR"| HUB
@@ -139,7 +139,7 @@ Key pieces:
 
 - **Routing** is file-based under `src/pages/`. Product pages are *dynamic*
   (`src/pages/[product]/...`), so one set of route files serves every product.
-  The `zh` mirror lives under `src/pages/zh/`.
+  Non-default locales are served by universal `src/pages/[locale]/...` routes.
 - **Content collections** are defined declaratively in
   [`src/content.config.ts`](./src/content.config.ts), which loops
   `products × locales` (docs) and `locales` (posts) to generate collections.
@@ -194,7 +194,7 @@ The sample posts and docs are placeholders - delete the files under
 ## Authoring content
 
 Content is Markdown in `src/content/`, organized by locale. The default locale
-`en` has no URL prefix; `zh` lives under `/zh/...`.
+`en` has no URL prefix; `zh-Hans` lives under `/zh-Hans/...`.
 
 **Blog posts** live in `src/content/posts/<locale>/`:
 
@@ -225,9 +225,9 @@ Two rules that matter:
 
 1. **Slug contract.** A file's slug is its path relative to the locale dir,
    without `.md`. Filenames **must be byte-identical across locales** so
-   fallback works (`en/foo.md` and `zh/foo.md` both have slug `foo`). Always
+   fallback works (`en/foo.md` and `zh-Hans/foo.md` both have slug `foo`). Always
    write the `en` version first.
-2. **Internal links.** Inside a localized (`zh`) page, link to `/zh/...` paths
+2. **Internal links.** Inside a localized (`zh-Hans`) page, link to `/zh-Hans/...` paths
    so readers stay in the localized shell.
 
 For the complete guide - frontmatter schemas, the `index` slug special case,
@@ -248,25 +248,25 @@ export const products: Product[] = [
 ];
 ```
 
-This auto-generates the `mytoolDocsEn` / `mytoolDocsZh` collections, a landing
+This auto-generates the `mytoolDocsEn` / `mytoolDocsZhHans` collections, a landing
 card, and the docs routes. Then add content:
 
 ```
 src/content/docs/mytool/en/index.md
 src/content/docs/mytool/en/getting-started.md
-src/content/docs/mytool/zh/index.md        # optional; falls back to en
+src/content/docs/mytool/zh-Hans/index.md   # optional; falls back to en
 ```
 
 Routes are dynamic, so no new route files are needed. Run `npm run build` and
-verify `/mytool/docs/` and `/zh/mytool/docs/` render.
+verify `/mytool/docs/` and `/zh-Hans/mytool/docs/` render.
 
 ### Add a locale
 
 Append to `locales` in [`src/lib/i18n.ts`](./src/lib/i18n.ts), add a block to
-every `Record<Locale, …>` table (`t`, `home`, `localeLabel`, `localeCode`),
-create the content dirs, and mirror `src/pages/zh/` under
-`src/pages/<locale>/`. Collection code is generic over the locale list, so no
-per-language files are needed beyond the route mirror. See
+every `Record<Locale, …>` table (`t`, `home`, `productCopy`, `localeLabel`,
+`localeCode`), and create the content dirs. **No route files are needed** -
+non-default locales are served by universal `src/pages/[locale]/...` routes,
+so adding a locale is a data-only change. See
 [Authoring content - Add a new language](./docs/en/authoring.md#add-a-new-language).
 
 ### Sync content from an external repo
@@ -279,7 +279,7 @@ syncs them in via a PR:
 <external-project>/
   posts/
     en/hello-world.md          <- /posts/hello-world/ on the hub
-    zh/hello-world.md          <- same filename as en/ (slug contract)
+    zh-Hans/hello-world.md     <- same filename as en/ (slug contract)
   docs/
     en/index.md                <- product docs landing page
     en/getting-started.md
@@ -333,12 +333,12 @@ astro-content-hub/                 <- the hub (Astro site) at the repo root
 │   ├── content/                 <- markdown collections (posts + docs)
 │   ├── content.config.ts        <- collection schemas (zod) + glob loaders
 │   ├── lib/                     <- i18n.ts, content.ts, docs.ts, feed.ts, remark-rewrite-links.mjs, heading-ids.mjs
-│   ├── pages/                   <- file-based routes (+ zh/ mirror)
+│   ├── pages/                   <- file-based routes (+ [locale]/ universal routes)
 │   └── styles/global.css        <- structural tokens + .prose typography (+ theme.css for brand)
 ├── public/                      <- favicon, images, CNAME
 ├── docs/                        <- this template's own docs (synced into the hub)
 ├── examples/                    <- sample external repos that sync INTO the hub
-│   ├── my-posts/                <- a posts example (en/zh)
+│   ├── my-posts/                <- a posts example (en/zh-Hans)
 │   ├── vite-docs/               <- a docs example (PRODUCT=vite)
 │   ├── astro-docs/             <- a docs example (PRODUCT=astro)
 │   └── json-server-docs/        <- a docs example (PRODUCT=json-server)
@@ -350,7 +350,7 @@ astro-content-hub/                 <- the hub (Astro site) at the repo root
 ## Documentation
 
 This template's documentation lives in [`docs/en/`](./docs/en) (with a Chinese
-mirror in [`docs/zh/`](./docs/zh)). It is also rendered on the live site at
+mirror in [`docs/zh-Hans/`](./docs/zh-Hans)). It is also rendered on the live site at
 [the `astro-content-hub` product docs](https://awareride.github.io/astro-content-hub/astro-content-hub/docs/).
 
 | Page | What it covers |

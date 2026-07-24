@@ -31,7 +31,7 @@ astro-content-hub/            <- 中心(Astro 站点)位于仓库根目录
 │   ├── content.config.ts     <- 集合 schema + glob 加载器
 │   ├── lib/                  <- i18n.ts, content.ts, docs.ts, feed.ts,
 │   │                          remark-rewrite-links.mjs, heading-ids.mjs
-│   ├── pages/                <- 基于文件的路由(+ zh/ 镜像)
+│   ├── pages/                <- 基于文件的路由(+ [locale]/ 通用路由)
 │   └── styles/global.css     <- 设计变量 + .prose 排版 + 暗色主题
 ├── public/                   <- favicon, images, CNAME
 ├── .github/workflows/        <- deploy.yml (GH Pages + CF Pages), sync-docs.yml
@@ -48,10 +48,12 @@ astro-content-hub/            <- 中心(Astro 站点)位于仓库根目录
 - `/<product>` -- 产品落地页,由 `src/config/products.ts` 的 `products` 数组**动态**
   提供。
 - `/<product>/docs`、`/<product>/docs/[...slug]` —— 文档索引 + 捕获所有路由。
-- `zh` 镜像位于 `src/pages/zh/` 下。
+- 非默认语言由 `src/pages/[locale]/...` 下的**通用路由**提供,这些路由
+  在 `getStaticPaths` 中遍历 `locales`(除去默认语言)。一套路由文件即可
+  服务所有非默认语言。
 
-由于产品页面由数据驱动,**你无需为每个产品创建路由文件。** 在 `products` 中
-添加一项,路由与文档集合即自动生成。
+由于产品与语言页面均由数据驱动,**你无需为每个产品或语言创建路由文件。** 在
+`products` 中添加一项,路由与文档集合即自动生成。
 
 ## 布局组合
 
@@ -79,7 +81,8 @@ Markdown 通过 `astro:content` 的 `render(entry)` 渲染;页面将 `<Content /
 
 | 文件 | 职责 |
 |------|------|
-| `i18n.ts` | 单一事实来源:`locales`、`defaultLocale`、`t`(UI 字符串)、`home`(落地文案)、`products` 及路径/语言辅助函数。 |
+| `i18n.ts` | 单一事实来源:`locales`、`defaultLocale`、`t`(UI 字符串)、`home`(落地文案)、`productCopy` 及路径/语言辅助函数。 |
+| `config/products.ts` | 产品注册表(`products` 数组)—— 列出提供文档与落地卡片的产品。 |
 | `content.ts` | 本地化路径生成 + 回退渲染辅助(文档 + 文章)。 |
 | `docs.ts` | `buildNav` —— 侧边栏构建(index → 基础路径,按 `order` 排序)。 |
 | `remark-rewrite-links.mjs` | 重写文档链接,使 `docs/<product>/<locale>/` 解析为 `/<product>/docs`。 |

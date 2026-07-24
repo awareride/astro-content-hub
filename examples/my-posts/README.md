@@ -9,7 +9,7 @@ my-posts/
 ├── posts/
 │   ├── en/                  <- default-locale posts (required)
 │   │   └── hello-from-my-repo.md
-│   └── zh/                  <- Chinese translations (optional, fallback to en)
+│   └── zh-Hans/             <- Chinese translations (optional, fallback to en)
 │       └── hello-from-my-repo.md
 ├── sync-delete.list         <- opt-in deletion manifest (see below)
 ├── .github/workflows/
