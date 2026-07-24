@@ -77,7 +77,27 @@ for (const raw of lines) {
   }
 
   const rel = line.slice(prefix.length + 1).replace(/\/+$/, '');
-  const target = resolve(HUB_DIR, rel);
+
+  // The `landing` namespace renames at copy time: landing/<locale>.md ->
+  // product-info/<locale>/${PRODUCT}.md. So the delete target is not a straight
+  // path mirror (unlike posts/docs) but <locale>/${PRODUCT}.md under HUB_DIR.
+  let targetRel = rel;
+  if (prefix === 'landing') {
+    const locale = rel.replace(/\.md$/, '');
+    const SUPPORTED = ['en', 'zh-Hans'];
+    if (!SUPPORTED.includes(locale)) {
+      console.warn(`  skip (not a known locale): ${line}`);
+      skipped++;
+      continue;
+    }
+    if (!process.env.PRODUCT) {
+      console.warn(`  skip (PRODUCT env not set; needed for landing deletes): ${line}`);
+      skipped++;
+      continue;
+    }
+    targetRel = `${locale}/${process.env.PRODUCT}.md`;
+  }
+  const target = resolve(HUB_DIR, targetRel);
 
   if (!isWithin(HUB_DIR, target)) {
     // Catches "..", absolute paths, the bare "<prefix>/" (collection root),

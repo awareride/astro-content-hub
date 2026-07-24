@@ -32,10 +32,10 @@ See `AGENTS.md`.
   Locale codes are BCP-47-style; the non-default locale is `zh-Hans` (script
   subtag included), so URLs are `/zh-Hans/...`.
 - `src/content.config.ts` auto-generates collections by looping
-  `products × locales` for docs and `locales` for posts. Collection names use a
-  PascalCase locale suffix via `collectionSuffix()` (e.g. `zh-Hans` ->
-  `postsZhHans`, `viteDocsZhHans`). Adding a product or locale is a one-line
-  change there.
+  `products × locales` for docs, `locales` for posts, and `locales` for product
+  landing info (`product-info`). Collection names use a PascalCase locale
+  suffix via `collectionSuffix()` (e.g. `zh-Hans` -> `postsZhHans`,
+  `viteDocsZhHans`). Adding a product or locale is a one-line change there.
 - `src/lib/content.ts` owns path generation + fallback rendering for both docs
   and posts. Route files are thin and delegate to it.
 - Product pages are **dynamic**: `src/pages/[product]/...` serves every product
@@ -112,6 +112,58 @@ Steps:
 4. Run `npm run build`. No route changes - the dynamic catch-all
    (`src/pages/[product]/docs/[...slug].astro` and the universal
    `src/pages/[locale]/[product]/docs/[...slug].astro`) picks it up automatically.
+
+## Task: add a product landing page (auto-generated)
+
+A product's landing page has three tiers, in order of precedence:
+
+1. **Hand-written override** - `src/components/product-landing/<slug>.astro`
+   renders fully custom `<main>` sections. Highest precedence.
+2. **Auto-generated from `product-info`** - a structured Markdown file at
+   `src/content/product-info/<locale>/<slug>.md` whose frontmatter drives a
+   rich landing (hero + tagline, highlights, install snippet, feature grid, an
+   optional `.prose` overview body, and a CTA).
+3. **Minimal default** - `ProductLandingDefault.astro` renders a hero + CTA.
+   Lowest precedence, used when neither of the above exists.
+
+Products without a `product-info` file look exactly as before (tier 3).
+
+**Frontmatter schema** (`productInfoSchema` in `content.config.ts`):
+
+```yaml
+---
+tagline: "One-line subtitle under the product name."   # required
+description: "Short summary for <meta> and cards."       # required
+features:                                                # optional; feature grid
+  - title: "Feature name"
+    body: "One or two sentences."
+install: |                                              # optional; code snippet block
+  npm install -g my-tool
+highlights:                                              # optional; stat/label row
+  - label: "License"
+    value: "MIT"
+links:                                                  # optional; extra action buttons
+  - label: "Website"
+    href: "https://example.com"
+---
+
+<!-- Optional body: a curated overview, rendered as styled prose. -->
+```
+
+Steps:
+1. Create `src/content/product-info/en/<slug>.md` (the `<slug>` is the
+   product's slug from `src/config/products.ts`, used as the filename).
+2. For Chinese, create `src/content/product-info/zh-Hans/<slug>.md` (same
+   filename). Missing `zh-Hans` falls back to `en` body + notice, like docs.
+3. Run `npm run build`. No route changes - `ProductLandingDefault.astro`
+   resolves the product-info file at render time (via
+   `getLocalizedProductInfo()` in `lib/content.ts`) and renders the rich
+   landing when present.
+
+**Note for per-product themes:** a `product-info` landing inherits the
+product theme tokens (see `data-product` / `product-themes/`) because it reads
+`var(--color-*)`, so an auto-generated landing and a themed product compose
+for free. A hand-written override also inherits themed tokens.
 
 ## Task: add a new product's docs
 
@@ -228,4 +280,5 @@ src/pages/               en routes (no prefix) + [locale]/ routes (/<locale>/ pr
                          [product]/... are dynamic, serving every product
 src/content/docs/<prod>/<locale>/   docs markdown
 src/content/posts/<locale>/          posts markdown (nested dirs ok)
+src/content/product-info/<locale>/<slug>.md   product landing info (auto-gen)
 ```

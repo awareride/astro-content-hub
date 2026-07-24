@@ -36,6 +36,9 @@ This keeps relative markdown links working on GitHub: they resolve against
       getting-started.md
     zh-Hans/
       index.md                <- optional; falls back to en if absent
+  landing/                       <- OPTIONAL; one file per locale, drives the auto-generated landing
+    en.md                      <- product slug injected at sync: -> product-info/en/${PRODUCT}.md
+    zh-Hans.md                 <- optional; falls back to en if absent
   skills/site-content-sync/      <- this skill (copied in)
     SKILL.md
     scripts/validate.mjs
@@ -80,6 +83,41 @@ order: 2                     # optional, defaults to 0; controls sidebar sort or
   regardless of `order`; `order` controls the remaining pages, then ties
   break by `title`.
 - Docs do **not** have `date`, `tags`, `author`, or `draft`.
+
+### Product landing info (`landing/<locale>.md`) - optional
+
+A product can ship a **structured landing page** (hero + highlights + install
+snippet + feature grid + an optional curated overview body) instead of the
+minimal default. One file per locale at `landing/<locale>.md` (e.g.
+`landing/en.md`). The product slug is **not** in the filename - it is injected
+at sync time from the `PRODUCT` env var, so the file lands at
+`src/content/product-info/<locale>/${PRODUCT}.md` on the hub.
+
+```yaml
+---
+tagline: "One-line subtitle shown under the product name."  # required
+description: "Short summary for <meta> and cards."            # required
+features:                                                      # optional; feature grid
+  - title: "Feature name"
+    body: "One or two sentences."
+install: |                                                    # optional; code snippet block
+  npm install -g my-tool
+highlights:                                                    # optional; stat/label row
+  - label: "License"
+    value: "MIT"
+links:                                                        # optional; extra action buttons
+  - label: "Website"
+    href: "https://example.com"
+---
+
+<!-- Optional body: a curated overview, rendered as styled prose.
+     Markdown (headings, code blocks, lists) is supported. -->
+```
+
+A hand-written landing override at
+`src/components/product-landing/<slug>.astro` (on the hub) always takes
+precedence over this file. With no override and no landing file, the product
+gets the minimal default landing (hero + CTA).
 
 ## The slug contract (critical)
 
@@ -166,11 +204,14 @@ Copy from `skills/site-content-sync/templates/`:
 - If you contribute docs: copy `sync-docs.yml` to
   `.github/workflows/sync-docs.yml`, and set the `PRODUCT` env var in it to
   your product name (e.g. `vite`). The product must be registered on the hub
-  (see "Registering a new product").
+  (see "Registering a new product"). The same workflow also syncs an optional
+  `landing/` directory (one file per locale) that drives the auto-generated
+  product landing page - see "Product landing info" above. No landing file =
+  the minimal default landing.
 
 Both run validation first, then sync. They trigger on pushes to `main` that
-touch `posts/**` or `docs/**` respectively, and can be run manually via the
-Actions tab ("workflow_dispatch").
+touch `posts/**` (sync-posts) or `docs/**` + `landing/**` (sync-docs)
+respectively, and can be run manually via the Actions tab ("workflow_dispatch").
 
 ### 3. Directory mapping (how the copy works)
 
@@ -178,6 +219,7 @@ Actions tab ("workflow_dispatch").
 |----------|-----|
 | `posts/` | `src/content/posts/` |
 | `docs/` | `src/content/docs/${PRODUCT}/` |
+| `landing/<locale>.md` | `src/content/product-info/<locale>/${PRODUCT}.md` (optional) |
 
 The product segment (`${PRODUCT}/`) is added by sync from the `PRODUCT` env
 var; it is **not** present in the external repo. This is what lets relative
@@ -210,9 +252,13 @@ Rules:
 - Paths are relative to the repo root and match the external file path, so
   they map through the copy (`posts/...` -> `src/content/posts/...`,
   `docs/...` -> `src/content/docs/${PRODUCT}/...`).
-- A single `sync-delete.list` can mix `posts/` and `docs/` entries. The
-  `sync-posts` workflow only processes `posts/...` lines and the `sync-docs`
-  workflow only processes `docs/...` lines; the other namespace is skipped.
+- A single `sync-delete.list` can mix `posts/`, `docs/`, and `landing/`
+  entries. The `sync-posts` workflow only processes `posts/...` lines; the
+  `sync-docs` workflow processes both `docs/...` and `landing/...` lines.
+- For `landing/`, the entry is `landing/<locale>.md` (e.g.
+  `landing/en.md`). The script applies the PRODUCT rename
+  (`landing/<locale>.md` -> `product-info/<locale>/${PRODUCT}.md`), so the
+  list entry mirrors the external path, just like `docs/...`.
 - A trailing slash means "delete the whole directory".
 - Unsafe paths (parent traversal `..`, absolute paths, or the bare collection
   root like `posts/`) are rejected with a warning.
@@ -282,7 +328,7 @@ node skills/site-content-sync/scripts/validate.mjs
 
 # Apply a sync-delete.list against a hub checkout (used by the workflows)
 node skills/site-content-sync/scripts/apply-delete-list.mjs \
-  <hub-collection-dir> <posts|docs>
+  <hub-collection-dir> <posts|docs|landing>
 
 # Add a post (en + zh-Hans)
 #   posts/en/my-post.md
@@ -292,10 +338,16 @@ node skills/site-content-sync/scripts/apply-delete-list.mjs \
 #   posts/en/old-post.md
 #   posts/zh-Hans/old-post.md
 #   docs/en/legacy/    (trailing slash = whole dir)
+#   landing/en.md       (retire the en landing; mapped to product-info/en/${PRODUCT}.md)
 
 # Add a doc page for product PRODUCT (set in sync-docs.yml; must be registered on the hub)
 #   docs/en/my-page.md
 #   docs/zh-Hans/my-page.md   (optional)
+
+# Add an auto-generated product landing (optional; drives a rich landing page)
+#   landing/en.md             (one file per locale; slug = PRODUCT, injected at sync)
+#   landing/zh-Hans.md        (optional; falls back to en)
+#   frontmatter: tagline + description (required), features/install/highlights/links (optional)
 
 # Workflows live at .github/workflows/sync-{posts,docs}.yml
 # Secret on THIS repo: <HUB_TOKEN_SECRET>
