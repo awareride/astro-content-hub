@@ -182,7 +182,75 @@ export async function getLocalizedDocIndex(
 }
 
 // ---------------------------------------------------------------------------
-// Posts — same fallback pattern as docs, but collections are named
+// Product landing info - structured per-product Markdown that drives the
+// auto-generated landing page. One file per product + locale at
+// src/content/product-info/<locale>/<slug>.md; falls back to the default
+// locale like docs/posts. Returns frontmatter fields + the rendered body.
+// ---------------------------------------------------------------------------
+
+function productInfoCollectionName(locale: Locale): string {
+  return `productInfo${collectionSuffix(locale)}`;
+}
+
+export interface ProductInfoEntryLike {
+  id: string;
+  body?: string;
+  data: {
+    tagline: string;
+    description: string;
+    features: { title: string; body: string }[];
+    install?: string;
+    highlights: { label: string; value: string }[];
+    links: { label: string; href: string }[];
+  };
+  render(): Promise<{ Content: any; headings: MarkdownHeading[] }>;
+}
+
+export interface ProductInfo {
+  tagline: string;
+  description: string;
+  features: { title: string; body: string }[];
+  install?: string;
+  highlights: { label: string; value: string }[];
+  links: { label: string; href: string }[];
+  Content: any;
+  hasBody: boolean;
+  locale: Locale;
+  isFallback: boolean;
+}
+
+/** Resolve a product's landing info for a locale, with default-locale fallback.
+ *  Returns null when no file exists for the product in either locale. */
+export async function getLocalizedProductInfo(
+  slug: string,
+  locale: Locale,
+): Promise<ProductInfo | null> {
+  const primary: ProductInfoEntryLike[] = await getCollection(productInfoCollectionName(locale) as any);
+  let entry = primary.find((d) => d.id === slug);
+  let isFallback = false;
+  if (!entry && locale !== defaultLocale) {
+    const fallback: ProductInfoEntryLike[] = await getCollection(productInfoCollectionName(defaultLocale) as any);
+    entry = fallback.find((d) => d.id === slug);
+    isFallback = true;
+  }
+  if (!entry) return null;
+  const { Content } = await render(entry as any);
+  return {
+    tagline: entry.data.tagline,
+    description: entry.data.description,
+    features: entry.data.features,
+    install: entry.data.install,
+    highlights: entry.data.highlights,
+    links: entry.data.links,
+    Content,
+    hasBody: Boolean(entry.body && entry.body.trim()),
+    locale,
+    isFallback,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Posts - same fallback pattern as docs, but collections are named
 // `posts<Locale>` (no product prefix) and drafts are filtered out.
 // ---------------------------------------------------------------------------
 

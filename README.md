@@ -144,7 +144,8 @@ Key pieces:
   Non-default locales are served by universal `src/pages/[locale]/...` routes.
 - **Content collections** are defined declaratively in
   [`src/content.config.ts`](./src/content.config.ts), which loops
-  `products × locales` (docs) and `locales` (posts) to generate collections.
+  `products × locales` (docs) and `locales` (posts, product landing info) to
+  generate collections.
 - **i18n** has a single source of truth in
   [`src/lib/i18n.ts`](./src/lib/i18n.ts): `locales`, UI strings (`t`), landing
   copy (`home`), and path/locale helpers.
@@ -300,6 +301,13 @@ shows the contract - reuse shared CSS classes (`.product-hero`, `.section`,
 `.btn`, `.feature-grid`, ...) and add a scoped `<style>` only when the global
 classes do not fit.
 
+**Auto-generated landings (no code).** Between the full override and the
+minimal default, a product can ship a **structured landing** from a Markdown
+file at `src/content/product-info/<locale>/<slug>.md`. Its frontmatter
+(`tagline`, `features`, `install`, `highlights`, `links`, and an optional prose
+overview body) renders a rich landing with no component code. A hand-written
+override always takes precedence; with neither, the minimal default is used.
+
 ### Add a locale
 
 Append to `locales` in [`src/lib/i18n.ts`](./src/lib/i18n.ts), add a block to
@@ -323,6 +331,8 @@ syncs them in via a PR:
   docs/
     en/index.md                <- product docs landing page
     en/getting-started.md
+  landing/                      <- optional; one file per locale, auto-generated landing
+    en.md
   .github/workflows/sync-posts.yml   <- copies posts/ into the hub on push
 ```
 
@@ -357,6 +367,11 @@ For the full flow - frontmatter schemas, the deletion manifest
   shadows) stay in [`src/styles/global.css`](./src/styles/global.css) and rarely
   need changing; reuse them in scoped `<style>` blocks instead of hard-coded
   values.
+- **Per-product themes** let one product (e.g. a "green" brand) override the
+  site's color tokens for its landing + docs pages. Add
+  `src/styles/product-themes/<slug>.css` (scoped to `html[data-product="<slug>"]`)
+  and an `@import` in `product-themes/index.css`; product routes emit
+  `data-product` automatically. See [`THEMING.md`](./THEMING.md).
 - **Markdown typography** is the single `.prose` class in `global.css`. Wrap
   `<Content />` in `class="prose"` on any new Markdown-rendering page.
 - **Site name / UI strings / landing copy** are in
@@ -371,11 +386,12 @@ astro-content-hub/                 <- the hub (Astro site) at the repo root
 │   ├── components/              <- Layout, Nav, Footer, DocsLayout, PostCard, LocaleSwitcher, ThemeToggle, TableOfContents, TagPage, ProductLandingDefault
 │   ├── components/product-landing/  <- optional per-product landing overrides (one file per product, keyed by slug)
 │   ├── config/products.ts       <- the products registry (add a product here)
-│   ├── content/                 <- markdown collections (posts + docs)
+│   ├── content/                 <- markdown collections (posts + docs + product-info)
 │   ├── content.config.ts        <- collection schemas (zod) + glob loaders
 │   ├── lib/                     <- i18n.ts, content.ts, docs.ts, feed.ts, product-landing.ts, remark-rewrite-links.mjs, heading-ids.mjs
 │   ├── pages/                   <- file-based routes (+ [locale]/ universal routes)
-│   └── styles/global.css        <- structural tokens + .prose typography (+ theme.css for brand)
+│   ├── styles/global.css        <- structural tokens + .prose typography (+ theme.css for brand)
+│   └── styles/product-themes/   <- optional per-product color themes (<slug>.css)
 ├── public/                      <- favicon, images, CNAME
 ├── docs/                        <- this template's own docs (synced into the hub)
 ├── examples/                    <- sample external repos that sync INTO the hub

@@ -27,7 +27,7 @@ const alternates = buildAlternates(`/${product.slug}`);
 const Override = getProductLanding(product.slug);
 ---
 
-<Layout title={product.name} description={c.metaDescription.replace('{name}', product.name)} locale={locale} alternates={alternates}>
+<Layout title={product.name} description={c.metaDescription.replace('{name}', product.name)} locale={locale} alternates={alternates} productSlug={product.slug}>
   <Nav alternates={alternates} />
 
   <main>

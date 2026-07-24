@@ -25,6 +25,7 @@ export interface Props {
   isFallback?: boolean;
   headings?: MarkdownHeading[];
   alternates?: Partial<Record<Locale, string>>;
+  productSlug?: string;
 }
 
 const {
@@ -38,6 +39,7 @@ const {
   isFallback = false,
   headings = [],
   alternates,
+  productSlug,
 } = Astro.props;
 
 const ui = t[locale];
@@ -56,7 +58,7 @@ const prevDoc = navIdx > 0 ? navItems[navIdx - 1] : null;
 const nextDoc = navIdx >= 0 && navIdx < navItems.length - 1 ? navItems[navIdx + 1] : null;
 ---
 
-<Layout title={title} description={description} locale={locale} alternates={alternates}>
+<Layout title={title} description={description} locale={locale} alternates={alternates} productSlug={productSlug}>
   <Nav alternates={alternates} />
 
   <main>
