@@ -1,0 +1,13 @@
+# Configuration for the GitHub issue template chooser.
+# Disables blank issues so contributors pick a template (or a contact link).
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://github.com/awareride/astro-content-hub/tree/main/docs/en
+    about: Read the docs (Architecture, Authoring, Content sync, Deployment) before opening an issue.
+  - name: Security report
+    url: https://github.com/awareride/astro-content-hub/security/advisories/new
+    about: Report a security vulnerability privately - do not open a public issue.
+  - name: Question / discussion
+    url: https://github.com/awareride/astro-content-hub/issues/new?labels=question
+    about: Ask a "how do I..." question (label it `question`).
