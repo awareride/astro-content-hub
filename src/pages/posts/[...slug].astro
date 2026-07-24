@@ -7,7 +7,9 @@ import Layout from '../../components/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import { renderLocalizedPost } from '../../lib/content';
-import { buildAlternates, localeCode, withBase } from '../../lib/i18n';
+import { getRelatedPosts, tagSlug } from '../../lib/content';
+import PostCard from '../../components/PostCard.astro';
+import { buildAlternates, localeCode, localizePath, withBase } from '../../lib/i18n';
 
 export async function getStaticPaths() {
   const { getPostLocalizedPaths } = await import('../../lib/content');
@@ -20,6 +22,7 @@ if (!page) return Astro.redirect(withBase('/posts'));
 const { Content, data } = page;
 const { title, date, description, tags, author, source } = data;
 const alternates = buildAlternates(`/posts/${slug}`);
+const related = await getRelatedPosts('en', slug, 3);
 
 const formattedDate = date.toLocaleDateString(localeCode.en, {
   year: 'numeric',
@@ -32,6 +35,11 @@ const formattedDate = date.toLocaleDateString(localeCode.en, {
   <Nav alternates={alternates} />
 
   <main>
+    <div class="container" style="padding-top: 1.5rem;">
+      <div class="docs-breadcrumb">
+        <a href={withBase(localizePath('/', 'en'))}>Home</a> / <a href={withBase(localizePath('/posts', 'en'))}>Posts</a> / <span>{title}</span>
+      </div>
+    </div>
     <article class="article">
       <a href={withBase('/posts')} class="article-back">← All Posts</a>
 
@@ -41,7 +49,9 @@ const formattedDate = date.toLocaleDateString(localeCode.en, {
         <div class="article-meta" style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
           {tags.length > 0 && (
             <div class="article-tags">
-              {tags.map(tag => <span class="tag">{tag}</span>)}
+              {tags.map(tag => (
+                <a class="tag" href={withBase(localizePath(`/posts/tags/${tagSlug(tag)}`, 'en'))}>{tag}</a>
+              ))}
             </div>
           )}
           {author && <span style="font-size:0.85rem; color:var(--color-text-muted);">by {author}</span>}
@@ -57,6 +67,30 @@ const formattedDate = date.toLocaleDateString(localeCode.en, {
         <Content />
       </div>
     </article>
+
+    {related.length > 0 && (
+      <section class="section" style="padding-top: 1rem;">
+        <div class="container">
+          <div class="section-header" style="margin-bottom: 1.5rem;">
+            <h2 style="font-size: 1.4rem;">Related posts</h2>
+          </div>
+          <div class="posts-grid">
+            {related.map(({ entry, isFallback }) => (
+              <PostCard
+                title={entry.data.title}
+                date={entry.data.date}
+                description={entry.data.description}
+                tags={entry.data.tags}
+                slug={entry.id}
+                source={null}
+                isFallback={isFallback}
+                locale="en"
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
   </main>
 
   <Footer />

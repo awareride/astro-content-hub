@@ -734,10 +734,26 @@ pre.astro-code code {
   position: relative;
 }
 
+/* Stretched link: the title <a> covers the whole card so the entire card is
+   clickable, while still allowing the tag links below to be independently
+   clicked (they sit above via position:relative + z-index:1). */
+.post-card-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-lg);
+}
+
+.post-card h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+
 .post-card-source {
   position: absolute;
   top: 0.75rem;
   right: 0.75rem;
+  z-index: 1;
   font-size: 0.65rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -793,6 +809,13 @@ pre.astro-code code {
   flex-wrap: wrap;
 }
 
+/* Tag links must sit above the stretched title link to stay independently
+   clickable. */
+.post-card-tags .tag {
+  position: relative;
+  z-index: 1;
+}
+
 .tag {
   font-size: 0.7rem;
   font-weight: 600;
@@ -800,6 +823,45 @@ pre.astro-code code {
   border-radius: 100px;
   background: var(--color-bg-alt);
   color: var(--color-text-muted);
+  transition: background var(--transition), color var(--transition);
+}
+
+/* Clickable tags (PostCard, article header, tag chip row). */
+a.tag {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+a.tag:hover {
+  background: var(--color-accent-subtle);
+  color: var(--color-accent-hover);
+}
+
+/* Tag chip row on the posts listing. */
+.posts-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.tag-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  padding: 0.3rem 0.75rem;
+}
+
+.tag-count {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0 0.35rem;
+  border-radius: 100px;
+  background: var(--color-border);
+  color: var(--color-text-secondary);
 }
 
 /* --- Article (single post) --- */
@@ -892,6 +954,35 @@ pre.astro-code code {
   font-size: 1.05rem;
   margin: 1.5rem 0 0.5rem;
   color: var(--color-text);
+}
+
+/* Heading anchor links (# beside each heading). Injected client-side; hidden
+   by default, revealed on heading hover. h1 (page title) gets none. */
+.prose h2,
+.prose h3,
+.prose h4 {
+  position: relative;
+}
+
+.heading-link {
+  position: absolute;
+  left: -1.25em;
+  opacity: 0;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  font-weight: 400;
+  transition: opacity var(--transition), color var(--transition);
+}
+
+.prose h2:hover .heading-link,
+.prose h3:hover .heading-link,
+.prose h4:hover .heading-link,
+.heading-link:focus-visible {
+  opacity: 1;
+}
+
+.heading-link:hover {
+  color: var(--color-accent-hover);
 }
 
 .prose p {

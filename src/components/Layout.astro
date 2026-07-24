@@ -75,5 +75,21 @@ const canonical = abs(stripBase(Astro.url.pathname));
 </head>
 <body>
   <slot />
+
+  <script>
+    // Heading anchor links: inject a `#` link beside each h2/h3/h4 in .prose
+    // that has an id, so readers can deep-link to a section. Progressive
+    // enhancement - the ids already exist (heading-ids plugin); this only adds
+    // the clickable glyph. h1 (page title) is skipped.
+    document.querySelectorAll('.prose h2[id], .prose h3[id], .prose h4[id]').forEach((h) => {
+      if (h.querySelector('.heading-link')) return; // idempotent
+      const a = document.createElement('a');
+      a.className = 'heading-link';
+      a.href = `#${h.id}`;
+      a.setAttribute('aria-label', 'Link to this section');
+      a.textContent = '#';
+      h.appendChild(a);
+    });
+  </script>
 </body>
 </html>

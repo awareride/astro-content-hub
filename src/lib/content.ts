@@ -271,3 +271,90 @@ export async function renderLocalizedPost(
   const { Content } = await render(entry as any);
   return { entry, Content, locale, isFallback, data: entry.data };
 }
+
+// ---------------------------------------------------------------------------
+// Tags - aggregate over the localized-posts set (incl. fallback), so a tag
+// page lists every post a reader would see on /posts, regardless of whether the
+// zh version exists. Tag slugs are normalized (lowercase, kebab-case, ASCII) so
+// `i18n` / `meta-architecture` are stable, display-friendly URLs.
+// ---------------------------------------------------------------------------
+
+/** Normalize a tag into a URL-safe slug (lowercase, kebab-case, ASCII-only).
+ *  Mirrors the slug a reader can type, and keeps en/zh tags that share text
+ *  on the same page (zh tags that are pure ASCII collapse with en). */
+export function tagSlug(tag: string): string {
+  return tag
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+export interface TagInfo {
+  /** URL slug for the tag page. */
+  slug: string;
+  /** Original (display) tag text, from the first post that used it. */
+  label: string;
+  /** Number of posts with this tag (in this locale, incl. fallback). */
+  count: number;
+}
+
+/** Every tag across the localized-posts set (incl. fallback), with counts.
+ *  The label shown is from the first post encountered that uses the tag, so it
+ *  reflects the locale's own wording when present. */
+export async function getAllTags(locale: Locale): Promise<TagInfo[]> {
+  const posts = await getLocalizedPosts(locale);
+  const map = new Map<string, TagInfo>();
+  for (const { entry } of posts) {
+    for (const tag of entry.data.tags) {
+      const slug = tagSlug(tag);
+      const existing = map.get(slug);
+      if (existing) {
+        existing.count += 1;
+      } else {
+        map.set(slug, { slug, label: tag, count: 1 });
+      }
+    }
+  }
+  // Most-used first, then alphabetical by label for a stable order.
+  return [...map.values()].sort(
+    (a, b) => b.count - a.count || a.label.localeCompare(b.label),
+  );
+}
+
+/** Posts that carry a given tag (by slug), in the given locale (with fallback).
+ *  Newest first. Used by the tag page route. */
+export async function getPostsByTag(
+  locale: Locale,
+  tag: string,
+): Promise<{ entry: PostEntryLike; isFallback: boolean }[]> {
+  const slug = tagSlug(tag);
+  const posts = await getLocalizedPosts(locale);
+  return posts
+    .filter(({ entry }) => entry.data.tags.some((t) => tagSlug(t) === slug))
+    .sort((a, b) => b.entry.data.date.getTime() - a.entry.data.date.getTime());
+}
+
+/** Up to `limit` posts sharing the most tags with `slug`, excluding itself.
+ *  Used for the "related posts" section on an article page. Falls back to the
+ *  newest other posts when no tags overlap. */
+export async function getRelatedPosts(
+  locale: Locale,
+  slug: string,
+  limit = 3,
+): Promise<{ entry: PostEntryLike; isFallback: boolean }[]> {
+  const posts = await getLocalizedPosts(locale);
+  const current = posts.find((p) => p.entry.id === slug);
+  const currentTags = current
+    ? new Set(current.entry.data.tags.map(tagSlug))
+    : new Set<string>();
+  const others = posts.filter((p) => p.entry.id !== slug);
+  return others
+    .map((p) => ({
+      p,
+      score: p.entry.data.tags.filter((t) => currentTags.has(tagSlug(t))).length,
+    }))
+    .sort((a, b) => b.score - a.score || b.p.entry.data.date.getTime() - a.p.entry.data.date.getTime())
+    .slice(0, limit)
+    .map(({ p }) => p);
+}
