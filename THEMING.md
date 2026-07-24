@@ -65,6 +65,38 @@ readable against it.
 - Components already use `var(--color-*)`, so they pick up your token changes
   automatically - no component edits needed.
 
+## Per-product themes
+
+A product can ship its own color theme (e.g. a "green" product) that applies
+to its landing page **and** every `/<slug>/docs/...` subpage, including the
+global header and footer. This is independent of the site theme above.
+
+**How it works.** Product routes emit `data-product="<slug>"` on `<html>` (via
+the `productSlug` prop on `Layout` / `DocsLayout`). A per-product CSS file
+overrides the **same token names** as `theme.css`, scoped to
+`html[data-product="<slug>"]`, so the override cascades into every descendant
+(header, footer, prose, code blocks) automatically - no component edits.
+
+**To theme a product:**
+
+1. Create `src/styles/product-themes/<slug>.css`. Copy `vite.css` (a full
+   worked demo) as a starting point, and change the two selectors
+   (`html[data-product="<slug>"]` and its `[data-theme='dark']` twin) to your
+   slug.
+2. Add `@import './<slug>.css';` to `src/styles/product-themes/index.css`.
+
+That's it. The theme applies only on that product's pages; the rest of the
+site keeps the default theme. `Nav` and `Footer` need no changes - they
+already use `var(--color-*)`.
+
+**Two depths, same mechanism.** Override only `--color-accent*` for a light
+touch (accent-colored buttons/links on the existing surfaces), or override the
+surfaces and text too for a full rebrand (as `vite.css` does).
+
+**`vite.css` is a demo**, not Vite's real brand - it exists to show the full
+cascade (header + footer + landing + docs). Delete it (and its `@import` line)
+to remove the demo, or rename it to theme another product.
+
 ## Sample themes
 
 [`src/styles/themes/`](./src/styles/themes) holds ready-to-try theme files. Each

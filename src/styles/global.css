@@ -1,4 +1,5 @@
 @import './theme.css';
+@import './product-themes/index.css';
 
 /* ============================================
    astro-content-hub - Global Styles

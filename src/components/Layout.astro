@@ -9,9 +9,15 @@ export interface Props {
   ogImage?: string;
   locale?: Locale;
   alternates?: Partial<Record<Locale, string>>;
+  productSlug?: string;
 }
 
-const { title, description, ogImage, locale = defaultLocale, alternates = {} } = Astro.props;
+const { title, description, ogImage, locale = defaultLocale, alternates = {}, productSlug } = Astro.props;
+
+// Per-product theme axis: when set, <html data-product="<slug>"> lets a
+// product-themes/<slug>.css override the same color tokens. Omitted on
+// non-product pages so the site theme applies untouched.
+const htmlAttrs = { ...(productSlug ? { 'data-product': productSlug } : {}) };
 const fullTitle = title === siteName ? title : `${title} - ${siteName}`;
 const site = Astro.site?.toString().replace(/\/$/, '') ?? '';
 const abs = (p: string) => (p.startsWith('http') ? p : `${site}${p}`);
@@ -23,7 +29,7 @@ const xDefaultHref = alternates[defaultLocale];
 ---
 
 <!doctype html>
-<html lang={locale}>
+<html lang={locale} {...htmlAttrs}>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />

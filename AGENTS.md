@@ -69,6 +69,13 @@ repositories, synced in via pull requests.
   custom properties. No CSS-in-JS, no Tailwind. Component-specific styles live
   in scoped `<style>` blocks, but shared typography (e.g. `.prose`) lives in
   `global.css` so it reliably applies to Astro `<Content />` output.
+- **Per-product themes**: a product may override the site's color tokens for
+  its landing + `/<slug>/docs/...` pages by adding
+  `src/styles/product-themes/<slug>.css` (scoped to
+  `html[data-product="<slug>"]`) and an `@import` in
+  `product-themes/index.css`. Product routes pass `productSlug` to
+  `Layout`/`DocsLayout`, which emits `data-product` on `<html>`. Nav/Footer
+  need no changes. See THEMING.md.
 - **Markdown**: Shiki with the `css-variables` theme.
 - **Node**: 22 (see deploy workflow). Use `npm`, not `pnpm`/`yarn`.
 
