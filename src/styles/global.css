@@ -1,34 +1,16 @@
+@import './theme.css';
+
 /* ============================================
-   astro-content-hub — Global Styles
+   astro-content-hub - Global Styles
    Clean, bold, minimal
+   --------------------------------------------
+   Brand tokens (colors, accent, fonts, dark theme) live in theme.css
+   and are imported above. This file holds structural tokens (spacing,
+   radius, shadows, transitions) and all component styles.
    ============================================ */
 
-/* --- CSS Custom Properties --- */
+/* --- CSS Custom Properties (structural only) --- */
 :root {
-  color-scheme: light;
-
-  /* Colors */
-  --color-bg: #faf9f7;
-  --color-bg-alt: #f2f0eb;
-  --color-bg-dark: #141413;
-  --color-surface: #ffffff;
-  --color-border: #e6e4df;
-  --color-border-light: #f0ede7;
-
-  /* Text */
-  --color-text: #141413;
-  --color-text-secondary: #6b6860;
-  --color-text-muted: #99968e;
-
-  /* Accent */
-  --color-accent: #d4a853;
-  --color-accent-hover: #c09940;
-  --color-accent-subtle: rgba(212, 168, 83, 0.12);
-
-  /* Typography */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
-
   /* Spacing */
   --container-max: 1200px;
   --section-gap: 6rem;
@@ -46,35 +28,6 @@
 
   /* Transitions */
   --transition: 200ms ease;
-}
-
-/* --- Dark theme ---
-   Activated by `data-theme="dark"` on <html>, set by a no-FOUC inline
-   script in Layout.astro (<head>, runs before paint) that reads
-   localStorage('theme') and falls back to prefers-color-scheme. Only page-
-   level tokens are overridden; --color-bg-dark stays as the fixed dark surface
-   for code blocks, primary buttons, and the CTA box (intentionally dark in
-   both themes). */
-:root[data-theme='dark'] {
-  color-scheme: dark;
-
-  --color-bg: #141413;
-  --color-bg-alt: #1c1b19;
-  --color-surface: #1e1d1b;
-  --color-border: #2e2c29;
-  --color-border-light: #262421;
-
-  --color-text: #f0ede7;
-  --color-text-secondary: #a8a59d;
-  --color-text-muted: #7a766e;
-
-  --color-accent: #e0b85e;
-  --color-accent-hover: #ecc676;
-  --color-accent-subtle: rgba(224, 184, 94, 0.14);
-
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.4);
 }
 
 /* --- Reset & Base --- */
@@ -161,7 +114,7 @@ code {
 
 pre.astro-code {
   background: var(--color-bg-dark) !important;
-  color: #f0ede7 !important;
+  color: var(--color-on-dark) !important;
   padding: 1.25rem 1.5rem;
   border-radius: var(--radius);
   overflow-x: auto;
@@ -261,7 +214,7 @@ pre.astro-code code {
   padding: 0.4rem 1rem;
   border-radius: 100px;
   background: var(--color-bg-dark);
-  color: #fff !important;
+  color: var(--color-on-dark) !important;
   font-size: 0.85rem;
   font-weight: 600;
   transition: opacity var(--transition);
@@ -425,7 +378,7 @@ pre.astro-code code {
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, var(--color-accent) 0%, #b8860b 50%, #8b6914 100%);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-2) 50%, var(--color-accent-3) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -462,7 +415,7 @@ pre.astro-code code {
 
 .btn-primary {
   background: var(--color-bg-dark);
-  color: #fff;
+  color: var(--color-on-dark);
 }
 
 .btn-primary:hover {
@@ -578,7 +531,7 @@ pre.astro-code code {
   padding: 0.2rem 0.7rem;
   border-radius: 100px;
   background: var(--color-bg-dark);
-  color: #fff;
+  color: var(--color-on-dark);
 }
 
 .badge-soft {
@@ -622,7 +575,7 @@ pre.astro-code code {
 
 .terminal-body {
   padding: 1.25rem 1.5rem;
-  color: #f0ede7;
+  color: var(--color-on-dark);
   font-family: var(--font-mono);
   font-size: 0.8rem;
   line-height: 1.8;
@@ -674,11 +627,11 @@ pre.astro-code code {
   padding: 3rem 2rem;
   background: var(--color-bg-dark);
   border-radius: var(--radius-lg);
-  color: #fff;
+  color: var(--color-on-dark);
 }
 
 .cta-box h2 {
-  color: #fff;
+  color: var(--color-on-dark);
   margin-bottom: 0.75rem;
 }
 
@@ -707,7 +660,7 @@ pre.astro-code code {
 .cta-box .btn-secondary {
   background: transparent;
   border-color: rgba(255,255,255,0.2);
-  color: #fff;
+  color: var(--color-on-dark);
 }
 
 .cta-box .btn-secondary:hover {
@@ -1041,7 +994,7 @@ a.tag:hover {
 .prose pre code {
   background: none;
   padding: 0;
-  color: #e0dcd0;
+  color: var(--color-on-dark);
   font-size: 0.85rem;
 }
 
@@ -1296,7 +1249,7 @@ a.docs-prev-next-item:hover {
   padding: 0.25rem 0.55rem;
   font-size: 0.72rem;
   font-family: var(--font-sans);
-  color: #f0ede7;
+  color: var(--color-on-dark);
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: var(--radius-sm);
