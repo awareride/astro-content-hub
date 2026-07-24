@@ -1,7 +1,7 @@
 ---
 // src/components/Layout.astro
 import '../styles/global.css';
-import { defaultLocale, siteName, withBase, type Locale } from '../lib/i18n';
+import { defaultLocale, siteName, stripBase, localizePath, withBase, type Locale } from '../lib/i18n';
 
 export interface Props {
   title: string;
@@ -12,9 +12,13 @@ export interface Props {
 }
 
 const { title, description, ogImage, locale = defaultLocale, alternates = {} } = Astro.props;
-const fullTitle = title === siteName ? title : `${title} — ${siteName}`;
+const fullTitle = title === siteName ? title : `${title} - ${siteName}`;
 const site = Astro.site?.toString().replace(/\/$/, '') ?? '';
 const abs = (p: string) => (p.startsWith('http') ? p : `${site}${p}`);
+// Canonical URL of the current page: strip the deploy base from the pathname,
+// then resolve against the configured `site` origin (which already includes
+// the base). Keeps canonical URLs correct under a sub-path deploy.
+const canonical = abs(stripBase(Astro.url.pathname));
 ---
 
 <!doctype html>
@@ -32,6 +36,12 @@ const abs = (p: string) => (p.startsWith('http') ? p : `${site}${p}`);
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content={siteName} />
   {ogImage && <meta property="og:image" content={ogImage} />}
+
+  <!-- RSS feed discovery (locale-specific) -->
+  <link rel="alternate" type="application/rss+xml" title={`${siteName} - Posts`} href={abs(localizePath('/rss.xml', locale))} />
+
+  <!-- Canonical -->
+  <link rel="canonical" href={canonical} />
 
   <!-- hreflang alternates -->
   {alternates.en && <link rel="alternate" hreflang="en" href={abs(alternates.en)} />}

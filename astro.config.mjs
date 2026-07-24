@@ -1,5 +1,6 @@
 import { defineConfig } from 'astro/config';
 import { satteri } from '@astrojs/markdown-satteri';
+import sitemap from '@astrojs/sitemap';
 import { rewriteRelativeMdLinks } from './src/lib/remark-rewrite-links.mjs';
 
 // Sub-path the site is served under. '/' for a root deploy (custom domain,
@@ -28,4 +29,22 @@ export default defineConfig({
       theme: 'css-variables',
     },
   },
+
+  integrations: [
+    // Generates /sitemap-index.xml from the build. Uses `site` for absolute
+    // URLs and respects `base`. Automatically embeds hreflang alternates for
+    // each page (Layout.astro already emits <link rel="alternate" hreflang>).
+    // The 404 page is excluded so it is never advertised to crawlers.
+    sitemap({
+      filter: (page) => !page.includes('/404'),
+      // Group en/zh versions of each page into <xhtml:link rel="alternate">
+      // hreflang entries. `en` is the default (no URL prefix); `zh` lives under
+      // /zh/. The HTML head already emits hreflang too; this adds the sitemap-
+      // level grouping so crawlers see the locale relations in one place.
+      i18n: {
+        defaultLocale: 'en',
+        locales: { en: 'en', zh: 'zh' },
+      },
+    }),
+  ],
 });
