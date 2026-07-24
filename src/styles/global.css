@@ -1455,6 +1455,17 @@ pre.astro-code code {
     margin: 0;
   }
 
+  /* On mobile the header bar holds logo + locale switcher + theme toggle +
+     hamburger. Hide the wordmark (keep the logo mark) so the bar doesn't get
+     crowded on narrow screens, and tighten the right cluster's gap. */
+  .logo-text {
+    display: none;
+  }
+
+  .nav-right {
+    gap: 0.75rem;
+  }
+
   /* Lock background scroll while the overlay is open. */
   html:has(.site-header.nav-open) {
     overflow: hidden;
