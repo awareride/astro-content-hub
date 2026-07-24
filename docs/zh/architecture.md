@@ -22,16 +22,19 @@ order: 1
 
 ```
 astro-content-hub/            <- 中心(Astro 站点)位于仓库根目录
-├── astro.config.mjs          <- 将 `site` 设为你的域名
+├── astro.config.mjs          <- 将 `site` 设为你的域名;sitemap + Sätteri 插件
 ├── src/
-│   ├── components/           <- Layout, Nav, Footer, DocsLayout, PostCard, LocaleSwitcher
+│   ├── components/           <- Layout, Nav, Footer, DocsLayout, PostCard,
+│   │                          LocaleSwitcher, ThemeToggle, TableOfContents, TagPage
+│   ├── config/products.ts    <- 产品注册表(在此添加产品)
 │   ├── content/              <- markdown 集合(文章 + 文档)
 │   ├── content.config.ts     <- 集合 schema + glob 加载器
-│   ├── lib/                  <- i18n.ts, content.ts, docs.ts, remark-rewrite-links.mjs
+│   ├── lib/                  <- i18n.ts, content.ts, docs.ts, feed.ts,
+│   │                          remark-rewrite-links.mjs, heading-ids.mjs
 │   ├── pages/                <- 基于文件的路由(+ zh/ 镜像)
-│   └── styles/global.css
-├── public/                   <- favicon, CNAME
-├── .github/workflows/        <- deploy.yml (GitHub Pages + Cloudflare Pages)
+│   └── styles/global.css     <- 设计变量 + .prose 排版 + 暗色主题
+├── public/                   <- favicon, images, CNAME
+├── .github/workflows/        <- deploy.yml (GH Pages + CF Pages), sync-docs.yml
 ├── examples/                 <- 同步进入中心的示例外部仓库
 └── docs/                     <- 本文档(同步至中心)
 ```
@@ -42,7 +45,7 @@ astro-content-hub/            <- 中心(Astro 站点)位于仓库根目录
 
 - `/` —— 落地页(`index.astro`)。
 - `/posts`、`/posts/[...slug]` —— 博客列表 + 捕获所有文章路由。
-- `/<product>` —— 产品落地页,由 `src/lib/i18n.ts` 的 `products` 数组**动态**
+- `/<product>` -- 产品落地页,由 `src/config/products.ts` 的 `products` 数组**动态**
   提供。
 - `/<product>/docs`、`/<product>/docs/[...slug]` —— 文档索引 + 捕获所有路由。
 - `zh` 镜像位于 `src/pages/zh/` 下。

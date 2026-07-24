@@ -57,11 +57,36 @@ generated automatically.
 ## Layout composition
 
 - `Layout.astro` owns the document shell (`<html>/<head>/<body>`, fonts, meta,
-  OpenGraph). Every page composes it — never hand-write a second document
-  shell.
-- `Nav.astro` (sticky header) and `Footer.astro` are composed inside `Layout`.
+  OpenGraph). It also emits the canonical URL, `hreflang` alternates, the RSS
+  feed-discovery `<link>`, the `theme-color` meta, and a no-FOUC inline script
+  that sets the dark/light theme before first paint. Every page composes it -
+  never hand-write a second document shell.
+- `Nav.astro` (sticky header) and `Footer.astro` are composed inside pages.
+  `Nav` holds the locale switcher and the theme toggle.
 - `DocsLayout.astro` is a content-region layout: it composes `Layout` + `Nav` +
-  `Footer` and adds a sidebar + `.prose` content area.
+  `Footer` and adds a sidebar, a `.prose` content area, a right-rail table of
+  contents, prev/next pagination, and the copy-code button script.
+
+## Built-in site features
+
+Beyond rendering Markdown, the hub ships these features out of the box:
+
+- **SEO**: canonical URLs, `sitemap-index.xml` (with `hreflang` grouping),
+  `robots.txt`, and a custom 404. Driven by `@astrojs/sitemap` and the
+  `Layout` head.
+- **RSS**: `/rss.xml` (en) and `/zh/rss.xml` (zh) via `@astrojs/rss`, built by
+  `src/lib/feed.ts`.
+- **Dark mode**: `:root[data-theme='dark']` token block in `global.css`, a
+  `ThemeToggle.astro` button, and a no-FOUC `<head>` script reading
+  `localStorage` + `prefers-color-scheme`.
+- **Reading UX**: heading anchor IDs (`src/lib/heading-ids.mjs`, a Sätteri
+  hast plugin), a right-rail `TableOfContents.astro` with IntersectionObserver
+  active-section highlight, prev/next docs pagination, copy-code buttons, and
+  heading `#` anchor links.
+- **Content discovery**: tag pages (`/posts/tags/[tag]`), clickable tags on
+  post cards, related posts on article pages, and post breadcrumbs. Tag
+  aggregation lives in `src/lib/content.ts` (`getAllTags`, `getPostsByTag`,
+  `getRelatedPosts`, `tagSlug`).
 
 ## Content collections
 

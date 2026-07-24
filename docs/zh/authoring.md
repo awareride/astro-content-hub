@@ -68,7 +68,7 @@ draft: false                                 # 可选;草稿会被排除
 ## 为已有产品编写文档
 
 文档位于 `src/content/docs/<product>/<locale>/`。产品来自 `products` 数组
-(`src/lib/i18n.ts`;示例:vite、astro、json-server)。
+(`src/config/products.ts`;示例:vite、astro、json-server)。
 
 **Frontmatter**(`docSchema`):
 
@@ -91,7 +91,7 @@ order: 2                     # 可选,控制侧边栏排序(默认 0)
 
 唯一会触及配置的编写任务:
 
-1. 在 `src/lib/i18n.ts` 中注册产品:
+1. 在 `src/config/products.ts` 中注册产品:
 
    ```ts
    export const products: Product[] = [
