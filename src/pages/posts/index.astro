@@ -7,7 +7,7 @@ import Footer from '../../components/Footer.astro';
 import PostCard from '../../components/PostCard.astro';
 import { getLocalizedPosts } from '../../lib/content';
 import { getAllTags } from '../../lib/content';
-import { buildAlternates, localizePath, withBase } from '../../lib/i18n';
+import { buildAlternates, localizePath, withBase, t } from '../../lib/i18n';
 
 const items = await getLocalizedPosts('en');
 const sorted = items.sort(
@@ -15,6 +15,7 @@ const sorted = items.sort(
 );
 const tags = (await getAllTags('en')).slice(0, 12);
 const alternates = buildAlternates('/posts');
+const ui = t.en;
 
 function dirname(id: string) {
   const parts = id.split('/');
@@ -23,8 +24,8 @@ function dirname(id: string) {
 ---
 
 <Layout
-  title="Posts"
-  description="Technical articles from the content hub — guides, notes, and announcements."
+  title={ui.postsListTitle}
+  description={ui.postsDescription}
   locale="en"
   alternates={alternates}
 >
@@ -33,10 +34,10 @@ function dirname(id: string) {
   <main>
     <section class="hero" style="padding-bottom: 2rem;">
       <div class="container">
-        <p class="eyebrow">Blog</p>
-        <h1>Posts</h1>
+        <p class="eyebrow">{ui.postsListEyebrow}</p>
+        <h1>{ui.postsListTitle}</h1>
         <p class="hero-lead" style="margin-top: 0.5rem;">
-          Thoughts on developer tooling, bundle analysis, perception, and building with awareness.
+          {ui.postsListLead}
         </p>
       </div>
     </section>
@@ -55,7 +56,7 @@ function dirname(id: string) {
         {
           sorted.length === 0 ? (
             <p style="text-align:center; color:var(--color-text-muted);">
-              No posts yet. Check back soon.
+              {ui.noPosts}
             </p>
           ) : (
             <div class="posts-grid">

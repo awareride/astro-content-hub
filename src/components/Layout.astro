@@ -1,7 +1,7 @@
 ---
 // src/components/Layout.astro
 import '../styles/global.css';
-import { defaultLocale, siteName, stripBase, localizePath, withBase, type Locale } from '../lib/i18n';
+import { defaultLocale, locales, siteName, stripBase, localizePath, withBase, type Locale } from '../lib/i18n';
 
 export interface Props {
   title: string;
@@ -19,6 +19,7 @@ const abs = (p: string) => (p.startsWith('http') ? p : `${site}${p}`);
 // then resolve against the configured `site` origin (which already includes
 // the base). Keeps canonical URLs correct under a sub-path deploy.
 const canonical = abs(stripBase(Astro.url.pathname));
+const xDefaultHref = alternates[defaultLocale];
 ---
 
 <!doctype html>
@@ -60,10 +61,12 @@ const canonical = abs(stripBase(Astro.url.pathname));
   <!-- Canonical -->
   <link rel="canonical" href={canonical} />
 
-  <!-- hreflang alternates -->
-  {alternates.en && <link rel="alternate" hreflang="en" href={abs(alternates.en)} />}
-  {alternates.zh && <link rel="alternate" hreflang="zh" href={abs(alternates.zh)} />}
-  {alternates.en && <link rel="alternate" hreflang="x-default" href={abs(alternates.en)} />}
+  <!-- hreflang alternates (data-driven over `locales`) -->
+  {locales.map((l) => {
+    const href = alternates[l];
+    return href ? <link rel="alternate" hreflang={l} href={abs(href)} /> : null;
+  })}
+  {xDefaultHref && <link rel="alternate" hreflang="x-default" href={abs(xDefaultHref)} />}
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />

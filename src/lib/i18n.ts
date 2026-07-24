@@ -16,9 +16,16 @@ export function isLocale(x: string): x is Locale {
   return (locales as readonly string[]).includes(x);
 }
 
-/** Capitalize the first letter - used to build collection names (e.g. `viteDocsZh`). */
-export function cap(s: string): string {
-  return s.charAt(0).toUpperCase() + s.slice(1);
+/** Build the PascalCase suffix for a content collection name from a locale
+ *  code: `en` -> `En`, `zh` -> `Zh`, `zh-Hans` -> `ZhHans`. Splitting on `-`
+ *  and capitalizing each part keeps subtagged locales (script/region) free of
+ *  hyphens, which would otherwise leak into collection names (`postsZh-Hans`).
+ *  Used by content.config.ts and content.ts to name the per-locale collections. */
+export function collectionSuffix(locale: Locale): string {
+  return locale
+    .split('-')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join('');
 }
 
 /** Prefix a path with the locale segment, unless it is the default locale. */
@@ -96,6 +103,22 @@ const tEn = {
   noTranslation: 'No translation available',
   noPages: 'No pages yet.',
   fallbackNotice: '',
+  postsListEyebrow: 'Blog',
+  postsListTitle: 'Posts',
+  postsListLead:
+    'Thoughts on developer tooling, bundle analysis, perception, and building with awareness.',
+  postsDescription:
+    'Technical articles from the content hub — guides, notes, and announcements.',
+  noPosts: 'No posts yet. Check back soon.',
+  allPostsBack: '← All Posts',
+  relatedPosts: 'Related posts',
+  byAuthor: 'by {author}',
+  viewSource: 'View source →',
+  tagEyebrow: 'Tag',
+  tagLead: '{n} post{s}',
+  tagDescription: 'Posts tagged {label}',
+  previous: '← Previous',
+  next: 'Next →',
 };
 export type UIStrings = typeof tEn;
 export const t: Record<Locale, UIStrings> = {
@@ -114,6 +137,21 @@ export const t: Record<Locale, UIStrings> = {
     noTranslation: '暂无中文翻译',
     noPages: '暂无页面。',
     fallbackNotice: '此页暂无中文翻译,以下显示英文原文。',
+    postsListEyebrow: '博客',
+    postsListTitle: '文章',
+    postsListLead:
+      '关于开发工具、bundle 分析、感知,以及以觉察之心构建的思考。',
+    postsDescription: '内容中心的技术文章 —— 指南、笔记与公告。',
+    noPosts: '暂无文章,敬请期待。',
+    allPostsBack: '← 全部文章',
+    relatedPosts: '相关文章',
+    byAuthor: '作者:{author}',
+    viewSource: '查看源码 →',
+    tagEyebrow: '标签',
+    tagLead: '共 {n} 篇文章',
+    tagDescription: '标签为 {label} 的文章',
+    previous: '← 上一篇',
+    next: '下一篇 →',
   },
 };
 
@@ -205,6 +243,7 @@ export const home: Record<Locale, HomeCopy> = {
  *  github, badges) come from the `products` array in `src/config/products.ts`;
  *  this supplies the surrounding labels, which are identical across products. */
 const productCopyEn = {
+  metaDescription: '{name} — open-source project documentation and posts.',
   heroBadge: 'Open Source',
   documentation: 'Documentation',
   viewSource: 'View Source',
@@ -221,6 +260,7 @@ export type ProductCopy = typeof productCopyEn;
 export const productCopy: Record<Locale, ProductCopy> = {
   en: productCopyEn,
   zh: {
+    metaDescription: '{name} —— 开源项目文档与文章。',
     heroBadge: '开源',
     documentation: '文档',
     viewSource: '查看源码',

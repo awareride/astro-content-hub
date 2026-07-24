@@ -21,7 +21,7 @@ const docsHref = withBase(localizePath(`/${product.slug}/docs`, locale));
 const alternates = buildAlternates(`/${product.slug}`);
 ---
 
-<Layout title={product.name} description={`${product.name} — open-source project documentation and posts.`} locale={locale} alternates={alternates}>
+<Layout title={product.name} description={c.metaDescription.replace('{name}', product.name)} locale={locale} alternates={alternates}>
   <Nav alternates={alternates} />
 
   <main>

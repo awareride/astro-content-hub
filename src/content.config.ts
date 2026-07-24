@@ -1,7 +1,7 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
-import { locales, cap } from './lib/i18n';
+import { locales, collectionSuffix } from './lib/i18n';
 import { products } from './config/products';
 
 // Products that ship a localized docs collection. Driven by the `products`
@@ -26,7 +26,7 @@ function makeDocCollections(): Record<string, ReturnType<typeof defineCollection
     // => ./docs/<locale>/, used by content synced in from an external repo).
     const baseDir = product.base ?? `./src/content/docs/${product.slug}`;
     for (const locale of locales) {
-      out[`${product.slug}Docs${cap(locale)}`] = defineCollection({
+      out[`${product.slug}Docs${collectionSuffix(locale)}`] = defineCollection({
         loader: glob({ pattern: '**/*.md', base: `${baseDir}/${locale}` }),
         schema: docSchema,
       });
@@ -50,7 +50,7 @@ const postSchema = z.object({
 function makePostCollections(): Record<string, ReturnType<typeof defineCollection>> {
   const out: Record<string, ReturnType<typeof defineCollection>> = {};
   for (const locale of locales) {
-    out[`posts${cap(locale)}`] = defineCollection({
+    out[`posts${collectionSuffix(locale)}`] = defineCollection({
       loader: glob({ pattern: '**/*.{md,mdx,html}', base: `./src/content/posts/${locale}` }),
       schema: postSchema,
     });

@@ -4,7 +4,7 @@
 // thin by delegating path generation and fallback rendering to these helpers.
 
 import { getCollection, render } from 'astro:content';
-import { defaultLocale, cap, type Locale } from './i18n';
+import { defaultLocale, collectionSuffix, type Locale } from './i18n';
 import { buildNav, type NavItem } from './docs';
 
 /** Minimal entry shape consumed by helpers and route files. We use this instead of
@@ -50,7 +50,7 @@ export interface RenderedPage {
 }
 
 function collectionName(productName: string, locale: Locale): string {
-  return `${productName}Docs${cap(locale)}`;
+  return `${productName}Docs${collectionSuffix(locale)}`;
 }
 
 /**
@@ -187,7 +187,7 @@ export async function getLocalizedDocIndex(
 // ---------------------------------------------------------------------------
 
 function postsCollectionName(locale: Locale): string {
-  return `posts${cap(locale)}`;
+  return `posts${collectionSuffix(locale)}`;
 }
 
 export interface LocalizedPostPathProps {
