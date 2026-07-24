@@ -2,6 +2,7 @@ import { defineConfig } from 'astro/config';
 import { satteri } from '@astrojs/markdown-satteri';
 import sitemap from '@astrojs/sitemap';
 import { rewriteRelativeMdLinks } from './src/lib/remark-rewrite-links.mjs';
+import { addHeadingIds } from './src/lib/heading-ids.mjs';
 
 // Sub-path the site is served under. '/' for a root deploy (custom domain,
 // Cloudflare Pages root); '/astro-content-hub/' for a GitHub Pages project
@@ -24,7 +25,13 @@ export default defineConfig({
     // routes at build time, so source files can keep GitHub-friendly relative
     // links. `base` is passed in because the plugin is a plain .mjs loaded at
     // config time and cannot read `import.meta.env.BASE_URL`.
-    processor: satteri({ mdastPlugins: [rewriteRelativeMdLinks(base)] }),
+    processor: satteri({
+      mdastPlugins: [rewriteRelativeMdLinks(base)],
+      // Adds `id` attributes to h1-h4 so anchor links and the TOC resolve to
+      // real in-page targets. The built-in heading-ids plugin still populates
+      // render().headings (the TOC data) and reuses these ids for its array.
+      hastPlugins: [addHeadingIds()],
+    }),
     shikiConfig: {
       theme: 'css-variables',
     },
