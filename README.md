@@ -311,9 +311,12 @@ For the full flow - frontmatter schemas, the deletion manifest
 - **Brand tokens (colors, accent, fonts)** live in
   [`src/styles/theme.css`](./src/styles/theme.css) - the one file to edit to
   rebrand the site (light + dark). See [`THEMING.md`](./THEMING.md) for a
-  guided walkthrough. **Structural tokens** (spacing, radius, shadows) stay in
-  [`src/styles/global.css`](./src/styles/global.css) and rarely need changing;
-  reuse them in scoped `<style>` blocks instead of hard-coded values.
+  guided walkthrough. **Sample themes** (e.g. an OpenAI-inspired palette) live
+  in [`src/styles/themes/`](./src/styles/themes) - try one by swapping one
+  `@import` line in `global.css`. **Structural tokens** (spacing, radius,
+  shadows) stay in [`src/styles/global.css`](./src/styles/global.css) and rarely
+  need changing; reuse them in scoped `<style>` blocks instead of hard-coded
+  values.
 - **Markdown typography** is the single `.prose` class in `global.css`. Wrap
   `<Content />` in `class="prose"` on any new Markdown-rendering page.
 - **Site name / UI strings / landing copy** are in
