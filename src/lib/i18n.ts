@@ -5,7 +5,7 @@
 // are needed. Because every table is typed `Record<Locale, …>`, forgetting a
 // locale (or letting its keys drift from the `en` seed) is a compile error.
 
-export const locales = ['en', 'zh'] as const;
+export const locales = ['en', 'zh-Hans'] as const;
 export type Locale = (typeof locales)[number];
 export const defaultLocale: Locale = 'en';
 
@@ -65,9 +65,11 @@ export function buildAlternates(defaultLocalePath: string): Partial<Record<Local
 
 /** Infer the current locale from a URL pathname (default locale if no prefix matches).
  *  Strips the deploy base prefix first so locale detection works under a sub-path
- *  deploy (e.g. /astro-content-hub/zh/ -> zh). */
+ *  deploy (e.g. /astro-content-hub/zh-Hans/ -> zh-Hans). The optional `-Script`
+ *  subtag lets prefixed locales like `zh-Hans` match, while plain 2-letter prefixes
+ *  (`en`, `ja`) still work. */
 export function localeFromPath(pathname: string): Locale {
-  const m = stripBase(pathname).match(/^\/([a-z]{2})(?:\/|$)/i);
+  const m = stripBase(pathname).match(/^\/([a-z]{2}(?:-[A-Z][a-z]+)?)(?:\/|$)/i);
   if (m && isLocale(m[1])) return m[1];
   return defaultLocale;
 }
@@ -76,14 +78,14 @@ export function localeFromPath(pathname: string): Locale {
  *  Data-driven (like `localeCode`) so adding a locale forces adding its label. */
 export const localeLabel: Record<Locale, string> = {
   en: 'English',
-  zh: '中文',
+  'zh-Hans': '中文',
 };
 
 /** BCP-47 locale code per locale, for `toLocaleDateString` and friends.
  *  Centralized so adding a locale doesn't require hunting down date calls. */
 export const localeCode: Record<Locale, string> = {
   en: 'en-US',
-  zh: 'zh-CN',
+  'zh-Hans': 'zh-Hans',
 };
 
 /** UI strings per locale. `t.en` is the canonical shape; every other locale must
@@ -123,7 +125,7 @@ const tEn = {
 export type UIStrings = typeof tEn;
 export const t: Record<Locale, UIStrings> = {
   en: tEn,
-  zh: {
+  'zh-Hans': {
     home: '首页',
     posts: '博客',
     docs: '文档',
@@ -199,7 +201,7 @@ const homeEn = {
 export type HomeCopy = typeof homeEn;
 export const home: Record<Locale, HomeCopy> = {
   en: homeEn,
-  zh: {
+  'zh-Hans': {
     title: 'Astro Content Hub',
     description: '聚合多个开源项目的文档与文章的内容中心,支持逐页本地化,并可免费自动部署。',
     eyebrow: '开源内容中心',
@@ -259,7 +261,7 @@ const productCopyEn = {
 export type ProductCopy = typeof productCopyEn;
 export const productCopy: Record<Locale, ProductCopy> = {
   en: productCopyEn,
-  zh: {
+  'zh-Hans': {
     metaDescription: '{name} —— 开源项目文档与文章。',
     heroBadge: '开源',
     documentation: '文档',
