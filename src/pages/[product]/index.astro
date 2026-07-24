@@ -1,7 +1,7 @@
 ---
 // src/pages/[product]/index.astro
 // Generic product landing page, driven by the `products` array in lib/i18n.
-// URL: /<slug>/  (and /zh/<slug>/ via the zh mirror).
+// URL: /<slug>/  (and /<locale>/<slug>/ via the universal [locale] twin).
 import Layout from '../../components/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
@@ -21,7 +21,7 @@ const docsHref = withBase(localizePath(`/${product.slug}/docs`, locale));
 const alternates = buildAlternates(`/${product.slug}`);
 ---
 
-<Layout title={product.name} description={`${product.name} — open-source project documentation and posts.`} locale={locale} alternates={alternates}>
+<Layout title={product.name} description={c.metaDescription.replace('{name}', product.name)} locale={locale} alternates={alternates}>
   <Nav alternates={alternates} />
 
   <main>

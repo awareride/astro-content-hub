@@ -31,7 +31,7 @@ astro-content-hub/            <- the hub (Astro site) at the repo root
 │   ├── content/              <- markdown collections (posts + docs)
 │   ├── content.config.ts     <- collection schemas + glob loaders
 │   ├── lib/                  <- i18n.ts, content.ts, docs.ts, remark-rewrite-links.mjs
-│   ├── pages/                <- file-based routes (+ zh/ mirror)
+│   ├── pages/                <- file-based routes (+ [locale]/ universal routes)
 │   └── styles/global.css
 ├── public/                   <- favicon, CNAME
 ├── .github/workflows/        <- deploy.yml (GitHub Pages + Cloudflare Pages)
@@ -46,13 +46,15 @@ Routes are file-based under `src/pages/`:
 - `/` — landing page (`index.astro`).
 - `/posts`, `/posts/[...slug]` — blog listing + catch-all article route.
 - `/<product>` — product landing page, served **dynamically** from the
-  `products` array in `src/lib/i18n.ts`.
+  `products` array in `src/config/products.ts`.
 - `/<product>/docs`, `/<product>/docs/[...slug]` — docs index + catch-all.
-- The `zh` mirror lives under `src/pages/zh/`.
+- Non-default locales are served by **universal routes** under
+  `src/pages/[locale]/...`, which loop `locales` (minus the default) in
+  `getStaticPaths`. One set of route files serves every non-default locale.
 
-Because product pages are data-driven, **you do not create per-product route
-files.** Add an entry to `products` and the routes + docs collections are
-generated automatically.
+Because product and locale pages are data-driven, **you do not create
+per-product or per-locale route files.** Add an entry to `products` and the
+routes + docs collections are generated automatically.
 
 ## Layout composition
 
@@ -74,8 +76,8 @@ Beyond rendering Markdown, the hub ships these features out of the box:
 - **SEO**: canonical URLs, `sitemap-index.xml` (with `hreflang` grouping),
   `robots.txt`, and a custom 404. Driven by `@astrojs/sitemap` and the
   `Layout` head.
-- **RSS**: `/rss.xml` (en) and `/zh/rss.xml` (zh) via `@astrojs/rss`, built by
-  `src/lib/feed.ts`.
+- **RSS**: `/rss.xml` (en) and `/zh-Hans/rss.xml` (zh-Hans) via `@astrojs/rss`, built by
+  `src/lib/feed.ts` (`src/pages/rss.xml.ts` + `src/pages/[locale]/rss.xml.ts`).
 - **Dark mode**: `:root[data-theme='dark']` token block in `global.css`, a
   `ThemeToggle.astro` button, and a no-FOUC `<head>` script reading
   `localStorage` + `prefers-color-scheme`.
@@ -106,7 +108,8 @@ Markdown is rendered via `render(entry)` from `astro:content`; pages pass
 
 | File | Responsibility |
 |------|----------------|
-| `i18n.ts` | Single source of truth: `locales`, `defaultLocale`, `t` (UI strings), `home` (landing copy), `products`, and path/locale helpers. |
+| `i18n.ts` | Single source of truth: `locales`, `defaultLocale`, `t` (UI strings), `home` (landing copy), `productCopy`, and path/locale helpers. |
+`config/products.ts` | Product registry (`products` array) — the list of products that ship docs + a landing card. |
 | `content.ts` | Localized path generation + fallback render helpers (docs + posts). |
 | `docs.ts` | `buildNav` — sidebar construction (index → base path, sort by `order`). |
 | `remark-rewrite-links.mjs` | Rewrites doc links so `docs/<product>/<locale>/` resolves to `/<product>/docs`. |

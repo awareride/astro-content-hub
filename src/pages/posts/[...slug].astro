@@ -9,7 +9,7 @@ import Footer from '../../components/Footer.astro';
 import { renderLocalizedPost } from '../../lib/content';
 import { getRelatedPosts, tagSlug } from '../../lib/content';
 import PostCard from '../../components/PostCard.astro';
-import { buildAlternates, localeCode, localizePath, withBase } from '../../lib/i18n';
+import { buildAlternates, localeCode, localizePath, withBase, t } from '../../lib/i18n';
 
 export async function getStaticPaths() {
   const { getPostLocalizedPaths } = await import('../../lib/content');
@@ -23,6 +23,7 @@ const { Content, data } = page;
 const { title, date, description, tags, author, source } = data;
 const alternates = buildAlternates(`/posts/${slug}`);
 const related = await getRelatedPosts('en', slug, 3);
+const ui = t.en;
 
 const formattedDate = date.toLocaleDateString(localeCode.en, {
   year: 'numeric',
@@ -37,11 +38,11 @@ const formattedDate = date.toLocaleDateString(localeCode.en, {
   <main>
     <div class="container" style="padding-top: 1.5rem;">
       <div class="docs-breadcrumb">
-        <a href={withBase(localizePath('/', 'en'))}>Home</a> / <a href={withBase(localizePath('/posts', 'en'))}>Posts</a> / <span>{title}</span>
+        <a href={withBase(localizePath('/', 'en'))}>{ui.home}</a> / <a href={withBase(localizePath('/posts', 'en'))}>{ui.posts}</a> / <span>{title}</span>
       </div>
     </div>
     <article class="article">
-      <a href={withBase('/posts')} class="article-back">← All Posts</a>
+      <a href={withBase(localizePath('/posts', 'en'))} class="article-back">{ui.allPostsBack}</a>
 
       <header class="article-header">
         <time class="article-date" datetime={date.toISOString()}>{formattedDate}</time>
@@ -54,10 +55,10 @@ const formattedDate = date.toLocaleDateString(localeCode.en, {
               ))}
             </div>
           )}
-          {author && <span style="font-size:0.85rem; color:var(--color-text-muted);">by {author}</span>}
+          {author && <span style="font-size:0.85rem; color:var(--color-text-muted);">{ui.byAuthor.replace('{author}', author)}</span>}
           {source && (
             <a href={source} style="font-size:0.8rem; color:var(--color-text-muted);" target="_blank" rel="noopener">
-              View source →
+              {ui.viewSource}
             </a>
           )}
         </div>
@@ -72,7 +73,7 @@ const formattedDate = date.toLocaleDateString(localeCode.en, {
       <section class="section" style="padding-top: 1rem;">
         <div class="container">
           <div class="section-header" style="margin-bottom: 1.5rem;">
-            <h2 style="font-size: 1.4rem;">Related posts</h2>
+            <h2 style="font-size: 1.4rem;">{ui.relatedPosts}</h2>
           </div>
           <div class="posts-grid">
             {related.map(({ entry, isFallback }) => (

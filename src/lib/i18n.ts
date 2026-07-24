@@ -5,7 +5,7 @@
 // are needed. Because every table is typed `Record<Locale, …>`, forgetting a
 // locale (or letting its keys drift from the `en` seed) is a compile error.
 
-export const locales = ['en', 'zh'] as const;
+export const locales = ['en', 'zh-Hans'] as const;
 export type Locale = (typeof locales)[number];
 export const defaultLocale: Locale = 'en';
 
@@ -16,9 +16,16 @@ export function isLocale(x: string): x is Locale {
   return (locales as readonly string[]).includes(x);
 }
 
-/** Capitalize the first letter - used to build collection names (e.g. `viteDocsZh`). */
-export function cap(s: string): string {
-  return s.charAt(0).toUpperCase() + s.slice(1);
+/** Build the PascalCase suffix for a content collection name from a locale
+ *  code: `en` -> `En`, `zh` -> `Zh`, `zh-Hans` -> `ZhHans`. Splitting on `-`
+ *  and capitalizing each part keeps subtagged locales (script/region) free of
+ *  hyphens, which would otherwise leak into collection names (`postsZh-Hans`).
+ *  Used by content.config.ts and content.ts to name the per-locale collections. */
+export function collectionSuffix(locale: Locale): string {
+  return locale
+    .split('-')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join('');
 }
 
 /** Prefix a path with the locale segment, unless it is the default locale. */
@@ -58,9 +65,11 @@ export function buildAlternates(defaultLocalePath: string): Partial<Record<Local
 
 /** Infer the current locale from a URL pathname (default locale if no prefix matches).
  *  Strips the deploy base prefix first so locale detection works under a sub-path
- *  deploy (e.g. /astro-content-hub/zh/ -> zh). */
+ *  deploy (e.g. /astro-content-hub/zh-Hans/ -> zh-Hans). The optional `-Script`
+ *  subtag lets prefixed locales like `zh-Hans` match, while plain 2-letter prefixes
+ *  (`en`, `ja`) still work. */
 export function localeFromPath(pathname: string): Locale {
-  const m = stripBase(pathname).match(/^\/([a-z]{2})(?:\/|$)/i);
+  const m = stripBase(pathname).match(/^\/([a-z]{2}(?:-[A-Z][a-z]+)?)(?:\/|$)/i);
   if (m && isLocale(m[1])) return m[1];
   return defaultLocale;
 }
@@ -69,14 +78,14 @@ export function localeFromPath(pathname: string): Locale {
  *  Data-driven (like `localeCode`) so adding a locale forces adding its label. */
 export const localeLabel: Record<Locale, string> = {
   en: 'English',
-  zh: '中文',
+  'zh-Hans': '中文',
 };
 
 /** BCP-47 locale code per locale, for `toLocaleDateString` and friends.
  *  Centralized so adding a locale doesn't require hunting down date calls. */
 export const localeCode: Record<Locale, string> = {
   en: 'en-US',
-  zh: 'zh-CN',
+  'zh-Hans': 'zh-Hans',
 };
 
 /** UI strings per locale. `t.en` is the canonical shape; every other locale must
@@ -96,11 +105,27 @@ const tEn = {
   noTranslation: 'No translation available',
   noPages: 'No pages yet.',
   fallbackNotice: '',
+  postsListEyebrow: 'Blog',
+  postsListTitle: 'Posts',
+  postsListLead:
+    'Thoughts on developer tooling, bundle analysis, perception, and building with awareness.',
+  postsDescription:
+    'Technical articles from the content hub — guides, notes, and announcements.',
+  noPosts: 'No posts yet. Check back soon.',
+  allPostsBack: '← All Posts',
+  relatedPosts: 'Related posts',
+  byAuthor: 'by {author}',
+  viewSource: 'View source →',
+  tagEyebrow: 'Tag',
+  tagLead: '{n} post{s}',
+  tagDescription: 'Posts tagged {label}',
+  previous: '← Previous',
+  next: 'Next →',
 };
 export type UIStrings = typeof tEn;
 export const t: Record<Locale, UIStrings> = {
   en: tEn,
-  zh: {
+  'zh-Hans': {
     home: '首页',
     posts: '博客',
     docs: '文档',
@@ -114,6 +139,21 @@ export const t: Record<Locale, UIStrings> = {
     noTranslation: '暂无中文翻译',
     noPages: '暂无页面。',
     fallbackNotice: '此页暂无中文翻译,以下显示英文原文。',
+    postsListEyebrow: '博客',
+    postsListTitle: '文章',
+    postsListLead:
+      '关于开发工具、bundle 分析、感知,以及以觉察之心构建的思考。',
+    postsDescription: '内容中心的技术文章 —— 指南、笔记与公告。',
+    noPosts: '暂无文章,敬请期待。',
+    allPostsBack: '← 全部文章',
+    relatedPosts: '相关文章',
+    byAuthor: '作者:{author}',
+    viewSource: '查看源码 →',
+    tagEyebrow: '标签',
+    tagLead: '共 {n} 篇文章',
+    tagDescription: '标签为 {label} 的文章',
+    previous: '← 上一篇',
+    next: '下一篇 →',
   },
 };
 
@@ -161,7 +201,7 @@ const homeEn = {
 export type HomeCopy = typeof homeEn;
 export const home: Record<Locale, HomeCopy> = {
   en: homeEn,
-  zh: {
+  'zh-Hans': {
     title: 'Astro Content Hub',
     description: '聚合多个开源项目的文档与文章的内容中心,支持逐页本地化,并可免费自动部署。',
     eyebrow: '开源内容中心',
@@ -205,6 +245,7 @@ export const home: Record<Locale, HomeCopy> = {
  *  github, badges) come from the `products` array in `src/config/products.ts`;
  *  this supplies the surrounding labels, which are identical across products. */
 const productCopyEn = {
+  metaDescription: '{name} — open-source project documentation and posts.',
   heroBadge: 'Open Source',
   documentation: 'Documentation',
   viewSource: 'View Source',
@@ -220,7 +261,8 @@ const productCopyEn = {
 export type ProductCopy = typeof productCopyEn;
 export const productCopy: Record<Locale, ProductCopy> = {
   en: productCopyEn,
-  zh: {
+  'zh-Hans': {
+    metaDescription: '{name} —— 开源项目文档与文章。',
     heroBadge: '开源',
     documentation: '文档',
     viewSource: '查看源码',

@@ -1,17 +1,22 @@
 ---
-// src/pages/zh/[product]/index.astro
-// Generic product landing page (locale: zh). URL: /zh/<slug>/
+// src/pages/[locale]/[product]/index.astro
+// Product landing for non-default locales (e.g. /zh-Hans/vite/).
+// The default-locale route is src/pages/[product]/index.astro (prefix-free).
 import Layout from '../../../components/Layout.astro';
 import Nav from '../../../components/Nav.astro';
 import Footer from '../../../components/Footer.astro';
-import { productCopy, localizePath, withBase, buildAlternates, type Locale } from '../../../lib/i18n';
-import { products } from '../../../config/products';
+import { productCopy, localizePath, withBase, buildAlternates, defaultLocale, locales, type Locale } from '../../../lib/i18n';
+import { products, type Product } from '../../../config/products';
 
 export function getStaticPaths() {
-  return products.map((p: typeof products[number]) => ({
-    params: { product: p.slug },
-    props: { product: p, locale: 'zh' as Locale },
-  }));
+  const paths: { params: { locale: Locale; product: string }; props: { product: Product; locale: Locale } }[] = [];
+  for (const l of locales) {
+    if (l === defaultLocale) continue;
+    for (const p of products) {
+      paths.push({ params: { locale: l, product: p.slug }, props: { product: p, locale: l } });
+    }
+  }
+  return paths;
 }
 
 const { product, locale } = Astro.props;
@@ -20,7 +25,7 @@ const docsHref = withBase(localizePath(`/${product.slug}/docs`, locale));
 const alternates = buildAlternates(`/${product.slug}`);
 ---
 
-<Layout title={product.name} description={`${product.name} —— 开源项目文档与文章。`} locale={locale} alternates={alternates}>
+<Layout title={product.name} description={c.metaDescription.replace('{name}', product.name)} locale={locale} alternates={alternates}>
   <Nav alternates={alternates} />
 
   <main>

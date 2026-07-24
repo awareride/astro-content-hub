@@ -2,7 +2,7 @@
 // their site URLs at build time.
 //
 // Why: source files keep GitHub-friendly relative links (e.g. `./getting-started.md`
-// or `../zh/getting-started.md`) so they resolve when browsing the repo on GitHub.
+// or `../zh-Hans/getting-started.md`) so they resolve when browsing the repo on GitHub.
 // On the hub, Astro's Markdown processor does NOT rewrite body markdown links, so
 // a raw `./getting-started.md` would render as `href="./getting-started.md"` and
 // 404. This plugin turns such links into the correct hub route

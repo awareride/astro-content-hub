@@ -17,7 +17,7 @@ import { join, relative } from 'node:path';
 
 const ROOT = process.cwd();
 const DEFAULT_LOCALE = 'en';
-const SUPPORTED_LOCALES = ['en', 'zh'];
+const SUPPORTED_LOCALES = ['en', 'zh-Hans'];
 
 let errors = 0;
 let warnings = 0;
@@ -72,7 +72,7 @@ function validatePosts() {
   if (!existsSync(base)) { warn('no posts/ directory - skipping posts validation'); return; }
 
   const locales = SUPPORTED_LOCALES.filter(l => existsSync(join(base, l)));
-  if (locales.length === 0) { warn('posts/ exists but has no locale subdirs (en/, zh/)'); return; }
+  if (locales.length === 0) { warn('posts/ exists but has no locale subdirs (en/, zh-Hans/)'); return; }
 
   const byLocale = {};
   for (const l of locales) {
@@ -119,7 +119,7 @@ function validateDocs() {
   // product-agnostic.)
   const locales = SUPPORTED_LOCALES.filter(l => existsSync(join(base, l)));
   if (locales.length === 0) {
-    warn('docs/ exists but has no locale subdirs (en/, zh/)');
+    warn('docs/ exists but has no locale subdirs (en/, zh-Hans/)');
     return;
   }
 

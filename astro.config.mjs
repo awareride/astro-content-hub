@@ -44,13 +44,13 @@ export default defineConfig({
     // The 404 page is excluded so it is never advertised to crawlers.
     sitemap({
       filter: (page) => !page.includes('/404'),
-      // Group en/zh versions of each page into <xhtml:link rel="alternate">
-      // hreflang entries. `en` is the default (no URL prefix); `zh` lives under
-      // /zh/. The HTML head already emits hreflang too; this adds the sitemap-
-      // level grouping so crawlers see the locale relations in one place.
+      // Group each page's locale versions into <xhtml:link rel="alternate">
+      // hreflang entries. `en` is the default (no URL prefix); `zh-Hans` lives
+      // under /zh-Hans/. The HTML head already emits hreflang too; this adds the
+      // sitemap-level grouping so crawlers see the locale relations in one place.
       i18n: {
         defaultLocale: 'en',
-        locales: { en: 'en', zh: 'zh' },
+        locales: { en: 'en', 'zh-Hans': 'zh-Hans' },
       },
     }),
   ],

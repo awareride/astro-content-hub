@@ -19,4 +19,4 @@ npm install
 npm run dev
 ```
 
-本文件同步后,内容中心会在 `/zh/vite/docs/getting-started/` 提供中文版本。
+本文件同步后,内容中心会在 `/zh-Hans/vite/docs/getting-started/` 提供中文版本。

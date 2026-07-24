@@ -1,20 +1,28 @@
 ---
-// src/pages/zh/posts/index.astro
-// Blog listing page (locale: zh). Posts without a Chinese version fall back
-// to the English content and are marked on the card.
+// src/pages/[locale]/posts/index.astro
+// Blog listing for non-default locales (e.g. /zh-Hans/posts/). Posts without
+// a localized version fall back to the default-locale content and are marked
+// on the card. The default-locale listing is src/pages/posts/index.astro.
 import Layout from '../../../components/Layout.astro';
 import Nav from '../../../components/Nav.astro';
 import Footer from '../../../components/Footer.astro';
 import PostCard from '../../../components/PostCard.astro';
-import { getLocalizedPosts } from '../../../lib/content';
-import { getAllTags } from '../../../lib/content';
-import { buildAlternates, localizePath, withBase } from '../../../lib/i18n';
+import { getLocalizedPosts, getAllTags } from '../../../lib/content';
+import { buildAlternates, localizePath, withBase, t, defaultLocale, locales, type Locale } from '../../../lib/i18n';
 
-const items = await getLocalizedPosts('zh');
+export function getStaticPaths() {
+  return locales
+    .filter((l): l is Locale => l !== defaultLocale)
+    .map((l) => ({ params: { locale: l }, props: { locale: l } }));
+}
+
+const { locale } = Astro.props;
+const ui = t[locale];
+const items = await getLocalizedPosts(locale);
 const sorted = items.sort(
   (a, b) => b.entry.data.date.getTime() - a.entry.data.date.getTime(),
 );
-const tags = (await getAllTags('zh')).slice(0, 12);
+const tags = (await getAllTags(locale)).slice(0, 12);
 const alternates = buildAlternates('/posts');
 
 function dirname(id: string) {
@@ -24,9 +32,9 @@ function dirname(id: string) {
 ---
 
 <Layout
-  title="博客"
-  description="内容中心的技术文章 —— 指南、笔记与公告。"
-  locale="zh"
+  title={ui.postsListTitle}
+  description={ui.postsDescription}
+  locale={locale}
   alternates={alternates}
 >
   <Nav alternates={alternates} />
@@ -34,10 +42,10 @@ function dirname(id: string) {
   <main>
     <section class="hero" style="padding-bottom: 2rem;">
       <div class="container">
-        <p class="eyebrow">博客</p>
-        <h1>文章</h1>
+        <p class="eyebrow">{ui.postsListEyebrow}</p>
+        <h1>{ui.postsListTitle}</h1>
         <p class="hero-lead" style="margin-top: 0.5rem;">
-          关于开发工具、bundle 分析、感知,以及以觉察之心构建的思考。
+          {ui.postsListLead}
         </p>
       </div>
     </section>
@@ -47,7 +55,7 @@ function dirname(id: string) {
         {tags.length > 0 && (
           <div class="posts-tag-row">
             {tags.map(tag => (
-              <a class="tag tag-link" href={withBase(localizePath(`/posts/tags/${tag.slug}`, 'zh'))}>
+              <a class="tag tag-link" href={withBase(localizePath(`/posts/tags/${tag.slug}`, locale))}>
                 {tag.label}<span class="tag-count">{tag.count}</span>
               </a>
             ))}
@@ -56,7 +64,7 @@ function dirname(id: string) {
         {
           sorted.length === 0 ? (
             <p style="text-align:center; color:var(--color-text-muted);">
-              暂无文章,敬请期待。
+              {ui.noPosts}
             </p>
           ) : (
             <div class="posts-grid">
@@ -69,7 +77,7 @@ function dirname(id: string) {
                   slug={entry.id}
                   source={dirname(entry.id)}
                   isFallback={isFallback}
-                  locale="zh"
+                  locale={locale}
                 />
               ))}
             </div>

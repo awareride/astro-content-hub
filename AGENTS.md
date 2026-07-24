@@ -95,14 +95,15 @@ public/            Static assets served as-is (favicon, images, CNAME)
 - `/` — landing page (`src/pages/index.astro`).
 - `/posts`, `/posts/[...slug]` — blog listing + catch-all article route.
 - `/<product>` — product landing page, served dynamically from the `products`
-  array in `src/lib/i18n.ts` (`src/pages/[product]/index.astro`).
+  array in `src/config/products.ts` (`src/pages/[product]/index.astro`).
 - `/<product>/docs`, `/<product>/docs/[...slug]` — docs index + catch-all route
-  rendering Markdown from the `<product>Docs<Locale>` collections. The `zh`
-  mirror lives under `src/pages/zh/`.
+  rendering Markdown from the `<product>Docs<Locale>` collections. Non-default
+  locales are served by universal routes under `src/pages/[locale]/...`, which
+  loop `locales` in `getStaticPaths` - one set of route files per locale.
 
-Products are data-driven: add an entry to `products` in `src/lib/i18n.ts` and
-content under `src/content/docs/<product>/<locale>/`; no per-product route
-files are required.
+Products are data-driven: add an entry to `products` in `src/config/products.ts`
+and content under `src/content/docs/<product>/<locale>/`; no per-product or
+per-locale route files are required.
 
 ### Layout composition
 - `Layout.astro` owns the document shell (`<html>/<head>/<body>`, fonts, meta,

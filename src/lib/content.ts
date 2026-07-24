@@ -4,7 +4,7 @@
 // thin by delegating path generation and fallback rendering to these helpers.
 
 import { getCollection, render } from 'astro:content';
-import { defaultLocale, cap, type Locale } from './i18n';
+import { defaultLocale, collectionSuffix, type Locale } from './i18n';
 import { buildNav, type NavItem } from './docs';
 
 /** Minimal entry shape consumed by helpers and route files. We use this instead of
@@ -50,7 +50,7 @@ export interface RenderedPage {
 }
 
 function collectionName(productName: string, locale: Locale): string {
-  return `${productName}Docs${cap(locale)}`;
+  return `${productName}Docs${collectionSuffix(locale)}`;
 }
 
 /**
@@ -187,7 +187,7 @@ export async function getLocalizedDocIndex(
 // ---------------------------------------------------------------------------
 
 function postsCollectionName(locale: Locale): string {
-  return `posts${cap(locale)}`;
+  return `posts${collectionSuffix(locale)}`;
 }
 
 export interface LocalizedPostPathProps {
@@ -274,14 +274,14 @@ export async function renderLocalizedPost(
 
 // ---------------------------------------------------------------------------
 // Tags - aggregate over the localized-posts set (incl. fallback), so a tag
-// page lists every post a reader would see on /posts, regardless of whether the
-// zh version exists. Tag slugs are normalized (lowercase, kebab-case, ASCII) so
-// `i18n` / `meta-architecture` are stable, display-friendly URLs.
+// page lists every post a reader would see on /posts, regardless of whether a
+// localized version exists. Tag slugs are normalized (lowercase, kebab-case,
+// ASCII) so `i18n` / `meta-architecture` are stable, display-friendly URLs.
 // ---------------------------------------------------------------------------
 
 /** Normalize a tag into a URL-safe slug (lowercase, kebab-case, ASCII-only).
- *  Mirrors the slug a reader can type, and keeps en/zh tags that share text
- *  on the same page (zh tags that are pure ASCII collapse with en). */
+ *  Mirrors the slug a reader can type, and keeps tags that share text on the
+ *  same page across locales (ASCII tags collapse onto one page). */
 export function tagSlug(tag: string): string {
   return tag
     .trim()

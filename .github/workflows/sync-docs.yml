@@ -16,7 +16,7 @@
 #   <this-repo>/docs/   ->  awareride.github.io/src/content/docs/${PRODUCT}/
 #
 # The docs/ tree is flat by locale: docs/<locale>/<slug>.md
-# (e.g. docs/en/index.md, docs/zh/index.md). The product dimension is NOT in
+# (e.g. docs/en/index.md, docs/zh-Hans/index.md). The product dimension is NOT in
 # this repo - it is injected by sync from the PRODUCT env var below, so the hub
 # ends up with src/content/docs/${PRODUCT}/<locale>/<slug>.md. Keeping this
 # repo flat lets relative markdown links resolve against docs/ on GitHub.

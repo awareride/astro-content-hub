@@ -27,12 +27,12 @@ directly** — content is reviewed first.
 <external-project>/
   posts/
     en/hello-world.md          <- /posts/hello-world/ on the hub
-    zh/hello-world.md          <- SAME filename as en/ (slug contract)
+    zh-Hans/hello-world.md     <- SAME filename as en/ (slug contract)
     en/my-product/foo.md       <- nested dirs become path segments
   docs/
     en/index.md                <- product docs landing page
     en/getting-started.md
-    zh/index.md                <- optional; falls back to en if absent
+    zh-Hans/index.md           <- optional; falls back to en if absent
   .agents/skills/awareride-content-sync/   <- the sync skill (copied in)
   sync-delete.list             <- opt-in deletion manifest (see below)
 ```
@@ -74,21 +74,21 @@ Docs have no `date`, `tags`, `author`, or `draft`.
 
 A file's slug is its path relative to the locale dir, without `.md`. The slug
 **must be byte-identical across locales** so fallback works (`en/foo.md` and
-`zh/foo.md` both have slug `foo`). Always write the `en` version first.
+`zh-Hans/foo.md` both have slug `foo`). Always write the `en` version first.
 
 ## Fallback
 
-Fallback is per-page and content-level, never a redirect. A missing `zh` page
-renders the `en` body inside a `zh` shell with a notice; post cards on
-`/zh/posts/` show an `EN` badge. Ship `en` first and translate incrementally —
+Fallback is per-page and content-level, never a redirect. A missing `zh-Hans` page
+renders the `en` body inside a `zh-Hans` shell with a notice; post cards on
+`/zh-Hans/posts/` show an `EN` badge. Ship `en` first and translate incrementally —
 the site never 404s on a missing translation.
 
 ## Internal links
 
 - In an `en` post/doc, link with default paths: `/posts/foo/`,
   `/<product>/docs/bar/`.
-- In a `zh` post/doc, use the `/zh/` prefix to keep readers in the Chinese
-  shell: `/zh/posts/foo/`, `/zh/<product>/docs/bar/`.
+- In a `zh-Hans` post/doc, use the `/zh-Hans/` prefix to keep readers in the Chinese
+  shell: `/zh-Hans/posts/foo/`, `/zh-Hans/<product>/docs/bar/`.
 
 ## Local validation
 
@@ -99,7 +99,7 @@ node .agents/skills/awareride-content-sync/scripts/validate.mjs
 ```
 
 It exits non-zero on any error, so it can gate the sync workflow. It catches
-missing/invalid frontmatter, `zh` files with no matching `en` file, and a
+missing/invalid frontmatter, `zh-Hans` files with no matching `en` file, and a
 missing `en/` locale dir. Run it whenever you add or rename content files.
 
 ## Syncing to the hub
@@ -125,7 +125,7 @@ The merge copy never deletes hub-only files. To retire a page, list it in
 ```text
 # one path per line, relative to the repo root; '#' and blank lines ignored
 posts/en/old-post.md
-posts/zh/old-post.md
+posts/zh-Hans/old-post.md
 docs/en/legacy/        # trailing slash = drop the whole directory
 ```
 
@@ -140,7 +140,7 @@ docs/en/legacy/        # trailing slash = drop the whole directory
 ## Registering a new product (docs only)
 
 Docs only render on the hub if the product is registered in the hub's
-`products` array (`src/lib/i18n.ts`). This is a **one-time hub-side change** an
+`products` array (`src/config/products.ts`). This is a **one-time hub-side change** an
 owner makes via PR — the external repo cannot do it through sync. Once merged,
 set `PRODUCT` in your `sync-docs.yml`. Posts need no registration.
 
@@ -148,6 +148,6 @@ set `PRODUCT` in your `sync-docs.yml`. Posts need no registration.
 
 The hub runs `npm run build` (Astro + `astro check`, zero errors expected).
 Your content can break it via: mismatched frontmatter types, duplicate slugs
-within a locale, a `zh`-only slug with no `en` file, or internal links to
+within a locale, a `zh-Hans`-only slug with no `en` file, or internal links to
 non-existent pages. `validate.mjs` catches most of these; run it before
 pushing.

@@ -11,6 +11,6 @@ Every page has an English default and a Chinese shell. When a Chinese version is
 missing, the hub renders the English body inside the Chinese layout and shows a
 small notice — instead of a 404.
 
-This post has no `zh` counterpart, so visiting `/zh/posts/localized-sample/`
+This post has no `zh-Hans` counterpart, so visiting `/zh-Hans/posts/localized-sample/`
 shows exactly that fallback behavior. Ship your default language first, then
 translate incrementally.

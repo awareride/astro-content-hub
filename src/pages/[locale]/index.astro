@@ -1,23 +1,33 @@
 ---
-// src/pages/zh/index.astro
-// Landing Page (locale: zh). Copy lives in lib/i18n.ts `home.zh`.
+// src/pages/[locale]/index.astro
+// Landing page for non-default locales (e.g. /zh-Hans/). Copy lives in
+// `home[locale]`. The default-locale landing is src/pages/index.astro
+// (prefix-free). Adding a locale needs no route file - it is picked up here
+// automatically once it is in `locales`.
 import Layout from '../../components/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import PostCard from '../../components/PostCard.astro';
 import { getLocalizedPosts } from '../../lib/content';
-import { home, localizePath, withBase, buildAlternates } from '../../lib/i18n';
+import { home, localizePath, withBase, buildAlternates, defaultLocale, locales, type Locale } from '../../lib/i18n';
 import { products } from '../../config/products';
 
-const c = home.zh;
-const items = await getLocalizedPosts('zh');
+export function getStaticPaths() {
+  return locales
+    .filter((l): l is Locale => l !== defaultLocale)
+    .map((l) => ({ params: { locale: l }, props: { locale: l } }));
+}
+
+const { locale } = Astro.props;
+const c = home[locale];
+const items = await getLocalizedPosts(locale);
 const latestPosts = items
   .sort((a, b) => b.entry.data.date.getTime() - a.entry.data.date.getTime())
   .slice(0, 3);
 const alternates = buildAlternates('/');
 ---
 
-<Layout title={c.title} description={c.description} locale="zh" alternates={alternates}>
+<Layout title={c.title} description={c.description} locale={locale} alternates={alternates}>
   <Nav alternates={alternates} />
 
   <main>
@@ -35,7 +45,7 @@ const alternates = buildAlternates('/');
           <a href="https://github.com" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
             {c.ctaGithub}
           </a>
-          <a href={withBase('/zh/astro-content-hub/docs')} class="btn btn-secondary">{c.ctaProjects}</a>
+          <a href={withBase(localizePath('/astro-content-hub/docs', locale))} class="btn btn-secondary">{c.ctaProjects}</a>
         </div>
       </div>
     </section>
@@ -59,12 +69,12 @@ const alternates = buildAlternates('/');
                   slug={entry.id}
                   source={null}
                   isFallback={isFallback}
-                  locale="zh"
+                  locale={locale}
                 />
               ))}
             </div>
             <div style="text-align:center; margin-top:2rem;">
-              <a href={withBase(localizePath('/posts', 'zh'))} class="btn btn-secondary">{c.allPosts}</a>
+              <a href={withBase(localizePath('/posts', locale))} class="btn btn-secondary">{c.allPosts}</a>
             </div>
           </div>
         </section>
@@ -129,7 +139,7 @@ const alternates = buildAlternates('/');
                 </div>
                 <h3>{p.name}</h3>
                 <div class="project-actions">
-                  <a href={withBase(localizePath(`/${p.slug}`, 'zh'))} class="btn btn-primary">{c.learnMore}</a>
+                  <a href={withBase(localizePath(`/${p.slug}`, locale))} class="btn btn-primary">{c.learnMore}</a>
                   <a href={p.github} class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
                     GitHub
                   </a>

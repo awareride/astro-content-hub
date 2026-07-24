@@ -110,13 +110,13 @@ const nextDoc = navIdx >= 0 && navIdx < navItems.length - 1 ? navItems[navIdx + 
             <nav class="docs-prev-next" aria-label="Pagination">
               {prevDoc ? (
                 <a class="docs-prev-next-item docs-prev" href={withBase(prevDoc.href)}>
-                  <span class="docs-prev-next-label">← Previous</span>
+                  <span class="docs-prev-next-label">{ui.previous}</span>
                   <span class="docs-prev-next-title">{prevDoc.label}</span>
                 </a>
               ) : <span class="docs-prev-next-item" />}
               {nextDoc ? (
                 <a class="docs-prev-next-item docs-next" href={withBase(nextDoc.href)}>
-                  <span class="docs-prev-next-label">Next -></span>
+                  <span class="docs-prev-next-label">{ui.next}</span>
                   <span class="docs-prev-next-title">{nextDoc.label}</span>
                 </a>
               ) : <span class="docs-prev-next-item" />}

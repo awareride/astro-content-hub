@@ -87,5 +87,5 @@ After a manual run, spot-check the deployed `dist/`:
 ```bash
 ls dist/
 ls dist/vite/docs/   # sample product docs
-ls dist/zh/          # localized mirror
+ls dist/zh-Hans/     # localized routes
 ```

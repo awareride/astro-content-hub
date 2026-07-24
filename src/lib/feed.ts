@@ -1,5 +1,6 @@
-// Shared RSS builder for the posts feed. Both /rss.xml (en) and /zh/rss.xml
-// (zh) delegate here so the locale is the only difference.
+// Shared RSS builder for the posts feed. Both /rss.xml (default locale) and
+// /[locale]/rss.xml (non-default locales, e.g. /zh-Hans/rss.xml) delegate
+// here so the locale is the only difference.
 //
 // Links are prefixed with the deploy base via `withBase()` before being handed
 // to `@astrojs/rss`, which resolves each item link against `site` with

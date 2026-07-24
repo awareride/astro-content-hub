@@ -1,6 +1,6 @@
 # i18n Refactor Plan - locale routing & management
 
-Status: DRAFT (awaiting decision)
+Status: APPROVED (executing)
 Last updated: 2026-07-24
 
 This plan evaluates whether/how to reduce the friction of the hub's i18n
@@ -216,3 +216,72 @@ focused session.
 - **Fold in the `zh-Hans` rename?** (recommend yes)
 - **Accept the clean break on `/zh/...` URLs** (no redirects)? (recommend yes -
   template is new)
+
+---
+
+## 11. Validation results & enhanced scope (pre-execution)
+
+### Validation performed (node 24)
+- `toLocaleDateString('zh-Hans', {year,month:'long',day})` -> "2026年7月24日"
+  (identical to `zh-CN`). So `localeCode['zh-Hans'] = 'zh-Hans'` directly - no
+  `zh-CN` Intl fallback is needed.
+- Proposed regex `/^\/([a-z]{2}(?:-[A-Z][a-z]+)?)(?:\/|$)/` matches `zh-Hans`
+  (and `en`, `ja`); the *current* regex `/^\/([a-z]{2})(?:\/|$)/i` returns null
+  for `/zh-Hans/...` - confirmed it MUST change.
+
+### Gaps discovered during codebase exploration (not in original plan)
+- **Collection naming via `cap()`.** `content.config.ts` + `content.ts` build
+  collection names as `<product>Docs${cap(locale)}` / `posts${cap(locale)}`.
+  `cap('zh-Hans')` = `'Zh-Hans'` -> `postsZh-Hans` (hyphenated). The plan never
+  validated whether Astro accepts hyphens in collection names. Fix: replace `cap`
+  with a `collectionSuffix(locale)` that PascalCases by splitting on `-` ->
+  `zh-Hans` becomes `ZhHans`. No behavior change for `en`/`zh` (still `En`/`Zh`).
+- **`Layout.astro` hardcodes `alternates.zh` + `hreflang="zh"`** (lines 64-66).
+  Under the rename these would emit nothing for `zh-Hans`. Fix: data-drive
+  hreflang by looping `locales` over the `alternates` map.
+- **`TagPage.astro` hardcodes `locale === 'zh'` conditionals** for eyebrow/lead
+  (lines 24-27). Would render English text on `zh-Hans` pages. Fix: move
+  `tagEyebrow` + `tagLead` (with `{n}`/`{s}` placeholders) + `tagDescription`
+  into the `t` table.
+- **`DocsLayout.astro` hardcodes "← Previous" / "Next ->"** (lines 113,119).
+  Fix: add `previous`/`next` to `t`.
+- **Route files carry inline locale UI strings** ("← All Posts"/"← 全部文章",
+  "Related posts"/"相关文章", "by {author}"/"作者:", "View source →", posts-list
+  title/lead/empty-state, product-landing meta description). For the universal
+  `[locale]` routes to be truly locale-agnostic (the goal: adding a locale is a
+  data change only), these MUST move into the `t` table. The docs routes
+  (`[product]/docs/*`) already delegate to `DocsLayout` + locale-aware helpers -
+  they convert trivially (just swap the hardcoded `'zh'` for the `[locale]`
+  param).
+
+### Confirmed decisions
+- Option A (two-file: default + universal `[locale]`) + `zh-Hans` rename +
+  clean break on `/zh/...` URLs (no redirects).
+- `localeCode['zh-Hans'] = 'zh-Hans'` (Intl confirmed working).
+- Introduce `collectionSuffix` (PascalCase on `-`) replacing `cap` for
+  collection naming -> clean `ZhHans` names, no hyphen risk.
+- Move every route inline UI string into the `t` table so the universal
+  `[locale]` routes are fully locale-agnostic; update the `en` default routes
+  to read from `t` too, so each route pair becomes two thin wrappers that
+  differ only in `getStaticPaths` + the `locale` value.
+
+### Execution sequence (each step keeps the build green; separate commits)
+- **A. Locale-agnosticize shared code (no rename yet).** Add `collectionSuffix`
+  + switch the 4 call sites; data-drive `Layout` hreflang; move `TagPage`
+  eyebrow/lead/description + `DocsLayout` prev/next into `t`; extract route
+  inline strings into `t` and update the `en` default routes to use `t`. Build
+  green with `en`/`zh` still in place.
+- **B. Rename + universal routes (atomic).** `zh`->`zh-Hans` in `i18n.ts`
+  (`locales`, `localeCode`, `localeLabel`, `t`, `home`, `productCopy`); update
+  `localeFromPath` regex; rename content dirs (`src/content/posts/zh`,
+  `src/content/docs/*/zh`, `docs/zh` -> `zh-Hans`); sitemap `i18n` config;
+  convert all 7 `zh/` route twins into universal `src/pages/[locale]/...`
+  files (looping `locales` minus default) and delete the `zh/` tree; collapse
+  `zh/rss.xml.ts` into `[locale]/rss.xml.ts`. Build green.
+- **C. Sync skill + examples + docs.** Rename `examples/*/docs/zh` +
+  `examples/*/posts/zh` dirs; update sync `SKILL.md` / `validate.mjs` / workflow
+  yml / example READMEs for `zh-Hans`; update `docs/zh-Hans/*.md` (architecture
+  routing table, authoring add-a-locale, content-sync) to reflect the new model.
+- **D. Verify.** `npm run build`; spot-check `/zh-Hans/posts/<slug>/` (`<html
+  lang>` + hreflang), switcher, sitemap hreflang; throwaway `'ja'` locale (no
+  route files) -> working `/ja/posts/<slug>/` fallback; then remove `ja`.
