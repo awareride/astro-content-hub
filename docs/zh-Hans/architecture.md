@@ -25,11 +25,12 @@ astro-content-hub/            <- 中心(Astro 站点)位于仓库根目录
 ├── astro.config.mjs          <- 将 `site` 设为你的域名;sitemap + Sätteri 插件
 ├── src/
 │   ├── components/           <- Layout, Nav, Footer, DocsLayout, PostCard,
-│   │                          LocaleSwitcher, ThemeToggle, TableOfContents, TagPage
+│   │                          LocaleSwitcher, ThemeToggle, TableOfContents, TagPage, ProductLandingDefault
+│   ├── components/product-landing/  <- 可选的逐产品落地页覆盖(每个产品一个文件,以 slug 命名)
 │   ├── config/products.ts    <- 产品注册表(在此添加产品)
 │   ├── content/              <- markdown 集合(文章 + 文档)
 │   ├── content.config.ts     <- 集合 schema + glob 加载器
-│   ├── lib/                  <- i18n.ts, content.ts, docs.ts, feed.ts,
+│   ├── lib/                  <- i18n.ts, content.ts, docs.ts, feed.ts, product-landing.ts,
 │   │                          remark-rewrite-links.mjs, heading-ids.mjs
 │   ├── pages/                <- 基于文件的路由(+ [locale]/ 通用路由)
 │   └── styles/global.css     <- 设计变量 + .prose 排版 + 暗色主题
@@ -54,6 +55,8 @@ astro-content-hub/            <- 中心(Astro 站点)位于仓库根目录
 
 由于产品与语言页面均由数据驱动,**你无需为每个产品或语言创建路由文件。** 在
 `products` 中添加一项,路由与文档集合即自动生成。
+
+**逐产品落地页覆盖。** 产品可通过添加 `src/components/product-landing/<slug>.astro` 来提供自定义落地页(独立的 `<main>` 区块)。`src/lib/product-landing.ts` 在构建时预先 glob 该目录,并按 slug 返回对应组件(或 `undefined`);两个落地路由(默认 `/<product>/` 路由及其 `/<locale>/<product>/` 双生路由)在存在覆盖时渲染之,否则使用共享回退 `src/components/ProductLandingDefault.astro`。覆盖只渲染 `<main>` 区块 -- 路由仍负责 `Layout` + `Nav` + `Footer` 与 `<head>`。覆盖与回退共用同一套 props 约定(`product`、`locale`、`c`、`docsHref`)。参见[编写内容 - 自定义产品落地页](./authoring.md#自定义产品落地页)。文档子路由(`/<product>/docs...`)不受影响。
 
 ## 布局组合
 
@@ -85,6 +88,7 @@ Markdown 通过 `astro:content` 的 `render(entry)` 渲染;页面将 `<Content /
 | `config/products.ts` | 产品注册表(`products` 数组)—— 列出提供文档与落地卡片的产品。 |
 | `content.ts` | 本地化路径生成 + 回退渲染辅助(文档 + 文章)。 |
 | `docs.ts` | `buildNav` —— 侧边栏构建(index → 基础路径,按 `order` 排序)。 |
+| `product-landing.ts` | 逐产品落地页覆盖解析器 -- 预先 glob `components/product-landing/*.astro`,以 slug 为键;返回覆盖组件或 `undefined`(回退到 `ProductLandingDefault.astro`)。 |
 | `remark-rewrite-links.mjs` | 重写文档链接,使 `docs/<product>/<locale>/` 解析为 `/<product>/docs`。 |
 
 ## 构建与部署

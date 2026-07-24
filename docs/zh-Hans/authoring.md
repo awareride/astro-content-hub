@@ -117,6 +117,27 @@ order: 2                     # 可选,控制侧边栏排序(默认 0)
 3. 路由是自动生成的(产品页面是动态的)。运行 `npm run build` 并验证
    `/mytool/docs/` 与 `/zh-Hans/mytool/docs/` 能正常渲染。
 
+## 自定义产品落地页
+
+默认情况下,每个产品落地页(`/<product>/`)都渲染 `src/components/ProductLandingDefault.astro` 中的共享通用 hero + CTA。要为某个产品提供自定义落地页,只需添加一个以产品 **slug** 命名的组件:
+
+```
+src/components/product-landing/<slug>.astro     # 例如 src/components/product-landing/vite.astro
+```
+
+`src/lib/product-landing.ts` 在构建时预先 glob 该目录,因此该文件会被自动发现 -- 无需配置,无需改动路由。两个落地路由(默认 `/<product>/` 路由及其 `/<locale>/<product>/` 双生路由)都会自动采用该覆盖;没有匹配文件的产品则继续使用通用落地页。文档子路由(`/<product>/docs...`)不受影响,仍为数据驱动。
+
+覆盖只渲染 **`<main>` 区块**(hero、自定义区块、CTA)。路由仍负责 `Layout` + `Nav` + `Footer` 与 `<head>`,因此不存在第二份文档外壳。它接收与回退相同的 props:
+
+| Prop | 含义 |
+|------|------|
+| `product` | 来自 `src/config/products.ts` 的完整 `Product` 条目。 |
+| `locale` | 当前 locale(默认路由传入 `'en'`,双生路由传入循环变量)。 |
+| `c` | 已按 locale 解析的 UI 字符串(`ProductCopy`)-- 复用 `c.viewSource`、`c.documentation`、`c.ctaTitle` 等。 |
+| `docsHref` | 已感知 base、带 locale 前缀的文档链接,由路由预先计算。 |
+
+要本地化覆盖专属文案,可在组件内部按 `locale` 分支;v1 为每个产品提供一份覆盖,跨所有 locale 使用(按语言拆分的覆盖文件如 `vite.zh-Hans.astro` 是未来的扩展)。示例 `src/components/product-landing/vite.astro` 展示了这一约定 -- 复用共享 CSS 类(`.product-hero`、`.section`、`.btn`、`.feature-grid` 等),仅当全局类不适用时才添加 scoped `<style>`。
+
 ## 添加一门新语言
 
 添加语言是**纯数据变更** —— 无需创建或镜像路由文件,因为非默认路由是通用的

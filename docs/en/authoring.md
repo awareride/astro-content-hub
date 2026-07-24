@@ -130,6 +130,41 @@ The only authoring task that touches config:
 3. Routes are automatic (product pages are dynamic). Run `npm run build` and
    verify `/mytool/docs/` and `/zh-Hans/mytool/docs/` render.
 
+## Customize a product landing
+
+By default every product landing (`/<product>/`) renders the shared generic
+hero + CTA in `src/components/ProductLandingDefault.astro`. To ship a custom
+landing for one product, add a single component keyed by the product **slug**:
+
+```
+src/components/product-landing/<slug>.astro     # e.g. src/components/product-landing/vite.astro
+```
+
+`src/lib/product-landing.ts` eagerly globs that directory at build time, so the
+file is auto-discovered - no config, no route changes. Both landing routes
+(the default `/<product>/` route and its `/<locale>/<product>/` twin) pick up
+the override automatically; products without a matching file keep the generic
+landing. Docs subroutes (`/<product>/docs...`) are unaffected and stay
+data-driven.
+
+The override renders **only the `<main>` sections** (hero, custom sections,
+CTA). The route still owns `Layout` + `Nav` + `Footer` and the `<head>`, so
+there is no second document shell. It receives the same props as the fallback:
+
+| Prop | What it is |
+|------|------------|
+| `product` | The full `Product` entry from `src/config/products.ts`. |
+| `locale` | Current locale (`'en'` from the default route, the loop value from the twin). |
+| `c` | Locale-resolved UI strings (`ProductCopy`) - reuse `c.viewSource`, `c.documentation`, `c.ctaTitle`, ... |
+| `docsHref` | Base-aware, locale-prefixed docs link, pre-computed by the route. |
+
+To localize override-only copy, branch on `locale` inside the component; v1
+ships one override per product used across all locales (per-locale override
+files like `vite.zh-Hans.astro` are a future extension). The worked example
+`src/components/product-landing/vite.astro` shows the contract - reuse shared
+CSS classes (`.product-hero`, `.section`, `.btn`, `.feature-grid`, ...) and add
+a scoped `<style>` only when the global classes do not fit.
+
 ## Add a new language
 
 Adding a locale is a **data-only change** — no route files are created or

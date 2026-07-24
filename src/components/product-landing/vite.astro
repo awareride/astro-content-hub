@@ -1,0 +1,104 @@
+---
+// src/components/product-landing/vite.astro
+// Worked-example override for the `vite` product landing.
+//
+// Renders ONLY the <main> sections (hero, feature grid, CTA). The route
+// (`src/pages/[product]/index.astro` and its [locale] twin) owns Layout +
+// Nav + Footer and the <head>, matching the DocsLayout pattern and the
+// AGENTS.md rule against a second document shell.
+//
+// Props are identical to ProductLandingDefault.astro, so the route can swap
+// the override and the fallback freely. Shared action labels come from the
+// route-resolved `c` (ProductCopy); `docsHref` is base-aware + locale-prefixed,
+// pre-computed by the route so this component never re-derives withBase /
+// localizePath. Override-only copy is localized internally (en + zh-Hans);
+// v1 ships one override per product across all locales.
+import type { Product } from '../../config/products';
+import type { Locale, ProductCopy } from '../../lib/i18n';
+import type { ProductLandingProps } from '../../lib/product-landing';
+
+interface Props extends ProductLandingProps {}
+const { product, locale, c, docsHref } = Astro.props as Props;
+
+// Override-specific copy. Kept here (not in lib/i18n.ts) because it is local
+// to the Vite landing. Reuse shared `c` for shared labels (viewSource,
+// documentation, ctaTitle, ...) and only branch on `locale` for custom copy.
+const copy: Record<Locale, {
+  heroLead: string;
+  featuresEyebrow: string;
+  featuresTitle: string;
+  features: { title: string; body: string }[];
+}> = {
+  en: {
+    heroLead: 'Next generation frontend tooling. A dev server that feels instant, and a build that feels effortless.',
+    featuresEyebrow: 'Why Vite',
+    featuresTitle: 'Built for developer experience',
+    features: [
+      { title: 'Native ESM dev server', body: 'No bundling during dev. The server starts in milliseconds and scales with your project size.' },
+      { title: 'Instant HMR', body: 'Hot module replacement over native ESM, so edits are reflected before you switch windows.' },
+      { title: 'Optimized build', body: 'Rollup-powered production builds with smart code splitting and asset handling out of the box.' },
+      { title: 'Framework agnostic', body: 'First-class templates for React, Vue, Svelte, and more, plus a flexible plugin API.' },
+    ],
+  },
+  'zh-Hans': {
+    heroLead: '下一代前端工具。开发服务器近乎瞬时,构建毫不费力。',
+    featuresEyebrow: '为什么选择 Vite',
+    featuresTitle: '为开发者体验而生',
+    features: [
+      { title: '原生 ESM 开发服务器', body: '开发阶段无需打包。服务器在毫秒级启动,并随项目规模平滑扩展。' },
+      { title: '即时 HMR', body: '基于原生 ESM 的热更新,在你切换窗口前即可看到改动。' },
+      { title: '优化构建', body: '由 Rollup 驱动的生产构建,内置智能代码分割与资源处理。' },
+      { title: '框架无关', body: '为 React、Vue、Svelte 等提供一流模板,并附带灵活的插件 API。' },
+    ],
+  },
+};
+const t = copy[locale] ?? copy.en;
+---
+
+<section class="product-hero">
+  <div class="container">
+    <div class="hero-badge" style="display:inline-block; font-size:0.85rem; font-weight:600; padding:0.25rem 0.9rem; border-radius:100px; background:var(--color-accent-subtle); color:var(--color-accent); margin-bottom:1.25rem;">
+      {c.heroBadge}
+    </div>
+    <h1>{product.name}</h1>
+    <p class="hero-lead">{t.heroLead}</p>
+    <div class="hero-actions">
+      <a href={product.github} class="btn btn-primary" target="_blank" rel="noopener">{c.viewSource}</a>
+      <a href={docsHref} class="btn btn-secondary">{c.documentation}</a>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-header">
+      <p class="eyebrow">{t.featuresEyebrow}</p>
+      <h2>{t.featuresTitle}</h2>
+    </div>
+    <div class="feature-grid">
+      {t.features.map((f) => (
+        <div class="feature-card">
+          <h3>{f.title}</h3>
+          <p>{f.body}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="cta-box">
+      <h2>{c.ctaTitle}</h2>
+      <p>{c.ctaBody}</p>
+      <div class="cta-actions">
+        <a href={product.github} class="btn btn-primary btn-large" target="_blank" rel="noopener">
+          {c.ctaPrimary}
+        </a>
+        <a href={docsHref} class="btn btn-secondary btn-large">
+          {c.readDocs}
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

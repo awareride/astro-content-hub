@@ -68,7 +68,9 @@ site looks complete out of the box. Replace it with your own.
 - **Data-driven products.** Products come from the `products` array in
   [`src/config/products.ts`](./src/config/products.ts). Add an entry and the
   product landing page, docs routes, and sidebar are generated automatically -
-  no per-product route files.
+  no per-product route files. A product can optionally ship a custom landing
+  page by adding one component (see
+  [Customize a product landing](#customize-a-product-landing)).
 - **Typed content collections.** Posts and docs are Markdown loaded from the
   filesystem with [zod](https://zod.dev/)-validated frontmatter, so malformed
   content fails the build before it reaches the site.
@@ -260,6 +262,44 @@ src/content/docs/mytool/zh-Hans/index.md   # optional; falls back to en
 Routes are dynamic, so no new route files are needed. Run `npm run build` and
 verify `/mytool/docs/` and `/zh-Hans/mytool/docs/` render.
 
+### Customize a product landing
+
+By default every product landing (`/<product>/`) renders the shared generic
+hero + CTA in
+[`src/components/ProductLandingDefault.astro`](./src/components/ProductLandingDefault.astro).
+To ship a custom landing for one product, add a single component keyed by the
+product **slug**:
+
+```
+src/components/product-landing/<slug>.astro     # e.g. src/components/product-landing/vite.astro
+```
+
+[`src/lib/product-landing.ts`](./src/lib/product-landing.ts) eagerly globs
+that directory at build time, so the file is auto-discovered - no config, no
+route changes. Both landing routes (the default `/<product>/` route and its
+`/<locale>/<product>/` twin) pick up the override automatically; products
+without a matching file keep the generic landing. Docs subroutes
+(`/<product>/docs...`) are unaffected and stay data-driven.
+
+The override renders **only the `<main>` sections** (hero, custom sections,
+CTA). The route still owns `Layout` + `Nav` + `Footer` and the `<head>`, so
+there is no second document shell. It receives the same props as the fallback:
+
+| Prop | What it is |
+|------|------------|
+| `product` | The full `Product` entry from `src/config/products.ts`. |
+| `locale` | Current locale (`'en'` from the default route, the loop value from the twin). |
+| `c` | Locale-resolved UI strings (`ProductCopy`) - reuse `c.viewSource`, `c.documentation`, `c.ctaTitle`, ... |
+| `docsHref` | Base-aware, locale-prefixed docs link, pre-computed by the route. |
+
+To localize override-only copy, branch on `locale` inside the component; v1
+ships one override per product used across all locales (per-locale override
+files like `vite.zh-Hans.astro` are a future extension). The worked example
+[`src/components/product-landing/vite.astro`](./src/components/product-landing/vite.astro)
+shows the contract - reuse shared CSS classes (`.product-hero`, `.section`,
+`.btn`, `.feature-grid`, ...) and add a scoped `<style>` only when the global
+classes do not fit.
+
 ### Add a locale
 
 Append to `locales` in [`src/lib/i18n.ts`](./src/lib/i18n.ts), add a block to
@@ -328,11 +368,12 @@ For the full flow - frontmatter schemas, the deletion manifest
 astro-content-hub/                 <- the hub (Astro site) at the repo root
 ├── astro.config.mjs              <- set `site`/`base` to your domain
 ├── src/
-│   ├── components/              <- Layout, Nav, Footer, DocsLayout, PostCard, LocaleSwitcher, ThemeToggle, TableOfContents, TagPage
+│   ├── components/              <- Layout, Nav, Footer, DocsLayout, PostCard, LocaleSwitcher, ThemeToggle, TableOfContents, TagPage, ProductLandingDefault
+│   ├── components/product-landing/  <- optional per-product landing overrides (one file per product, keyed by slug)
 │   ├── config/products.ts       <- the products registry (add a product here)
 │   ├── content/                 <- markdown collections (posts + docs)
 │   ├── content.config.ts        <- collection schemas (zod) + glob loaders
-│   ├── lib/                     <- i18n.ts, content.ts, docs.ts, feed.ts, remark-rewrite-links.mjs, heading-ids.mjs
+│   ├── lib/                     <- i18n.ts, content.ts, docs.ts, feed.ts, product-landing.ts, remark-rewrite-links.mjs, heading-ids.mjs
 │   ├── pages/                   <- file-based routes (+ [locale]/ universal routes)
 │   └── styles/global.css        <- structural tokens + .prose typography (+ theme.css for brand)
 ├── public/                      <- favicon, images, CNAME

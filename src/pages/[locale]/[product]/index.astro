@@ -5,6 +5,8 @@
 import Layout from '../../../components/Layout.astro';
 import Nav from '../../../components/Nav.astro';
 import Footer from '../../../components/Footer.astro';
+import ProductLandingDefault from '../../../components/ProductLandingDefault.astro';
+import { getProductLanding } from '../../../lib/product-landing';
 import { productCopy, localizePath, withBase, buildAlternates, defaultLocale, locales, type Locale } from '../../../lib/i18n';
 import { products, type Product } from '../../../config/products';
 
@@ -23,45 +25,21 @@ const { product, locale } = Astro.props;
 const c = productCopy[locale];
 const docsHref = withBase(localizePath(`/${product.slug}/docs`, locale));
 const alternates = buildAlternates(`/${product.slug}`);
+// Per-product override: if `src/components/product-landing/<slug>.astro` exists
+// it replaces the generic hero+CTA; otherwise ProductLandingDefault is used.
+// The override renders only <main> sections; Layout/Nav/Footer stay here.
+const Override = getProductLanding(product.slug);
 ---
 
 <Layout title={product.name} description={c.metaDescription.replace('{name}', product.name)} locale={locale} alternates={alternates}>
   <Nav alternates={alternates} />
 
   <main>
-    <section class="product-hero">
-      <div class="container">
-        <div class="hero-badge" style="display:inline-block; font-size:0.85rem; font-weight:600; padding:0.25rem 0.9rem; border-radius:100px; background:var(--color-accent-subtle); color:var(--color-accent); margin-bottom:1.25rem;">
-          {c.heroBadge}
-        </div>
-        <h1>{product.name}</h1>
-        <div class="hero-actions">
-          <a href={product.github} class="btn btn-primary" target="_blank" rel="noopener">{c.viewSource}</a>
-          <a href={docsHref} class="btn btn-secondary">{c.documentation}</a>
-        </div>
-      </div>
-    </section>
-
-    <section class="section section-alt">
-      <div class="container">
-        <div class="section-header">
-          <p class="eyebrow">{c.docsEyebrow}</p>
-          <h2>{c.docsTitle}</h2>
-        </div>
-        <div class="cta-box">
-          <h2>{c.ctaTitle}</h2>
-          <p>{c.ctaBody}</p>
-          <div class="cta-actions">
-            <a href={product.github} class="btn btn-primary btn-large" target="_blank" rel="noopener">
-              {c.ctaPrimary}
-            </a>
-            <a href={docsHref} class="btn btn-secondary btn-large">
-              {c.readDocs}
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
+    {Override ? (
+      <Override product={product} locale={locale} c={c} docsHref={docsHref} />
+    ) : (
+      <ProductLandingDefault product={product} locale={locale} c={c} docsHref={docsHref} />
+    )}
   </main>
 
   <Footer />
