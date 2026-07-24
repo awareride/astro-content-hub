@@ -64,3 +64,23 @@ readable against it.
   [`src/lib/i18n.ts`](./src/lib/i18n.ts) - replace the sample copy with yours.
 - Components already use `var(--color-*)`, so they pick up your token changes
   automatically - no component edits needed.
+
+## Sample themes
+
+[`src/styles/themes/`](./src/styles/themes) holds ready-to-try theme files. Each
+is a drop-in override of the same token names as `theme.css`.
+
+| File | Look |
+|------|------|
+| [`openai.css`](./src/styles/themes/openai.css) | "OpenAI"-inspired: clean neutrals + a vivid emerald-teal accent, near-black canvas. |
+
+**To try a sample theme**, swap one line in
+[`src/styles/global.css`](./src/styles/global.css):
+
+```css
+@import './themes/openai.css';   /* was: './theme.css' */
+```
+
+Revert the line to return to the default. (You can also copy a sample file
+over `src/styles/theme.css` if you'd rather keep the import pointing at
+`theme.css`.)
