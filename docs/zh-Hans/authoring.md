@@ -128,9 +128,9 @@ order: 2                     # 可选,控制侧边栏排序(默认 0)
   (children 为普通链接)。`activePrefix` 是路径段列表——当前路径包含其中任意一段即高亮;
   下拉在任一 child 命中时点亮。标签按 locale:`{ en: '...', 'zh-Hans': '...' }`。
 - **`site.footer.links`** —— 页脚列,按数组顺序渲染在品牌块之后。自定义列是
-  `{ title, items: [...] }`;自动生成的 Products 列是 `{ type: 'products', limit? }`
-  —— 省略 `limit` 列出所有产品,或设 `limit` 截断列表并在超出时显示指向 `/products`
-  的 "All products" 链接。
+  `{ title, items: [...] }`;自动生成的 Products 列是 `{ type: 'products', all?, limit? }`
+  —— 默认列出 featured 产品(`all: true` 列出所有),设 `limit` 截断列表并在超出时显示
+  指向 `/products` 的 "All products" 链接。
 
 内部 href 会自动加 locale/base 前缀;外部链接使用绝对 `https://...`(并设
 `external: true` 以新标签打开)。

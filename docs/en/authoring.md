@@ -146,9 +146,10 @@ dropdown, locale/theme) always renders; you add entries via config:
   per-locale: `{ en: '...', 'zh-Hans': '...' }`.
 - **`site.footer.links`** - footer columns, rendered in array order after the
   brand block. A custom column is `{ title, items: [...] }`; the
-  auto-generated Products column is `{ type: 'products', limit? }` - omit
-  `limit` to list every product, or set it to cap the list and show an
-  "All products" link to `/products` when there are more.
+  auto-generated Products column is `{ type: 'products', all?, limit? }` - it
+  lists featured products by default (`all: true` for every product), and
+  `limit` caps the list, showing an "All products" link to `/products` when
+  there are more.
 
 Internal hrefs are auto-prefixed with the locale/base; use absolute
 `https://...` for external links (and set `external: true` to open in a new
