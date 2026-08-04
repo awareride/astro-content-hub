@@ -1,0 +1,158 @@
+# Tier Audit - framework / starter / registry boundary
+
+> Status: **Approved** - owner decisions incorporated. Implementation not
+> started yet; the order below is the execution sequence once the go-ahead
+> is given.
+> Origin: nimbus (cloudflare/nimbus) review discussion - apply its "boundary
+> test" to this repo so the template's three layers are explicit and any
+> misplaced code is found. Nothing implemented yet.
+
+## Why
+
+nimbus splits a docs-site codebase into three tiers, each with one test:
+
+| Tier | Test | Lives in |
+|---|---|---|
+| Framework | "Am I changing taste or fixing a bug?" - bug = framework | `nimbus-docs` package |
+| Starter | "Do changes alter classes/layout or call signatures?" | starter source |
+| Registry | "Does every site need this on day 1?" - no = registry | registry, installed on demand |
+
+This repo is a *template* (per `.agents/plan/plan.md`: abstract the hub into a
+reusable template). The same split applies, but today the tiers are implicit: a
+new adopter (or a coding agent) cannot tell which files are "machinery to
+keep" versus "your copy to rewrite" versus "optional hooks". This plan makes
+the split explicit, flags real boundary problems, and fixes the small ones.
+
+## Tier definitions for this repo (adopter-friendly names)
+
+Owner decision 1: use friendlier tier names, but keep the descriptions
+precise. The nimbus terms are kept in parentheses so anyone who read the
+original discussion can map across.
+
+| Tier (this repo) | nimbus term | What lives here | Editing means |
+|---|---|---|---|
+| **Machinery** | Framework | behavior with (mostly) one correct answer: path/fallback generation, collection wiring, base/locale helpers, route delegation, build validation, sync mechanics | fixing behavior / a bug |
+| **Your site** | Starter | visible UI and instance configuration: component look, Nav/Footer/landing layout, global styles, sample copy (`t`/`home`/`productCopy`), the `products` array, sample content | your taste / rebranding |
+| **Extensions** | Registry | optional per-product hooks, enabled by a file existing: `product-landing/<slug>.astro`, `product-themes/<slug>.css`, `product-info/<locale>/<slug>.md`, plus `examples/*` sample source repos | opting in / adding optional features |
+
+Boundary test (unchanged): one correct answer -> Machinery; a user might
+reasonably want a different answer -> Your site; not needed on day 1 ->
+Extensions.
+
+## The audit (findings)
+
+### Framework (mechanism)
+
+| File | Role |
+|---|---|
+| `src/lib/i18n.ts` | locales, base/locale helpers, dictionary *shapes* (see finding A) |
+| `src/lib/content.ts` | localized paths + fallback rendering (docs / posts / product-info) |
+| `src/lib/docs.ts` | sidebar nav builder |
+| `src/lib/feed.ts` | RSS builder |
+| `src/lib/product-landing.ts` | landing-override resolver (registry mechanism) |
+| `src/lib/heading-ids.mjs`, `src/lib/remark-rewrite-links.mjs` | markdown plugins |
+| `src/content.config.ts` | collection generation (zod schemas) |
+| `src/pages/**` (all routes) | thin delegation to lib/ |
+| `skills/site-content/SKILL.md` | per-hub authoring contract |
+| `.github/workflows/deploy.yml` | template CI (build + dual deploy) |
+
+### Starter (taste + instance config)
+
+| File | Role |
+|---|---|
+| `src/components/Layout.astro`, `DocsLayout.astro` | shell composition (behavior noted in finding C) |
+| `src/components/Nav.astro`, `Footer.astro`, `PostCard.astro`, `TagPage.astro`, `TableOfContents.astro`, `ThemeToggle.astro`, `LocaleSwitcher.astro`, `ProductLandingDefault.astro` | visible UI |
+| `src/config/products.ts` | instance registry (the `Product` interface is framework) |
+| `src/content/**` | sample posts / docs / product-info (replaceable) |
+| `src/styles/global.css`, `theme.css` | tokens + prose (see finding D) |
+| `AGENTS.md`, `README.md`, `THEMING.md`, `CONTRIBUTING.md` | instance docs |
+
+### Registry (hooks - file-exists-enables)
+
+| Hook | Docs |
+|---|---|
+| `src/components/product-landing/<slug>.astro` | landing override |
+| `src/styles/product-themes/<slug>.css` + barrel line | per-product theme |
+| `src/content/product-info/<locale>/<slug>.md` | auto-generated landing data |
+| `examples/*` | installable sample source repos + sync skill |
+
+### Findings (boundary problems)
+
+**A. `src/lib/i18n.ts` mixes machinery with instance copy.** The dictionary
+tables `t` / `home` / `productCopy` (and `siteName`) are *your copy to
+rewrite*; the helpers around them are machinery. Today an adopter must
+hand-edit a lib file to rebrand. Fix (approved, decision 2): split the copy
+into `src/config/copy.ts`; `i18n.ts` re-exports so import churn is zero;
+ARCHITECTURE.md documents "edit `src/config/copy.ts` to rebrand". Cost: one
+new file + re-export lines; no behavior change.
+
+**B. `src/config/products.ts`** - the `Product` interface (machinery) and the
+array (instance config) live together. Acceptable; document in
+ARCHITECTURE.md. No code change.
+
+**C. `Layout.astro` shell** - head behavior (lang, hreflang, base-aware meta,
+`data-product`) is framework logic inside a starter-looking component. Today
+it is thin and already delegates to `buildAlternates` / `withBase`; extracting
+a `buildHeadData()` helper is possible but low value now. Deferred.
+
+**D. CSS contract vs taste** - the `--color-*` token names and `.prose`
+typography are the shared contract; token *values* and everything else in
+`global.css` are taste. No code change; document the contract in
+ARCHITECTURE.md.
+
+**E. Routes / lib - clean.** They already delegate to lib/ and are product-
+and locale-agnostic. No change.
+
+## Deliverables
+
+1. **NEW `ARCHITECTURE.md` (repo root)** - the durable tier map. Contents:
+   - the three-tier table above (adopter-friendly names + nimbus mapping),
+   - the boundary test ("one correct answer -> Machinery; taste -> Your
+     site; not needed day 1 -> Extensions"),
+   - an "edit X to rebrand / to change behavior / to extend" quick table,
+   - the consolidated extension-points table (the three registry hooks +
+     `examples/*`), pulled together from today's scattered docs (the
+     AGENTS.md product-landing paragraph, THEMING.md, product-info docs).
+   `AGENTS.md` gains a short pointer to it (one paragraph; AGENTS.md stays
+   conduct/rules, ARCHITECTURE.md is the map).
+2. **Finding A fix (in scope, decision 2)** - split the instance copy out of
+   `src/lib/i18n.ts` into `src/config/copy.ts` with re-exports, so rebranding
+   is an edit to a config file, not a lib file. Zero import churn; no
+   behavior change.
+3. The extension-points table (see 1) consolidates the currently scattered
+   docs.
+
+## Decisions (resolved, owner review)
+
+1. **Tier names: adopter-friendly and precise.** Use "Machinery / Your site /
+   Extensions", each described accurately (see the tier table above); nimbus
+   terms kept as a mapping.
+2. **Finding A: do the split.** `src/config/copy.ts` holds the instance copy;
+   `src/lib/i18n.ts` re-exports for zero churn.
+3. **Tier map lives in a NEW `ARCHITECTURE.md`** at the repo root; AGENTS.md
+   points to it.
+
+## Implementation order
+
+1. Commit 1: NEW `ARCHITECTURE.md` (tier map + extension points) + AGENTS.md
+   pointer paragraph (docs only).
+2. Commit 2: Finding A split - `src/config/copy.ts` + re-exports in
+   `src/lib/i18n.ts` + ARCHITECTURE.md "edit X to rebrand" entry.
+3. Verify: `npm run build` passes; `astro check` clean; ARCHITECTURE.md
+   matches the tree.
+
+## Verification checklist
+
+- `npm run build` passes with 0 errors.
+- ARCHITECTURE.md tier table matches the actual tree (spot-check a few
+  files).
+- Finding A: `grep` confirms re-exports keep all existing imports working;
+  the site renders identically; rebranding now = editing `src/config/copy.ts`.
+
+## Out of scope
+
+- Moving files between tiers beyond the Finding A split (the copy tables
+  move Machinery -> Your site by design; no other relocations in v1).
+- Extracting a real npm package (no second repo; the template stays a single
+  repo - that is a deliberate divergence from nimbus).
+- Any behavior change to routes/content/UI.

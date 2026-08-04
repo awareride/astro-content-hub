@@ -63,6 +63,11 @@ deployed to GitHub Pages and Cloudflare Pages from `main` via GitHub Actions.
 It is a **content-hub template**: the site aggregates docs and posts from many
 repositories, synced in via pull requests.
 
+For the codebase tier map - which files are **Machinery** (fix a bug), which
+are **Your site** (edit to rebrand), and which are **Extensions** (optional
+hooks) - see [ARCHITECTURE.md](./ARCHITECTURE.md). AGENTS.md stays
+conduct/rules; ARCHITECTURE.md is the map.
+
 ### Tech stack
 - **Framework**: Astro (`output: 'static'`), TypeScript, no UI framework.
 - **Styling**: a single global stylesheet `src/styles/global.css` using CSS
