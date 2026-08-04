@@ -621,17 +621,82 @@ pre.astro-code code {
   border: 1px solid var(--color-border-light);
   border-radius: var(--radius-lg);
   padding: 2rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+}
+
+.project-card:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Fill card height so actions can sit flush at the bottom regardless of
+   description length; the desc line-clamps so cards stay even. */
+.project-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* Stretched link: the product name <a> covers the whole card (PostCard
+   pattern) so the card is clickable while the GitHub button below stays
+   independently clickable via position:relative + z-index:1. */
+.project-card-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-lg);
+}
+
+.project-card h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.project-card .project-actions {
+  position: relative;
+  z-index: 1;
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+.project-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.project-logo .media {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
 }
 
 .project-info h3 {
-  font-size: 1.5rem;
+  font-size: 1.35rem;
+  margin-bottom: 0;
+}
+
+.project-desc {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
   margin-bottom: 0.75rem;
+  /* Cap description height so cards with long copy don't outgrow their
+     siblings; ellipsis on overflow. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .project-meta {
   display: flex;
   gap: 0.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
   flex-wrap: wrap;
 }
 

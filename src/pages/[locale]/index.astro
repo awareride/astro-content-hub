@@ -8,6 +8,7 @@ import Layout from '../../components/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import PostCard from '../../components/PostCard.astro';
+import Media from '../../components/Media.astro';
 import { getLocalizedPosts } from '../../lib/content';
 import { home, localizePath, withBase, buildAlternates, defaultLocale, locales, type Locale } from '../../lib/i18n';
 import { products } from '../../../site.config';
@@ -157,14 +158,23 @@ const alternates = buildAlternates('/');
           {products.map((p) => (
             <div class="project-card">
               <div class="project-info">
+                <div class="project-header">
+                  {p.logo && (
+                    <div class="project-logo">
+                      <Media media={p.logo} alt={`${p.name} logo`} shape="card" size={48} />
+                    </div>
+                  )}
+                  <h3>
+                    <a class="project-card-link" href={withBase(localizePath(`/${p.slug}`, locale))}>{p.name}</a>
+                  </h3>
+                </div>
+                <p class="project-desc">{p.description[locale]}</p>
                 <div class="project-meta">
                   {p.badges.map((b) => (
-                    <span class="badge">{b}</span>
+                    <span class="badge badge-soft">{b}</span>
                   ))}
                 </div>
-                <h3>{p.name}</h3>
                 <div class="project-actions">
-                  <a href={withBase(localizePath(`/${p.slug}`, locale))} class="btn btn-primary">{c.learnMore}</a>
                   <a href={p.github} class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
                     GitHub
                   </a>

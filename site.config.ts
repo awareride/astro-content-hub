@@ -35,6 +35,10 @@ export interface Product {
   name: string;
   github: string;
   badges: string[];
+  /** Optional product logo for the landing grid card. Accepts the media
+   *  model shape (src | github | fallback+gradient); when absent the card
+   *  renders a first-letter gradient chip derived from the product name. */
+  logo?: string | { src?: string; github?: string; fallback?: string; gradient?: string };
   base?: string;
   description: Record<Locale, string>;
   featured: boolean;
@@ -140,6 +144,7 @@ export const products: Product[] = [
     name: 'Astro Content Hub',
     github: 'https://github.com/awareride/astro-content-hub',
     badges: ['Astro', 'ContentHub'],
+    logo: { github: 'awareride' },
     base: './docs',
     featured: true,
     description: {
@@ -152,6 +157,7 @@ export const products: Product[] = [
     name: 'Vite',
     github: 'https://github.com/vitejs/vite',
     badges: ['Build Tool', 'JavaScript'],
+    logo: { github: 'vitejs' },
     featured: true,
     description: {
       en: 'A fast, modern frontend build tool.',
@@ -163,6 +169,7 @@ export const products: Product[] = [
     name: 'Astro',
     github: 'https://github.com/withastro/astro',
     badges: ['Web Framework', 'JavaScript'],
+    logo: { github: 'withastro' },
     featured: true,
     description: {
       en: 'A web framework for content-driven websites.',
@@ -174,6 +181,7 @@ export const products: Product[] = [
     name: 'JSON Server',
     github: 'https://github.com/typicode/json-server',
     badges: ['Mock API', 'Node'],
+    logo: { fallback: 'JS', gradient: 'linear-gradient(135deg, #2a2a26 0%, #141413 100%)' },
     featured: true,
     description: {
       en: 'A full fake REST API in seconds.',
