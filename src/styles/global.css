@@ -1838,6 +1838,13 @@ a.docs-prev-next-item:hover {
     background: none;
     border: none;
     box-shadow: none;
+    /* Collapsed by default in the mobile overlay; expanded when the
+       trigger toggles .nav-dropdown-open (JS). */
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .nav-menu-primary .nav-dropdown.nav-dropdown-open .nav-dropdown-panel {
     opacity: 1;
     visibility: visible;
   }

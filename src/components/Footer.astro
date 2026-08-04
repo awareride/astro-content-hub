@@ -19,13 +19,20 @@ const footerLinkHref = (href: string) =>
 // A column is a custom list of links, or the auto-generated Products column
 // (driven by the products registry).
 const isProductsColumn = (col: (typeof footerColumns)[number]) => col.type === 'products';
-// Products shown in a Products column: capped by its `limit` when set.
-const visibleProducts = (col: (typeof footerColumns)[number]) =>
-  isProductsColumn(col) && col.limit ? products.slice(0, col.limit) : products;
+// Products shown in a Products column: featured-only by default (matching the
+// nav dropdown), or every product when `all: true`; capped by `limit` when set.
+const visibleProducts = (col: (typeof footerColumns)[number]) => {
+  if (!isProductsColumn(col)) return [];
+  const source = col.all ? products : products.filter((p) => p.featured);
+  return col.limit !== undefined ? source.slice(0, col.limit) : source;
+};
 // "All products" appears when a Products column caps the list and there are
 // more products than the limit.
-const showAllProducts = (col: (typeof footerColumns)[number]) =>
-  isProductsColumn(col) && col.limit !== undefined && products.length > col.limit;
+const showAllProducts = (col: (typeof footerColumns)[number]) => {
+  if (!isProductsColumn(col)) return false;
+  const source = col.all ? products : products.filter((p) => p.featured);
+  return col.limit !== undefined && source.length > col.limit;
+};
 const productsCatalogHref = withBase(localizePath('/products', locale));
 ---
 <footer class="site-footer">
