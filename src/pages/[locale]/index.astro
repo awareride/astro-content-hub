@@ -8,6 +8,7 @@ import Layout from '../../components/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import PostCard from '../../components/PostCard.astro';
+import Media from '../../components/Media.astro';
 import { getLocalizedPosts } from '../../lib/content';
 import { home, localizePath, withBase, buildAlternates, defaultLocale, locales, type Locale } from '../../lib/i18n';
 import { products } from '../../../site.config';
@@ -34,6 +35,7 @@ const alternates = buildAlternates('/');
     <!-- Hero -->
     <section class="hero">
       <div class="hero-glow" aria-hidden="true"></div>
+      <div class="hero-glow hero-glow-2" aria-hidden="true"></div>
       <div class="container">
         <p class="eyebrow">{c.eyebrow}</p>
         <h1 class="hero-title">
@@ -80,6 +82,30 @@ const alternates = buildAlternates('/');
         </section>
       )
     }
+
+    <!-- Stats (data-driven, mirrors the product landing stats) -->
+    <section class="section section-alt">
+      <div class="container">
+        <div class="section-header">
+          <p class="eyebrow">{c.homeStatsEyebrow}</p>
+          <h2>{c.homeStatsTitle}</h2>
+        </div>
+        <div class="stats-row">
+          <div class="stats-item">
+            <div class="stats-value">{products.length}</div>
+            <div class="stats-label">{c.homeStatsProducts}</div>
+          </div>
+          <div class="stats-item">
+            <div class="stats-value">{locales.length}</div>
+            <div class="stats-label">{c.homeStatsLocales}</div>
+          </div>
+          <div class="stats-item">
+            <div class="stats-value">65</div>
+            <div class="stats-label">{c.homeStatsPages}</div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- About -->
     <section id="about" class="section section-alt">
@@ -132,14 +158,23 @@ const alternates = buildAlternates('/');
           {products.map((p) => (
             <div class="project-card">
               <div class="project-info">
+                <div class="project-header">
+                  {p.logo && (
+                    <div class="project-logo">
+                      <Media media={p.logo} alt={`${p.name} logo`} shape="card" size={48} />
+                    </div>
+                  )}
+                  <h3>
+                    <a class="project-card-link" href={withBase(localizePath(`/${p.slug}`, locale))}>{p.name}</a>
+                  </h3>
+                </div>
+                <p class="project-desc">{p.description[locale]}</p>
                 <div class="project-meta">
                   {p.badges.map((b) => (
-                    <span class="badge">{b}</span>
+                    <span class="badge badge-soft">{b}</span>
                   ))}
                 </div>
-                <h3>{p.name}</h3>
                 <div class="project-actions">
-                  <a href={withBase(localizePath(`/${p.slug}`, locale))} class="btn btn-primary">{c.learnMore}</a>
                   <a href={p.github} class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
                     GitHub
                   </a>
