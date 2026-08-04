@@ -18,6 +18,15 @@ features:
 links:
   - label: "Website"
     href: "https://json-server.typicode.com"
+# Section system demo (Phase 1): explicitly declares the same sections the
+# legacy fixed order renders, so this product is the worked example for
+# "MD declares data, code registry maps components". Entries without `data`
+# are filled from the matching field above (tagline/features/highlights/install).
+sections:
+  - type: hero
+  - type: highlights
+  - type: install
+  - type: features
 ---
 
 `json-server` watches a JSON file and exposes it as a REST API. It is a popular

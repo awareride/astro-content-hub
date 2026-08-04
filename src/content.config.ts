@@ -72,6 +72,15 @@ const productInfoSchema = z.object({
   install: z.string().optional(),
   highlights: z.array(z.object({ label: z.string(), value: z.string() })).default([]),
   links: z.array(z.object({ label: z.string(), href: z.string() })).default([]),
+  // Landing section list - "MD declares data, code registry maps components".
+  // Each entry names a section type resolved by src/lib/landing-sections.ts at
+  // build time. `data` is optional: when omitted, the renderer fills it from
+  // the matching product-info field (features/highlights/install/links), so a
+  // plain `- type: features` entry needs no duplication. Missing `sections`
+  // entirely preserves the legacy fixed order.
+  sections: z
+    .array(z.object({ type: z.string(), data: z.any().optional() }))
+    .optional(),
 });
 
 function makeProductInfoCollections(): Record<string, ReturnType<typeof defineCollection>> {

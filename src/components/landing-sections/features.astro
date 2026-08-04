@@ -1,0 +1,25 @@
+---
+// src/components/landing-sections/features.astro
+// Landing section: feature card grid (product-info `features`).
+// Rendered by ProductLandingDefault via the section registry.
+import type { LandingSectionProps } from '../../lib/landing-sections';
+
+interface Props extends LandingSectionProps {}
+const { data, product } = Astro.props as Props;
+const features = (Array.isArray(data) ? data : []) as { title: string; body: string }[];
+if (features.length === 0) return null;
+void product;
+---
+
+<section class="section">
+  <div class="container">
+    <div class="feature-grid">
+      {features.map((f) => (
+        <div class="feature-card">
+          <h3>{f.title}</h3>
+          <p>{f.body}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

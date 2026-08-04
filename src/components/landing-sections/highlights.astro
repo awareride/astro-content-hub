@@ -1,0 +1,25 @@
+---
+// src/components/landing-sections/highlights.astro
+// Landing section: labeled stats row (product-info `highlights`).
+// Rendered by ProductLandingDefault via the section registry.
+import type { LandingSectionProps } from '../../lib/landing-sections';
+
+interface Props extends LandingSectionProps {}
+const { data, product } = Astro.props as Props;
+const highlights = (Array.isArray(data) ? data : []) as { label: string; value: string }[];
+if (highlights.length === 0) return null;
+void product;
+---
+
+<section class="section">
+  <div class="container">
+    <div class="product-highlights">
+      {highlights.map((h) => (
+        <div class="product-highlight">
+          <div class="product-highlight-value">{h.value}</div>
+          <div class="product-highlight-label">{h.label}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
