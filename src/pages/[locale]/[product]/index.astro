@@ -6,6 +6,7 @@ import Layout from '../../../components/Layout.astro';
 import Nav from '../../../components/Nav.astro';
 import Footer from '../../../components/Footer.astro';
 import ProductLandingDefault from '../../../components/ProductLandingDefault.astro';
+import ProductBreadcrumb from '../../../components/ProductBreadcrumb.astro';
 import { getProductLanding } from '../../../lib/product-landing';
 import { productCopy, localizePath, withBase, buildAlternates, defaultLocale, locales, type Locale } from '../../../lib/i18n';
 import { products, type Product } from '../../../../site.config';
@@ -35,6 +36,9 @@ const Override = getProductLanding(product.slug);
   <Nav alternates={alternates} />
 
   <main>
+    <div class="container">
+      <ProductBreadcrumb locale={locale} productName={product.name} />
+    </div>
     {Override ? (
       <Override product={product} locale={locale} c={c} docsHref={docsHref} />
     ) : (

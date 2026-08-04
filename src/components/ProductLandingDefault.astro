@@ -40,6 +40,12 @@ const legacySections: ProductInfoSection[] = [
   { type: 'features' },
 ];
 const sections: ProductInfoSection[] = info?.sections ?? legacySections;
+// Split declared sections into the pre-CTA body and the closing CTA, so the
+// curated overview body always sits before the CTA (and an explicit
+// `- type: cta` never double-renders with the auto-appended one).
+const declaredCta = sections.find((s) => s.type === 'cta');
+const preCtaSections = sections.filter((s) => s.type !== 'cta');
+const closingCta = declaredCta ?? { type: 'cta' } as ProductInfoSection;
 
 /** Fill a section's data from the matching product-info field when the author
  *  omitted `data` (so `- type: features` reuses the existing `features` field). */
@@ -62,7 +68,7 @@ function resolveData(section: ProductInfoSection): unknown {
 
 {info ? (
   <Fragment>
-    {sections.map((s) => {
+    {preCtaSections.map((s) => {
       const Comp = getSectionComponent(s.type);
       if (!Comp) return null; // unknown type -> skip, never break the build
       const data = resolveData(s);
@@ -89,8 +95,18 @@ function resolveData(section: ProductInfoSection): unknown {
     )}
 
     {(() => {
-      const Cta = getSectionComponent('cta');
-      return Cta ? <Cta type="cta" data={undefined} product={product} locale={locale} c={c} docsHref={docsHref} /> : null;
+      const Cta = getSectionComponent(closingCta.type);
+      if (!Cta) return null;
+      return (
+        <Cta
+          type={closingCta.type}
+          data={closingCta.data}
+          product={product}
+          locale={locale}
+          c={c}
+          docsHref={docsHref}
+        />
+      );
     })()}
   </Fragment>
 ) : (

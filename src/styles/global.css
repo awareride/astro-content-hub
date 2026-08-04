@@ -1681,6 +1681,70 @@ a.docs-prev-next-item:hover {
   color: var(--color-accent);
 }
 
+/* --- Landing FAQ (native details/summary accordion) --- */
+.faq-list {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.faq-item {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.5rem;
+}
+
+.faq-item summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--color-text);
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item summary::after {
+  content: '+';
+  font-size: 1.1rem;
+  color: var(--color-accent);
+  transition: transform var(--transition);
+}
+
+.faq-item[open] summary::after {
+  transform: rotate(45deg);
+}
+
+.faq-item p {
+  margin: 0.75rem 0 0;
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+}
+
+/* --- Product hero breadcrumb --- */
+.product-breadcrumb {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-bottom: 1.25rem;
+}
+
+.product-breadcrumb a {
+  color: var(--color-text-secondary);
+  transition: color var(--transition);
+}
+
+.product-breadcrumb a:hover {
+  color: var(--color-text);
+}
+
 /* --- Usage Section --- */
 .usage-grid {
   display: grid;

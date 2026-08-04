@@ -41,6 +41,12 @@ sections:
         author: "Marcus Lee"
         role: "Tech Writer"
   - type: docs-preview
+  - type: faq
+    data:
+      - q: "Is json-server production-ready?"
+        a: "It targets prototyping and demos; pair it with a real backend for production."
+      - q: "Does it support filtering and pagination?"
+        a: "Yes - out of the box, via query parameters."
   - type: cta
     data:
       primary: { label: "Get Started", href: "/json-server/docs/getting-started" }

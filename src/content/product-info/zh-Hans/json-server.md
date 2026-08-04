@@ -41,6 +41,12 @@ sections:
         author: "李宇飞"
         role: "技术写作"
   - type: docs-preview
+  - type: faq
+    data:
+      - q: "json-server 可以用于生产环境吗?"
+        a: "它面向原型与演示;生产环境请搭配真实后端。"
+      - q: "支持过滤与分页吗?"
+        a: "支持 —— 开箱即用,通过查询参数即可。"
   - type: cta
     data:
       primary: { label: "开始上手", href: "/json-server/docs/getting-started" }

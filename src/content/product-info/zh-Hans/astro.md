@@ -1,0 +1,45 @@
+---
+tagline: "面向内容驱动网站的 Web 框架 —— 默认零 JavaScript。"
+description: "Astro 用于构建博客、营销页与文档等快速、内容驱动的网站,并按需加入交互岛屿。"
+highlights:
+  - label: "许可证"
+    value: "MIT"
+  - label: "运行时"
+    value: "Node"
+features:
+  - title: "默认零 JS"
+    body: "页面默认以纯 HTML 交付、不携带任何 JavaScript —— 岛屿仅在需要处加入交互。"
+  - title: "内容集合"
+    body: "带类型校验的 Markdown,开箱即用,适合文档、博客等场景。"
+  - title: "框架无关"
+    body: "自带 UI 框架 —— React、Vue、Svelte 等,按组件接入。"
+links:
+  - label: "官网"
+    href: "https://astro.build"
+# Section system demo (Phase 4): rich landing for the astro product so every
+# product page in the hub has a consistent, content-driven landing.
+sections:
+  - type: hero
+  - type: highlights
+  - type: install
+  - type: features
+  - type: stats
+    data:
+      - { label: "GitHub Stars", value: "48k" }
+      - { label: "npm 周下载量", value: "900k" }
+      - { label: "许可证", value: "MIT" }
+  - type: docs-preview
+  - type: faq
+    data:
+      - q: "Astro 默认会携带 JavaScript 吗?"
+        a: "不会 —— 页面默认是纯 HTML,交互岛屿按需开启。"
+      - q: "可以使用我熟悉的框架吗?"
+        a: "可以 —— 支持 React、Vue、Svelte、Preact 等,按组件接入。"
+  - type: cta
+    data:
+      primary: { label: "开始上手", href: "/astro/docs/getting-started" }
+      secondary: { label: "查看源码", href: "https://github.com/withastro/astro" }
+---
+
+Astro 是面向内容驱动网站(博客、营销站点与文档)的 Web 框架。它**默认零
+JavaScript**,页面天然快速,仅在需要处加入交互岛屿。
