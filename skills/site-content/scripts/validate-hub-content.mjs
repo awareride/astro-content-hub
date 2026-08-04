@@ -15,7 +15,7 @@
  *     missing index.md, product-info for an unregistered product, drafts).
  *
  * Stdlib only - no dependencies. Reads the source-of-truth registries
- * (locales from src/lib/i18n.ts, products from src/config/products.ts) and
+ * (locales from src/lib/i18n.ts, products from the root site.config.ts) and
  * walks the content directories (src/content/ plus any product `base`
  * override, e.g. ./docs for the hub's own docs).
  *
@@ -51,16 +51,25 @@ function parseLocales() {
   return { locales, defaultLocale };
 }
 
-/** Parse `products` (slug + optional base) from src/config/products.ts.
- *  Products are single-line objects, so per-line regexes are stable. */
+/** Parse `products` (slug + optional base) from the root site.config.ts.
+ *  Products are object blocks whose `slug` is a single-quoted literal; `base`
+ *  may sit on a later line of the same block, so scan until the closing brace. */
 function parseProducts() {
-  const src = readFileSync(join(ROOT, 'src/config/products.ts'), 'utf8');
+  const src = readFileSync(join(ROOT, 'site.config.ts'), 'utf8');
   const products = [];
-  for (const line of src.split('\n')) {
-    const slug = line.match(/slug:\s*'([^']+)'/);
+  const lines = src.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const slug = lines[i].match(/slug:\s*'([^']+)'/);
     if (!slug) continue;
-    const base = line.match(/base:\s*'([^']+)'/);
-    products.push({ slug: slug[1], base: base ? base[1] : null });
+    let base = null;
+    for (let j = i; j < lines.length && !lines[j].includes('}'); j++) {
+      const m = lines[j].match(/base:\s*'([^']+)'/);
+      if (m) {
+        base = m[1];
+        break;
+      }
+    }
+    products.push({ slug: slug[1], base });
   }
   return products;
 }
@@ -208,7 +217,7 @@ function checkUnknownProductInfo(locale, files, knownSlugs) {
     add('warning', [
       `product-info (${locale}): slug '${f.id}' is not a registered product - this file renders nothing`,
       `  ${rel(f.path)} -> slug -> '${f.id}'`,
-      `  fix: rename it to a product slug from src/config/products.ts, or register the product,`,
+      `  fix: rename it to a product slug from site.config.ts, or register the product,`,
       `       or delete the file.`,
     ]);
   }

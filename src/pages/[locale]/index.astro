@@ -10,7 +10,7 @@ import Footer from '../../components/Footer.astro';
 import PostCard from '../../components/PostCard.astro';
 import { getLocalizedPosts } from '../../lib/content';
 import { home, localizePath, withBase, buildAlternates, defaultLocale, locales, type Locale } from '../../lib/i18n';
-import { products } from '../../config/products';
+import { products } from '../../../site.config';
 
 export function getStaticPaths() {
   return locales
@@ -121,14 +121,14 @@ const alternates = buildAlternates('/');
       </div>
     </section>
 
-    <!-- Projects -->
-    <section id="projects" class="section">
+    <!-- Products -->
+    <section id="products" class="section">
       <div class="container">
         <div class="section-header">
-          <p class="eyebrow">{c.projectsEyebrow}</p>
-          <h2>{c.projectsTitle}</h2>
+          <p class="eyebrow">{c.productsEyebrow}</p>
+          <h2>{c.productsTitle}</h2>
         </div>
-        <div class="projects-grid">
+        <div class="products-grid">
           {products.map((p) => (
             <div class="project-card">
               <div class="project-info">

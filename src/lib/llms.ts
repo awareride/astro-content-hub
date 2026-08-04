@@ -21,7 +21,7 @@ import {
   withBase,
   type Locale,
 } from './i18n';
-import { products } from '../config/products';
+import { products } from '../../site.config';
 
 interface DocEntry {
   id: string;

@@ -1,12 +1,32 @@
 ---
 // src/components/Footer.astro
+// Site footer. Columns come from site.config.ts `site.footer.links` (one
+// column per entry, rendered after the brand block). A Products column
+// ({ type: 'products' }) renders from the products registry, optionally
+// capped by `limit` with a trailing "All products" link to the catalog.
 // Locale is inferred from the URL pathname, matching Nav.
 import { localeFromPath, localizePath, withBase, t, siteName } from '../lib/i18n';
-import { products } from '../config/products';
+import { products, site } from '../../site.config';
 
 const locale = localeFromPath(Astro.url.pathname);
 const ui = t[locale];
 const homeHref = withBase(localizePath('/', locale));
+const footerColumns = site.footer.links;
+// Resolve a footer link href: internal links are base- and locale-prefixed,
+// external links (http) are used as-is.
+const footerLinkHref = (href: string) =>
+  href.startsWith('http') ? href : withBase(localizePath(href, locale));
+// A column is a custom list of links, or the auto-generated Products column
+// (driven by the products registry).
+const isProductsColumn = (col: (typeof footerColumns)[number]) => col.type === 'products';
+// Products shown in a Products column: capped by its `limit` when set.
+const visibleProducts = (col: (typeof footerColumns)[number]) =>
+  isProductsColumn(col) && col.limit ? products.slice(0, col.limit) : products;
+// "All products" appears when a Products column caps the list and there are
+// more products than the limit.
+const showAllProducts = (col: (typeof footerColumns)[number]) =>
+  isProductsColumn(col) && col.limit !== undefined && products.length > col.limit;
+const productsCatalogHref = withBase(localizePath('/products', locale));
 ---
 <footer class="site-footer">
   <div class="container footer-grid">
@@ -17,27 +37,40 @@ const homeHref = withBase(localizePath('/', locale));
       </a>
       <p class="footer-tagline">{ui.footerTagline}</p>
     </div>
-    <div>
-      <h4>{ui.links}</h4>
-      <ul class="footer-links">
-        <li><a href={homeHref}>{ui.home}</a></li>
-        <li><a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-      </ul>
-    </div>
-    <div>
-      <h4>{ui.projects}</h4>
-      <ul class="footer-links">
-        {products.map((p) => (
-          <li><a href={withBase(localizePath(`/${p.slug}`, locale))}>{p.name}</a></li>
-        ))}
-      </ul>
-    </div>
-    <div>
-      <h4>{ui.connect}</h4>
-      <ul class="footer-links">
-        <li><a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-      </ul>
-    </div>
+    {
+      footerColumns.map((col) =>
+        isProductsColumn(col) ? (
+          <div>
+            <h4>{ui.products}</h4>
+            <ul class="footer-links">
+              {visibleProducts(col).map((p) => (
+                <li><a href={withBase(localizePath(`/${p.slug}`, locale))}>{p.name}</a></li>
+              ))}
+              {showAllProducts(col) && (
+                <li><a href={productsCatalogHref}>{ui.viewAllProducts} →</a></li>
+              )}
+            </ul>
+          </div>
+        ) : (
+          <div>
+            <h4>{col.title[locale]}</h4>
+            <ul class="footer-links">
+              {col.items.map((item) => (
+                <li>
+                  <a
+                    href={footerLinkHref(item.href)}
+                    target={item.external ? '_blank' : undefined}
+                    rel={item.external ? 'noopener noreferrer' : undefined}
+                  >
+                    {item.label[locale]}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ),
+      )
+    }
   </div>
   <div class="container footer-bottom">
     <p>&copy; {new Date().getFullYear()} {siteName}. {ui.builtWith}</p>

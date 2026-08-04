@@ -283,14 +283,11 @@ human still reviews what is removed before it ships.
 ## Registering a new product (docs only)
 
 A product's docs only render on the hub if the product is registered in the
-hub's `src/config/products.ts` `products` array:
+hub's `site.config.ts` (repo root) `products` array:
 
 ```ts
 export const products: Product[] = [
-  { slug: 'vite', name: 'Vite', github: 'https://github.com/vitejs/vite', badges: ['Build Tool'], nav: false },
-  { slug: 'astro', name: 'Astro', github: 'https://github.com/withastro/astro', badges: ['Web Framework'], nav: false },
-  { slug: 'json-server', name: 'JSON Server', github: 'https://github.com/typicode/json-server', badges: ['Mock API'], nav: false },
-  { slug: 'mytool', name: 'MyTool', github: 'https://github.com/owner/mytool', badges: ['Tool'], nav: false },
+  { slug: 'mytool', name: 'MyTool', github: 'https://github.com/owner/mytool', badges: ['Tool'], featured: true, description: { en: 'A short one-liner.', 'zh-Hans': '一句话简介。' } },
 ];
 ```
 
@@ -298,7 +295,7 @@ This is a **one-time setup on the hub side**, not something this external
 project can do via sync. When you introduce a new product:
 
 1. Open a PR (or issue) against `<HUB_REPO>` adding the product entry to
-   `src/config/products.ts`. **No route files are needed** — the hub uses
+   `site.config.ts`. **No route files are needed** — the hub uses
    universal dynamic routes (`src/pages/[product]/...` for the default locale
    and `src/pages/[locale]/[product]/...` for non-default locales), so one set
    of route files serves every product and every locale. The hub's own

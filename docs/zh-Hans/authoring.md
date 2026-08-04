@@ -14,7 +14,7 @@ order: 2
 ## i18n 模型
 
 `src/lib/i18n.ts` 是 locale、UI 字符串(`t`)、落地页文案(`home`)及产品页文案
-(`productCopy`)的唯一事实来源。`products` 数组位于 `src/config/products.ts`。
+(`productCopy`)的唯一事实来源。`products` 数组位于仓库根目录的 `site.config.ts`。
 `src/content.config.ts` 通过遍历 `products × locales`(文档)和 `locales`(文章)
 自动生成集合。集合名通过 `collectionSuffix()` 使用 PascalCase 语言后缀
 (例如 `zh-Hans` -> `postsZhHans`、`viteDocsZhHans`)。添加产品或语言只需改动一行。
@@ -71,7 +71,7 @@ draft: false                                 # 可选;草稿会被排除
 ## 为已有产品编写文档
 
 文档位于 `src/content/docs/<product>/<locale>/`。产品来自 `products` 数组
-(`src/config/products.ts`;示例:vite、astro、json-server)。
+(`site.config.ts`;示例:vite、astro、json-server)。
 
 **Frontmatter**(`docSchema`):
 
@@ -94,17 +94,17 @@ order: 2                     # 可选,控制侧边栏排序(默认 0)
 
 唯一会触及配置的编写任务:
 
-1. 在 `src/config/products.ts` 中注册产品:
+1. 在仓库根目录的 `site.config.ts` 中注册产品:
 
    ```ts
    export const products: Product[] = [
      // ...已有...
-     { slug: 'mytool', name: 'MyTool', github: 'https://github.com/owner/mytool', badges: ['Tool'] },
+     { slug: 'mytool', name: 'MyTool', github: 'https://github.com/owner/mytool', badges: ['Tool'], featured: true, description: { en: 'A short one-liner.', 'zh-Hans': '一句话简介。' } },
    ];
    ```
 
    这会自动生成 `mytoolDocsEn` / `mytoolDocsZhHans` 集合,以及落地页卡片
-   (`nav: true` 时含导航项)。
+   (`featured: true` 时含导航下拉项)。
 
 2. 添加内容:
 
@@ -116,6 +116,24 @@ order: 2                     # 可选,控制侧边栏排序(默认 0)
 
 3. 路由是自动生成的(产品页面是动态的)。运行 `npm run build` 并验证
    `/mytool/docs/` 与 `/zh-Hans/mytool/docs/` 能正常渲染。
+
+## 配置导航与页脚
+
+顶部导航与页脚由 `site.config.ts`(仓库根目录)中的 `site` 段数据驱动。内置骨架
+(logo、Posts、Products 下拉、locale/theme)始终渲染;你通过配置追加条目:
+
+- **`site.orgUrl`** —— 导航 CTA 与页脚链接使用的 git 托管地址。改为你的组织/仓库即可。
+- **`site.nav.links`** —— 追加在 Posts/Products 之后的自定义条目。普通条目是
+  `{ label, href, external?, activePrefix? }`;下拉是 `{ label, children: [...] }`
+  (children 为普通链接)。`activePrefix` 是路径段列表——当前路径包含其中任意一段即高亮;
+  下拉在任一 child 命中时点亮。标签按 locale:`{ en: '...', 'zh-Hans': '...' }`。
+- **`site.footer.links`** —— 页脚列,按数组顺序渲染在品牌块之后。自定义列是
+  `{ title, items: [...] }`;自动生成的 Products 列是 `{ type: 'products', limit? }`
+  —— 省略 `limit` 列出所有产品,或设 `limit` 截断列表并在超出时显示指向 `/products`
+  的 "All products" 链接。
+
+内部 href 会自动加 locale/base 前缀;外部链接使用绝对 `https://...`(并设
+`external: true` 以新标签打开)。
 
 ## 自定义产品落地页
 
@@ -131,7 +149,7 @@ src/components/product-landing/<slug>.astro     # 例如 src/components/product-
 
 | Prop | 含义 |
 |------|------|
-| `product` | 来自 `src/config/products.ts` 的完整 `Product` 条目。 |
+| `product` | 来自仓库根目录 `site.config.ts` 的完整 `Product` 条目。 |
 | `locale` | 当前 locale(默认路由传入 `'en'`,双生路由传入循环变量)。 |
 | `c` | 已按 locale 解析的 UI 字符串(`ProductCopy`)-- 复用 `c.viewSource`、`c.documentation`、`c.ctaTitle` 等。 |
 | `docsHref` | 已感知 base、带 locale 前缀的文档链接,由路由预先计算。 |

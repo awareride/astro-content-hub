@@ -37,7 +37,7 @@ import { readdirSync, statSync, existsSync } from 'node:fs';
 import { join, relative, resolve, dirname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { locales, defaultLocale } from './i18n';
-import { products } from '../config/products';
+import { products } from '../../site.config';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 // src/lib -> project root (two levels up).

@@ -10,7 +10,7 @@
 // by their filename (the product slug) for O(1) lookup. Resolution happens at
 // render time, so `getStaticPaths` is unaffected.
 
-import type { Product } from '../config/products';
+import type { Product } from '../../site.config';
 import type { Locale, ProductCopy } from './i18n';
 
 export interface ProductLandingProps {

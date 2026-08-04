@@ -66,11 +66,18 @@ site looks complete out of the box. Replace it with your own.
   translation renders the default-language body inside the localized shell -
   never a 404. Ship `en` first, translate incrementally.
 - **Data-driven products.** Products come from the `products` array in
-  [`src/config/products.ts`](./src/config/products.ts). Add an entry and the
+  [`site.config.ts`](./site.config.ts) at the repo root. Add an entry and the
   product landing page, docs routes, and sidebar are generated automatically -
   no per-product route files. A product can optionally ship a custom landing
   page by adding one component (see
   [Customize a product landing](#customize-a-product-landing)).
+- **Config-driven nav & footer.** The same `site.config.ts` holds a `site`
+  block: `orgUrl` (git host used by the nav CTA and footer), `nav.links`
+  (custom nav entries - plain links or dropdowns, with per-locale labels and
+  active-state prefixes), and `footer.links` (footer columns - custom link
+  lists and/or the auto-generated Products column, optionally capped with a
+  `limit` + "All products" link). Rebranding the header/footer is a config
+  edit, not a component edit.
 - **Typed content collections.** Posts and docs are Markdown loaded from the
   filesystem with [zod](https://zod.dev/)-validated frontmatter, so malformed
   content fails the build before it reaches the site.
@@ -245,12 +252,12 @@ adding a product or locale, and verification steps - read
 ### Add a product
 
 The only extension that touches config. Register the product in
-[`src/config/products.ts`](./src/config/products.ts):
+[`site.config.ts`](./site.config.ts) at the repo root:
 
 ```ts
 export const products: Product[] = [
   // ...existing...
-  { slug: 'mytool', name: 'MyTool', github: 'https://github.com/owner/mytool', badges: ['Tool'], nav: false },
+  { slug: 'mytool', name: 'MyTool', github: 'https://github.com/owner/mytool', badges: ['Tool'], featured: true, description: { en: 'A short one-liner.', 'zh-Hans': '一句话简介。' } },
 ];
 ```
 
@@ -265,6 +272,58 @@ src/content/docs/mytool/zh-Hans/index.md   # optional; falls back to en
 
 Routes are dynamic, so no new route files are needed. Run `npm run build` and
 verify `/mytool/docs/` and `/zh-Hans/mytool/docs/` render.
+
+### Customize the nav & footer
+
+The top nav and footer are data-driven from the `site` block in
+[`site.config.ts`](./site.config.ts). The built-in skeleton (logo, Posts,
+Products dropdown, locale/theme controls) always renders; `site.nav.links`
+appends custom entries and `site.footer.links` defines footer columns.
+
+```ts
+export const site = {
+  // Git host for the nav CTA + footer links.
+  orgUrl: 'https://github.com',
+  nav: {
+    links: [
+      // Plain link: lights up on any /docs/... page.
+      { label: { en: 'Docs', 'zh-Hans': '文档' }, href: '/astro-content-hub/docs', activePrefix: ['docs'] },
+      // Dropdown: children render in a panel (styled like the Products menu).
+      {
+        label: { en: 'Community', 'zh-Hans': '社区' },
+        children: [
+          { label: { en: 'All Products', 'zh-Hans': '全部产品' }, href: '/products', activePrefix: ['products'] },
+          { label: { en: 'GitHub', 'zh-Hans': 'GitHub' }, href: 'https://github.com', external: true },
+        ],
+      },
+    ],
+  },
+  footer: {
+    links: [
+      { title: { en: 'Links', 'zh-Hans': '链接' }, items: [
+        { label: { en: 'Home', 'zh-Hans': '首页' }, href: '/' },
+      ]},
+      { title: { en: 'Connect', 'zh-Hans': '联系' }, items: [
+        { label: { en: 'GitHub', 'zh-Hans': 'GitHub' }, href: 'https://github.com', external: true },
+      ]},
+      // Auto-generated Products column; `limit` caps how many show, and a
+      // "All products" link to /products appears when there are more.
+      { type: 'products', limit: 5 },
+    ],
+  },
+};
+```
+
+- `nav.links` entries: set `href` for a plain link, or provide `children` for
+  a dropdown (each child is the same shape). `external: true` opens in a new
+  tab. `activePrefix` is a list of path segments; the link stays highlighted
+  on any page whose path contains one (a dropdown lights up when any child
+  matches). Labels are per-locale (`Record<Locale, string>`).
+- `footer.links` entries: a custom column is `{ title, items }`; the Products
+  column is `{ type: 'products', limit? }` (omit `limit` to list every
+  product). The footer renders columns in array order after the brand block.
+- All internal hrefs are auto-prefixed with the locale/base; use absolute
+  `https://...` for external links.
 
 ### Customize a product landing
 
@@ -291,7 +350,7 @@ there is no second document shell. It receives the same props as the fallback:
 
 | Prop | What it is |
 |------|------------|
-| `product` | The full `Product` entry from `src/config/products.ts`. |
+| `product` | The full `Product` entry from `site.config.ts` (repo root). |
 | `locale` | Current locale (`'en'` from the default route, the loop value from the twin). |
 | `c` | Locale-resolved UI strings (`ProductCopy`) - reuse `c.viewSource`, `c.documentation`, `c.ctaTitle`, ... |
 | `docsHref` | Base-aware, locale-prefixed docs link, pre-computed by the route. |
@@ -379,16 +438,19 @@ For the full flow - frontmatter schemas, the deletion manifest
   `<Content />` in `class="prose"` on any new Markdown-rendering page.
 - **Site name / UI strings / landing copy** are in
   [`src/lib/i18n.ts`](./src/lib/i18n.ts) - replace the sample copy with yours.
+- **Nav & footer links** are configured in [`site.config.ts`](./site.config.ts)
+  (`site.nav.links`, `site.footer.links`, `site.orgUrl`) - see
+  [Customize the nav & footer](#customize-the-nav--footer).
 
 ## Project structure
 
 ```
 astro-content-hub/                 <- the hub (Astro site) at the repo root
 ├── astro.config.mjs              <- set `site`/`base` to your domain
+├── site.config.ts               <- site config (orgUrl, nav/footer links) + the products registry
 ├── src/
 │   ├── components/              <- Layout, Nav, Footer, DocsLayout, PostCard, LocaleSwitcher, ThemeToggle, TableOfContents, TagPage, ProductLandingDefault
 │   ├── components/product-landing/  <- optional per-product landing overrides (one file per product, keyed by slug)
-│   ├── config/products.ts       <- the products registry (add a product here)
 │   ├── content/                 <- markdown collections (posts + docs + product-info)
 │   ├── content.config.ts        <- collection schemas (zod) + glob loaders
 │   ├── lib/                     <- i18n.ts, content.ts, docs.ts, feed.ts, product-landing.ts, remark-rewrite-links.mjs, heading-ids.mjs

@@ -132,7 +132,7 @@ docs/en/legacy/        # 尾部斜杠 = 删除整个目录
 
 ## 注册新产品(仅文档)
 
-只有当产品注册在中心的 `products` 数组(`src/config/products.ts`)中时,其文档才会在
+只有当产品注册在中心的 `products` 数组(仓库根目录的 `site.config.ts`)中时,其文档才会在
 中心渲染。这是所有者通过 PR 完成的**一次性中心侧变更** —— 外部仓库无法通过
 同步完成。合并后,在你的 `sync-docs.yml` 中设置 `PRODUCT`。文章无需注册。
 

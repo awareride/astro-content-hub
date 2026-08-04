@@ -47,7 +47,7 @@ Routes are file-based under `src/pages/`:
 - `/` — landing page (`index.astro`).
 - `/posts`, `/posts/[...slug]` — blog listing + catch-all article route.
 - `/<product>` — product landing page, served **dynamically** from the
-  `products` array in `src/config/products.ts`.
+  `products` array in `site.config.ts` (repo root).
 - `/<product>/docs`, `/<product>/docs/[...slug]` — docs index + catch-all.
 - Non-default locales are served by **universal routes** under
   `src/pages/[locale]/...`, which loop `locales` (minus the default) in
@@ -122,7 +122,7 @@ Markdown is rendered via `render(entry)` from `astro:content`; pages pass
 | File | Responsibility |
 |------|----------------|
 | `i18n.ts` | Single source of truth: `locales`, `defaultLocale`, `t` (UI strings), `home` (landing copy), `productCopy`, and path/locale helpers. |
-| `config/products.ts` | Product registry (`products` array) — the list of products that ship docs + a landing card. |
+| `site.config.ts` (root) | Instance config: the `site` block (`orgUrl`, `nav.links` custom nav entries, `footer.links` footer columns) and the `products` registry (the list of products that ship docs + a landing card). |
 | `content.ts` | Localized path generation + fallback render helpers (docs + posts). |
 | `docs.ts` | `buildNav` — sidebar construction (index → base path, sort by `order`). |
 | `product-landing.ts` | Per-product landing override resolver - eager-globs `components/product-landing/*.astro` keyed by slug; returns the override or `undefined` (falls back to `ProductLandingDefault.astro`). |
