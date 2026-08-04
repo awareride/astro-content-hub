@@ -230,9 +230,34 @@ loops `locales`). Suppose adding `ja`.
    to `en` inside a `ja` shell - which is a valid way to confirm routing works
    before translating.)
 
+## Task: validate your content before committing (pre-commit gate)
+
+Single-file frontmatter is validated by zod at build time; **cross-file** rules
+live in a stdlib-only checker at `skills/site-content/scripts/validate-hub-content.mjs`,
+run via `npm run validate:content`. It is the pre-commit gate for content
+providers and also runs in CI before `npm run build`.
+
+- **Errors (exit non-zero - fix before opening a PR):**
+  - Duplicate slugs within one locale, including nested-dir collisions
+    (`foo.md` + `foo/index.md` map to the same page; Astro builds either way
+    but silently drops one, so this is caught here).
+- **Warnings (reported, exit 0 - review, fix when not intentional):**
+  - A non-default-locale slug with no default-locale counterpart (breaks
+    fallback - the default-locale route is simply absent).
+  - A product+locale docs collection with some docs but no `index.md`.
+  - A `product-info/<locale>/<slug>.md` whose slug isn't in the `products`
+    array (it renders nothing).
+- **Info:** drafts (excluded from the build).
+
+Each issue prints `file -> field -> offending value -> fix hint`. The checker
+walks `src/content/` plus any product `base` override (e.g. `./docs` for the
+hub's own docs) and reads locales/products from `src/lib/i18n.ts` and
+`src/config/products.ts`.
+
 ## Verification (always run before declaring done)
 
 ```bash
+npm run validate:content   # cross-file rules; must exit 0 (0 errors)
 npm run build
 ```
 
