@@ -192,6 +192,26 @@ Markdown is rendered via `render(entry)` from `astro:content`; pages pass
 
 ## Verifying your work
 Before declaring a task done:
-1. Run `npm run build` and confirm it passes with no errors.
-2. Check the affected route's rendered HTML in `dist/` if behavior is uncertain.
-3. Summarize what changed, what to review, and any follow-ups for the human.
+1. Run `npm run validate:content` (cross-file content rules) and fix any errors.
+2. Run `npm run build` and confirm it passes with no errors.
+3. Check the affected route's rendered HTML in `dist/` if behavior is uncertain.
+4. Summarize what changed, what to review, and any follow-ups for the human.
+
+## Content health audit (agent audit brief)
+When a task touches content (posts, docs, product-info) or the routes that
+render it, audit the hub end to end before claiming done:
+
+1. **`npm run validate:content`** — cross-file rules the zod schemas cannot
+   express. Errors (duplicate slugs within one locale, incl. nested-dir
+   collisions like `foo.md` + `foo/index.md`) block with a value-echoing
+   message naming every file; warnings (slug parity, missing `index.md`,
+   product-info for an unregistered product) are reported but do not fail.
+2. **`npm run build`** — zod types, route generation, and link rewriting;
+   must pass with 0 errors.
+3. **Spot-check `dist/`** — a fallback page (`/zh-Hans/...`) renders the `en`
+   body inside the `zh-Hans` shell with the translation notice and keeps
+   `lang="zh-Hans"` + correct hreflang alternates; `dist/llms.txt` and
+   `dist/llms-full.txt` exist and contain the expected default-locale sections.
+4. **If the sync skill / examples changed** — run the examples-consistency
+   check (`npm run check:examples`, planned in
+   `.agents/plan/examples-consistency.plan`, not yet wired to package.json).
