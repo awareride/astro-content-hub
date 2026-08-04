@@ -1,0 +1,43 @@
+name: Examples consistency check
+
+# Drift guard for the examples/ sample repos (nimbus templates-check in
+# miniature): verifies each examples/*/skills/site-content-sync/ copy is
+# byte-identical to the canonical tree (examples/_shared/site-content-sync/),
+# that .github/workflows/sync-*.yml matches what the generator produces, and
+# that each example's content passes its own validator. See
+# .agents/plan/examples-consistency.plan.
+#
+# Runs `npm run check:examples` - pure Node stdlib, no npm ci / astro build,
+# which keeps this job cheap.
+#
+# NOTE: PR detection is implemented but DISABLED by default (owner decision):
+# manual builds stay manual. To gate drift on pull requests, uncomment the
+# `pull_request:` block below.
+
+on:
+  workflow_dispatch:
+  # Enable drift gating on pull requests by uncommenting this block:
+  # pull_request:
+  #   branches: [main]
+  #   paths:
+  #     - 'examples/**'
+  #     - 'skills/**'
+  #     - 'scripts/**'
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check examples consistency
+        run: npm run check:examples
