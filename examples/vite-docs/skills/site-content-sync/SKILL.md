@@ -3,6 +3,14 @@ name: site-content-sync
 description: Organize blog posts and product docs in this external project and sync them into a content hub built with the astro-content-hub template. Use when authoring markdown content under posts/ or docs/, adding translations, or setting up the GitHub Action that pushes content to the hub. Covers the en-default + zh-Hans i18n layout, slug contracts, per-page fallback, local validation, and sync workflow setup.
 ---
 
+> **Canonical copy - do not hand-edit generated copies.** This skill is
+> generated into every sample repo under `examples/*/skills/site-content-sync/`
+> by `npm run sync:examples` in the `astro-content-hub` template repo. The
+> single source of truth is `examples/_shared/site-content-sync/` here: edit
+> the files in that directory and re-run the sync; `npm run check:examples`
+> fails when a copy drifts. (If you copied an `examples/*` repo into your own
+> external project, this note is inert history - the copy is yours to edit.)
+
 # Content Sync
 
 This skill is for an **external project** that contributes blog posts or

@@ -9,7 +9,9 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "validate:content": "node skills/site-content/scripts/validate-hub-content.mjs"
+    "validate:content": "node skills/site-content/scripts/validate-hub-content.mjs",
+    "sync:examples": "node scripts/sync-examples.mjs",
+    "check:examples": "node scripts/check-examples.mjs"
   },
   "repository": {
     "type": "git",

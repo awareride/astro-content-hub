@@ -102,10 +102,27 @@ src/
 examples/          Sample external repos that sync INTO the hub:
                    my-posts/ (posts) and vite-docs/ astro-docs/
                    json-server-docs/ (one docs repo per product). Each carries a
-                   skills/site-content-sync/ skill and sync workflow templates.
+                   skills/site-content-sync/ skill copy, regenerated from the
+                   canonical tree examples/_shared/site-content-sync/ via
+                   `npm run sync:examples` (see below).
 skills/site-content/  Per-hub authoring skill (docs in this repo).
 public/            Static assets served as-is (favicon, images, CNAME)
 ```
+
+### Examples & the sync skill (drift discipline)
+- The sample repos under `examples/*` each carry a copy of the
+  `site-content-sync` skill. The **single source of truth** is
+  `examples/_shared/site-content-sync/` — hand-edit the skill **only** there
+  (per-example workflow config lives in `scripts/examples-lib.mjs`). The
+  copies under `examples/*/skills/site-content-sync/` and
+  `examples/*/.github/workflows/sync-*.yml` are sync output; do not hand-edit
+  them.
+- `npm run sync:examples` regenerates every example's skill copy and workflows
+  from the canonical tree (idempotent).
+- `npm run check:examples` gates drift: it byte-compares each copy against the
+  canonical tree, compares workflows against the generated templates, and
+  re-runs each example's own `validate.mjs` against its content. Run it
+  whenever you touch `examples/`, `skills/`, or `scripts/`.
 
 ### Pages & routing
 - `/` — landing page (`src/pages/index.astro`).
@@ -212,6 +229,7 @@ render it, audit the hub end to end before claiming done:
    body inside the `zh-Hans` shell with the translation notice and keeps
    `lang="zh-Hans"` + correct hreflang alternates; `dist/llms.txt` and
    `dist/llms-full.txt` exist and contain the expected default-locale sections.
-4. **If the sync skill / examples changed** — run the examples-consistency
-   check (`npm run check:examples`, planned in
-   `.agents/plan/examples-consistency.plan`, not yet wired to package.json).
+4. **If the sync skill / examples changed** — run `npm run check:examples`
+   (examples-consistency drift guard: skill copies vs the canonical tree,
+   workflows vs templates, per-example validation) and fix any drift with
+   `npm run sync:examples`.
