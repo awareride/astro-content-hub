@@ -140,7 +140,7 @@ docs/en/legacy/        # trailing slash = drop the whole directory
 ## Registering a new product (docs only)
 
 Docs only render on the hub if the product is registered in the hub's
-`products` array (`src/config/products.ts`). This is a **one-time hub-side change** an
+`products` array (`site.config.ts` at the repo root). This is a **one-time hub-side change** an
 owner makes via PR — the external repo cannot do it through sync. Once merged,
 set `PRODUCT` in your `sync-docs.yml`. Posts need no registration.
 

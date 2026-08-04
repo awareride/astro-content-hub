@@ -16,7 +16,7 @@ prefix; other locales live under `/<locale>/...` (currently `zh-Hans`).
 
 `src/lib/i18n.ts` is the single source of truth for locales, UI strings
 (`t`), landing copy (`home`), and product page copy (`productCopy`). The
-`products` array lives in `src/config/products.ts`. `src/content.config.ts`
+`products` array lives in `site.config.ts` at the repo root. `src/content.config.ts`
 auto-generates collections by looping `products × locales` (docs) and
 `locales` (posts). Adding a product or a locale is a one-line change.
 Collection names use a PascalCase locale suffix via `collectionSuffix()`
@@ -84,7 +84,7 @@ so you can deep-link to any section.
 ## Docs for an existing product
 
 Docs live in `src/content/docs/<product>/<locale>/`. Products come from the
-`products` array (`src/config/products.ts`; samples: vite, astro, json-server).
+`products` array (`site.config.ts`; samples: vite, astro, json-server).
 
 **Frontmatter** (`docSchema`):
 
@@ -107,17 +107,17 @@ order: 2                     # optional, controls sidebar sort (default 0)
 
 The only authoring task that touches config:
 
-1. Register the product in `src/config/products.ts`:
+1. Register the product in `site.config.ts` (repo root):
 
    ```ts
    export const products: Product[] = [
      // ...existing...
-     { slug: 'mytool', name: 'MyTool', github: 'https://github.com/owner/mytool', badges: ['Tool'] },
+     { slug: 'mytool', name: 'MyTool', github: 'https://github.com/owner/mytool', badges: ['Tool'], featured: true, description: { en: 'A short one-liner.', 'zh-Hans': '一句话简介。' } },
    ];
    ```
 
    This auto-generates `mytoolDocsEn` / `mytoolDocsZhHans` collections and a
-   landing card (+ nav entry when `nav: true`).
+   landing card (+ nav dropdown entry when `featured: true`).
 
 2. Add content:
 
@@ -129,6 +129,30 @@ The only authoring task that touches config:
 
 3. Routes are automatic (product pages are dynamic). Run `npm run build` and
    verify `/mytool/docs/` and `/zh-Hans/mytool/docs/` render.
+
+## Configure the nav & footer
+
+The top nav and footer are data-driven from the `site` block in
+`site.config.ts` (repo root). The built-in skeleton (logo, Posts, Products
+dropdown, locale/theme) always renders; you add entries via config:
+
+- **`site.orgUrl`** - git host used by the nav CTA and footer links. Change it
+  to point at your org/repo.
+- **`site.nav.links`** - custom entries appended after Posts/Products. A
+  plain entry is `{ label, href, external?, activePrefix? }`; a dropdown is
+  `{ label, children: [...] }` (children are plain links). `activePrefix` is
+  a list of path segments - the link stays highlighted on any page whose
+  path contains one; a dropdown lights up when any child matches. Labels are
+  per-locale: `{ en: '...', 'zh-Hans': '...' }`.
+- **`site.footer.links`** - footer columns, rendered in array order after the
+  brand block. A custom column is `{ title, items: [...] }`; the
+  auto-generated Products column is `{ type: 'products', limit? }` - omit
+  `limit` to list every product, or set it to cap the list and show an
+  "All products" link to `/products` when there are more.
+
+Internal hrefs are auto-prefixed with the locale/base; use absolute
+`https://...` for external links (and set `external: true` to open in a new
+tab).
 
 ## Customize a product landing
 
@@ -153,7 +177,7 @@ there is no second document shell. It receives the same props as the fallback:
 
 | Prop | What it is |
 |------|------------|
-| `product` | The full `Product` entry from `src/config/products.ts`. |
+| `product` | The full `Product` entry from `site.config.ts` (repo root). |
 | `locale` | Current locale (`'en'` from the default route, the loop value from the twin). |
 | `c` | Locale-resolved UI strings (`ProductCopy`) - reuse `c.viewSource`, `c.documentation`, `c.ctaTitle`, ... |
 | `docsHref` | Base-aware, locale-prefixed docs link, pre-computed by the route. |

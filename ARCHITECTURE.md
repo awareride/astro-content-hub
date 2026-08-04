@@ -44,7 +44,7 @@ discussion.
 | Shell | `src/components/Layout.astro`, `DocsLayout.astro` | document shell + content-region layout (head behavior delegates to i18n helpers; see audit note C) |
 | Visible UI | `src/components/Nav.astro`, `Footer.astro`, `PostCard.astro`, `TagPage.astro`, `TableOfContents.astro`, `ThemeToggle.astro`, `LocaleSwitcher.astro`, `ProductLandingDefault.astro` | header, footer, cards, tags, TOC, theme toggle, locale switcher, default landing |
 | Instance copy | `src/config/copy.ts` | `siteName`, UI strings (`t`), landing copy (`home`), product page copy (`productCopy`) - **rebrand by editing this file** |
-| Instance registry | `src/config/products.ts` | the `products` array (the `Product` interface is Machinery) |
+| Instance config | `site.config.ts` (repo root) | the `site` block (`orgUrl`, `nav.links`, `footer.links`) + the `products` array (the `Product`/`NavLink`/`FooterColumn` interfaces are Machinery) |
 | Sample content | `src/content/**` | sample posts / docs / product-info (replaceable) |
 | Styles | `src/styles/global.css`, `src/styles/theme.css` | tokens + prose (token *names* and `.prose` are the contract - see audit note D) |
 | Instance docs | `AGENTS.md`, `README.md`, `THEMING.md`, `CONTRIBUTING.md` | repo docs |
@@ -63,7 +63,8 @@ discussion.
 | Want to | Edit | Tier |
 |---|---|---|
 | Rebrand (site name, taglines, UI strings) | `src/config/copy.ts` | Your site |
-| Add / remove a product | `src/config/products.ts` | Your site |
+| Add / remove a product | `site.config.ts` (repo root) | Your site |
+| Customize nav / footer links | `site.config.ts` (repo root) `site.nav.links` / `site.footer.links` | Your site |
 | Add a language | `src/lib/i18n.ts` (`locales` + `localeLabel`/`localeCode`) and add the locale tables in `src/config/copy.ts` | Machinery + Your site |
 | Change the look | `src/components/*`, `src/styles/*` | Your site |
 | Fix routing / fallback behavior | `src/lib/content.ts`, `src/lib/i18n.ts`, `src/pages/**` | Machinery |
@@ -79,9 +80,10 @@ discussion.
   `productCopy`) lives in `src/config/copy.ts`; `src/lib/i18n.ts` re-exports
   it so every existing `from './i18n'` import keeps working. Rebranding is an
   edit to a config file, not a lib file.
-- **B. `src/config/products.ts`** - the `Product` interface is Machinery; the
-  `products` array is Your-site config. They share a file by design; treat
-  the interface as stable.
+- **B. `site.config.ts`** - the `Product`/`NavLink`/`FooterColumn` interfaces are
+  Machinery; the `products` array and the `site` block (`orgUrl`, `nav.links`,
+  `footer.links`) are Your-site config. They share a file by design; treat
+  the interfaces as stable.
 - **C. `Layout.astro` shell** - head behavior (lang, hreflang, base-aware
   meta, `data-product`) is Machinery logic inside a Your-site component. It
   already delegates to `buildAlternates`/`withBase`; extracting a

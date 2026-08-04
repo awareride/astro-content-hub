@@ -128,13 +128,14 @@ public/            Static assets served as-is (favicon, images, CNAME)
 - `/` — landing page (`src/pages/index.astro`).
 - `/posts`, `/posts/[...slug]` — blog listing + catch-all article route.
 - `/<product>` — product landing page, served dynamically from the `products`
-  array in `src/config/products.ts` (`src/pages/[product]/index.astro`).
+  array in `site.config.ts` at the repo root (`src/pages/[product]/index.astro`).
 - `/<product>/docs`, `/<product>/docs/[...slug]` — docs index + catch-all route
   rendering Markdown from the `<product>Docs<Locale>` collections. Non-default
   locales are served by universal routes under `src/pages/[locale]/...`, which
   loop `locales` in `getStaticPaths` - one set of route files per locale.
 
-Products are data-driven: add an entry to `products` in `src/config/products.ts`
+Products are data-driven: add an entry to `products` in `site.config.ts`
+(repo root)
 and content under `src/content/docs/<product>/<locale>/`; no per-product or
 per-locale route files are required.
 
@@ -160,7 +161,12 @@ fully data-driven.
   OG tags). Every page should compose it — do **not** hand-write a second
   document shell.
 - `Nav.astro` (sticky header) and `Footer.astro` are composed inside `Layout`
-  by pages that need them.
+  by pages that need them. Both are data-driven from `site.config.ts`:
+  `site.orgUrl` (git host CTA), `site.nav.links` (custom nav entries,
+  including dropdowns) and `site.footer.links` (footer columns, including the
+  `{ type: 'products', limit? }` auto column). The built-in Posts/Products
+  skeleton always renders in the nav; edit `site.config.ts` to rebrand or
+  add links, not the components.
 - `DocsLayout.astro` is a content-region layout: it composes `Layout` +
   `Nav` + `Footer` and adds a sidebar + `.prose` content area. Do not duplicate
   the document shell inside it.

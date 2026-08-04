@@ -19,16 +19,21 @@ See `AGENTS.md`.
 
 1. Read `AGENTS.md` for repo conduct (no `git push`, no dep installs without
    authorization, small focused changes).
-2. Read `src/lib/i18n.ts` (locales, `t`/`home`/`productCopy` dictionaries,
-   `products` array) and `src/content.config.ts` (collection generation) to see
+2. Read `src/lib/i18n.ts` (locales, `t`/`home`/`productCopy` dictionaries),
+   the `products` array in `site.config.ts` (repo root), and
+   `src/content.config.ts` (collection generation) to see
    the current shape.
 3. Run `npm run build` to confirm a clean baseline before you start.
 
 ## The i18n model (read this once)
 
-- `src/lib/i18n.ts` is the single source of truth: `locales`, `defaultLocale`,
+- `site.config.ts` (repo root) is the instance config: the `site` block
+  (`orgUrl`, `nav.links` custom nav entries, `footer.links` footer columns)
+  and the `products` registry (the list of products that ship docs + a
+  landing card). `src/lib/i18n.ts`
+  holds the machinery around it: `locales`, `defaultLocale`,
   `t` (small UI strings), `home` (landing copy), `productCopy` (product page
-  copy), and `products` (the list of products that ship docs + a landing card).
+  copy).
   Locale codes are BCP-47-style; the non-default locale is `zh-Hans` (script
   subtag included), so URLs are `/zh-Hans/...`.
 - `src/content.config.ts` auto-generates collections by looping
@@ -87,7 +92,8 @@ Steps:
 ## Task: add a doc page to an existing product
 
 Docs live in `src/content/docs/<product>/<locale>/`. Products come from the
-`products` array in `src/lib/i18n.ts` (samples: vite, astro, json-server).
+`products` array in `site.config.ts` (repo root) (samples: vite, astro,
+json-server).
 
 **Frontmatter schema** (`docSchema`):
 
@@ -152,7 +158,7 @@ links:                                                  # optional; extra action
 
 Steps:
 1. Create `src/content/product-info/en/<slug>.md` (the `<slug>` is the
-   product's slug from `src/config/products.ts`, used as the filename).
+   product's slug from `site.config.ts` (repo root), used as the filename).
 2. For Chinese, create `src/content/product-info/zh-Hans/<slug>.md` (same
    filename). Missing `zh-Hans` falls back to `en` body + notice, like docs.
 3. Run `npm run build`. No route changes - `ProductLandingDefault.astro`
@@ -170,19 +176,17 @@ for free. A hand-written override also inherits themed tokens.
 This is the only task that touches config, not just content. Suppose the
 product is `mytool`.
 
-1. **Register the product** - edit the `products` array in `src/config/products.ts`
-   (the `products` array used to live in `src/lib/i18n.ts`; it now lives in
-   `src/config/products.ts`):
+1. **Register the product** - edit the `products` array in `site.config.ts`
+   (the `products` array used to live in `src/lib/i18n.ts` and later in
+   `src/config/products.ts`; it now lives at the repo root):
    ```ts
    export const products: Product[] = [
-     { slug: 'vite', name: 'Vite', github: 'https://github.com/vitejs/vite', badges: ['Build Tool'], nav: false },
-     { slug: 'astro', name: 'Astro', github: 'https://github.com/withastro/astro', badges: ['Web Framework'], nav: false },
-     { slug: 'json-server', name: 'JSON Server', github: 'https://github.com/typicode/json-server', badges: ['Mock API'], nav: false },
-     { slug: 'mytool', name: 'MyTool', github: 'https://github.com/owner/mytool', badges: ['Tool'], nav: false },
+     { slug: 'mytool', name: 'MyTool', github: 'https://github.com/owner/mytool', badges: ['Tool'], featured: true, description: { en: 'A short one-liner.', 'zh-Hans': '一句话简介。' } },
    ];
    ```
    This auto-generates `mytoolDocsEn` / `mytoolDocsZhHans` collections and a
-   landing card on the home page (+ nav entry when `nav: true`).
+   landing card on the home page, the footer, and the `/products` catalog
+   (+ a nav dropdown entry when `featured: true`).
 
 2. **Add content**:
    ```
@@ -251,8 +255,8 @@ providers and also runs in CI before `npm run build`.
 
 Each issue prints `file -> field -> offending value -> fix hint`. The checker
 walks `src/content/` plus any product `base` override (e.g. `./docs` for the
-hub's own docs) and reads locales/products from `src/lib/i18n.ts` and
-`src/config/products.ts`.
+hub's own docs) and reads locales from `src/lib/i18n.ts` and products from
+the root `site.config.ts`.
 
 ## Verification (always run before declaring done)
 
@@ -297,7 +301,8 @@ grep -c '此页暂无中文翻译' dist/zh-Hans/posts/localized-sample/index.htm
 src/lib/i18n.ts          locales, dictionaries (t/home/productCopy), helpers
 src/lib/content.ts       localized path + render helpers (docs + posts)
 src/lib/docs.ts          buildNav (sidebar) - index -> base path, sort by order
-src/config/products.ts   products[] registry
+site.config.ts (repo root)  site block + products[] registry
+                            (orgUrl, nav.links, footer.links)
 src/content.config.ts    collection generation (declarative, loops products×locales)
 src/components/          Layout (lang/hreflang), Nav/Footer (URL-inferred),
                          DocsLayout, PostCard, LocaleSwitcher

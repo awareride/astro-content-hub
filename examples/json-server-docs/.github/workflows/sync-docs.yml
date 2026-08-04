@@ -31,7 +31,7 @@
 # GitHub (rather than docs/<product>/).
 #
 # IMPORTANT: set PRODUCT (below) to a name that is listed in the hub's
-# src/content.config.ts `products` array, otherwise the synced content won't
+# site.config.ts `products` array, otherwise the synced content won't
 # have a collection. See SKILL.md "Registering a new product".
 #
 # The copy uses `rsync -a docs/ dest/` ("contents of docs/ into dest/") so the
