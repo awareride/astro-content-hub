@@ -40,6 +40,11 @@ sections:
       - quote: "The fastest way to mock a backend for tutorials and demos."
         author: "Marcus Lee"
         role: "Tech Writer"
+  - type: docs-preview
+  - type: cta
+    data:
+      primary: { label: "Get Started", href: "/json-server/docs/getting-started" }
+      secondary: { label: "View Source", href: "https://github.com/typicode/json-server" }
 ---
 
 `json-server` watches a JSON file and exposes it as a REST API. It is a popular

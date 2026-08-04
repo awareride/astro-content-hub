@@ -40,6 +40,11 @@ sections:
       - quote: "为教程和演示 mock 后端的最快方式。"
         author: "李宇飞"
         role: "技术写作"
+  - type: docs-preview
+  - type: cta
+    data:
+      primary: { label: "开始上手", href: "/json-server/docs/getting-started" }
+      secondary: { label: "查看源码", href: "https://github.com/typicode/json-server" }
 ---
 
 `json-server` 监视一个 JSON 文件并将其暴露为 REST API。它是快速原型、
