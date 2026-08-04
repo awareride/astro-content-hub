@@ -7,7 +7,7 @@
  * providers (it lives with the authoring skill at skills/site-content/) and
  * runs in CI before `npm run build` (see .github/workflows/deploy.yml).
  *
- * Error vs warning (owner decision, .agents/plan/agent-facing-content.plan):
+ * Error vs warning (owner decision):
  *   - errors   exit non-zero: issues that would break or corrupt the build
  *     (duplicate slugs - a nested-dir collision like `foo.md` + `foo/index.md`
  *     does not hard-fail Astro but silently drops one page, so we catch it here).
