@@ -5,111 +5,109 @@
 // `src/components/product-landing/<slug>.astro`. Shares the same prop
 // contract as an override, so the route can swap them freely.
 //
-// Auto-generated mode: if a structured `product-info` file exists for this
-// product + locale (with default-locale fallback) it is rendered as a rich
-// landing (hero + tagline, highlights, install snippet, feature grid, an
-// optional curated overview body, and a CTA). With no file, the minimal
-// hero + CTA below is shown. A hand-written override always takes precedence
-// over this component (the route resolves it first).
+// Auto-generated mode: a structured `product-info` file drives the landing.
+// When the file declares a `sections` list, this component becomes an
+// orchestrator - each entry is resolved to a section component via the
+// registry (src/lib/landing-sections.ts) and rendered in declared order with
+// the declared data. Entries that omit `data` are filled from the matching
+// product-info field (tagline/features/highlights/install/links), so authors
+// write `- type: features` without duplicating content. The curated overview
+// body, when present, is appended after the declared sections. Unknown
+// section types are skipped (never a build error).
+//
+// With no `sections` declared, the legacy fixed order is preserved
+// (hero -> highlights -> install -> features -> overview -> CTA), so existing
+// product-info files render exactly as before - zero migration.
+//
+// A hand-written override at `src/components/product-landing/<slug>.astro`
+// always takes precedence over this component (the route resolves it first).
 import type { ProductLandingProps } from '../lib/product-landing';
 import { getLocalizedProductInfo } from '../lib/content';
+import { getSectionComponent } from '../lib/landing-sections';
+import type { ProductInfoSection } from '../lib/content';
 
 interface Props extends ProductLandingProps {}
 const { product, locale, c, docsHref } = Astro.props as Props;
 
 // Resolve landing info (null when no product-info file exists for this product).
 const info = await getLocalizedProductInfo(product.slug, locale);
-const tagline = info?.tagline;
-const features = info?.features ?? [];
-const highlights = info?.highlights ?? [];
-const install = info?.install;
-const links = info?.links ?? [];
-const hasBody = info?.hasBody ?? false;
-const Content = info?.Content;
+
+// Legacy fixed order, kept when the file declares no `sections`.
+const legacySections: ProductInfoSection[] = [
+  { type: 'hero' },
+  { type: 'highlights' },
+  { type: 'install' },
+  { type: 'features' },
+];
+const sections: ProductInfoSection[] = info?.sections ?? legacySections;
+// Split declared sections into the pre-CTA body and the closing CTA, so the
+// curated overview body always sits before the CTA (and an explicit
+// `- type: cta` never double-renders with the auto-appended one).
+const declaredCta = sections.find((s) => s.type === 'cta');
+const preCtaSections = sections.filter((s) => s.type !== 'cta');
+const closingCta = declaredCta ?? { type: 'cta' } as ProductInfoSection;
+
+/** Fill a section's data from the matching product-info field when the author
+ *  omitted `data` (so `- type: features` reuses the existing `features` field). */
+function resolveData(section: ProductInfoSection): unknown {
+  if (section.data !== undefined) return section.data;
+  switch (section.type) {
+    case 'hero':
+      return { tagline: info?.tagline ?? '', links: info?.links ?? [] };
+    case 'highlights':
+      return info?.highlights ?? [];
+    case 'install':
+      return info?.install ?? '';
+    case 'features':
+      return info?.features ?? [];
+    default:
+      return undefined;
+  }
+}
 ---
 
 {info ? (
   <Fragment>
-    <section class="product-hero">
-      <div class="container">
-        <div class="hero-badge" style="display:inline-block; font-size:0.85rem; font-weight:600; padding:0.25rem 0.9rem; border-radius:100px; background:var(--color-accent-subtle); color:var(--color-accent); margin-bottom:1.25rem;">
-          {c.heroBadge}
-        </div>
-        <h1>{product.name}</h1>
-        <p class="hero-lead">{tagline}</p>
-        <div class="hero-actions">
-          <a href={product.github} class="btn btn-primary" target="_blank" rel="noopener">{c.viewSource}</a>
-          <a href={docsHref} class="btn btn-secondary">{c.documentation}</a>
-          {links.map((l) => (
-            <a href={l.href} class="btn btn-secondary" target="_blank" rel="noopener">{l.label}</a>
-          ))}
-        </div>
-      </div>
-    </section>
+    {preCtaSections.map((s) => {
+      const Comp = getSectionComponent(s.type);
+      if (!Comp) return null; // unknown type -> skip, never break the build
+      const data = resolveData(s);
+      return (
+        <Comp
+          type={s.type}
+          data={data}
+          product={product}
+          locale={locale}
+          c={c}
+          docsHref={docsHref}
+        />
+      );
+    })}
 
-    {highlights.length > 0 && (
-      <section class="section">
-        <div class="container">
-          <div class="product-highlights">
-            {highlights.map((h) => (
-              <div class="product-highlight">
-                <div class="product-highlight-value">{h.value}</div>
-                <div class="product-highlight-label">{h.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    )}
-
-    {install && (
-      <section class="section section-alt">
-        <div class="container">
-          <div class="terminal product-install-terminal">
-            <div class="terminal-header"><span></span><span></span><span></span></div>
-            <div class="terminal-body"><code>{install}</code></div>
-          </div>
-        </div>
-      </section>
-    )}
-
-    {features.length > 0 && (
-      <section class="section">
-        <div class="container">
-          <div class="feature-grid">
-            {features.map((f) => (
-              <div class="feature-card">
-                <h3>{f.title}</h3>
-                <p>{f.body}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    )}
-
-    {hasBody && Content && (
+    {info.hasBody && info.Content && (
       <section class="section section-alt">
         <div class="container">
           <div class="prose product-overview">
-            <Content />
+            <info.Content />
           </div>
         </div>
       </section>
     )}
 
-    <section class="section">
-      <div class="container">
-        <div class="cta-box">
-          <h2>{c.ctaTitle}</h2>
-          <p>{c.ctaBody}</p>
-          <div class="cta-actions">
-            <a href={product.github} class="btn btn-primary btn-large" target="_blank" rel="noopener">{c.ctaPrimary}</a>
-            <a href={docsHref} class="btn btn-secondary btn-large">{c.readDocs}</a>
-          </div>
-        </div>
-      </div>
-    </section>
+    {(() => {
+      const Cta = getSectionComponent(closingCta.type);
+      if (!Cta) return null;
+      return (
+        <Cta
+          type={closingCta.type}
+          data={closingCta.data}
+          product={product}
+          locale={locale}
+          c={c}
+          docsHref={docsHref}
+        />
+      );
+    })()}
   </Fragment>
 ) : (
   <Fragment>

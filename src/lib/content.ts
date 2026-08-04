@@ -204,8 +204,14 @@ export interface ProductInfoEntryLike {
     install?: string;
     highlights: { label: string; value: string }[];
     links: { label: string; href: string }[];
+    sections?: { type: string; data?: unknown }[];
   };
   render(): Promise<{ Content: any; headings: MarkdownHeading[] }>;
+}
+
+export interface ProductInfoSection {
+  type: string;
+  data?: unknown;
 }
 
 export interface ProductInfo {
@@ -215,6 +221,9 @@ export interface ProductInfo {
   install?: string;
   highlights: { label: string; value: string }[];
   links: { label: string; href: string }[];
+  /** Landing section list ("MD declares data, code registry maps components").
+   *  undefined = legacy fixed order. */
+  sections?: ProductInfoSection[];
   Content: any;
   hasBody: boolean;
   locale: Locale;
@@ -244,6 +253,7 @@ export async function getLocalizedProductInfo(
     install: entry.data.install,
     highlights: entry.data.highlights,
     links: entry.data.links,
+    sections: entry.data.sections,
     Content,
     hasBody: Boolean(entry.body && entry.body.trim()),
     locale,

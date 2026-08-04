@@ -18,6 +18,39 @@ features:
 links:
   - label: "Website"
     href: "https://json-server.typicode.com"
+# Section system demo (Phase 1): explicitly declares the same sections the
+# legacy fixed order renders, so this product is the worked example for
+# "MD declares data, code registry maps components". Entries without `data`
+# are filled from the matching field above (tagline/features/highlights/install).
+sections:
+  - type: hero
+  - type: highlights
+  - type: install
+  - type: features
+  - type: stats
+    data:
+      - { label: "GitHub Stars", value: "58k" }
+      - { label: "npm weekly downloads", value: "1.2M" }
+      - { label: "License", value: "MIT" }
+  - type: testimonials
+    data:
+      - quote: "json-server got our prototype off the ground in an afternoon."
+        author: "Ada Chen"
+        role: "Frontend Engineer, Nimbus"
+      - quote: "The fastest way to mock a backend for tutorials and demos."
+        author: "Marcus Lee"
+        role: "Tech Writer"
+  - type: docs-preview
+  - type: faq
+    data:
+      - q: "Is json-server production-ready?"
+        a: "It targets prototyping and demos; pair it with a real backend for production."
+      - q: "Does it support filtering and pagination?"
+        a: "Yes - out of the box, via query parameters."
+  - type: cta
+    data:
+      primary: { label: "Get Started", href: "/json-server/docs/getting-started" }
+      secondary: { label: "View Source", href: "https://github.com/typicode/json-server" }
 ---
 
 `json-server` watches a JSON file and exposes it as a REST API. It is a popular

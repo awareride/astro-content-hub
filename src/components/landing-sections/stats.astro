@@ -1,0 +1,28 @@
+---
+// src/components/landing-sections/stats.astro
+// Landing section: social-proof metrics row (GitHub stars, npm downloads,
+// license, contributors, ...). Data is a list of { label, value } pairs,
+// declared in product-info frontmatter under the `stats` section type.
+// Reuses the .product-highlight grid styling from global.css so it renders
+// consistently with the legacy highlights row.
+import type { LandingSectionProps } from '../../lib/landing-sections';
+
+interface Props extends LandingSectionProps {}
+const { data, product, locale, c, docsHref } = Astro.props as Props;
+const stats = (Array.isArray(data) ? data : []) as { label: string; value: string }[];
+if (stats.length === 0) return null;
+void product; void locale; void c; void docsHref;
+---
+
+<section class="section">
+  <div class="container">
+    <div class="product-highlights stats-row">
+      {stats.map((s) => (
+        <div class="product-highlight">
+          <div class="product-highlight-value">{s.value}</div>
+          <div class="product-highlight-label">{s.label}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

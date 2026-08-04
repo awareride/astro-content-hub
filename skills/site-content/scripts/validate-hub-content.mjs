@@ -29,6 +29,62 @@ import { fileURLToPath } from 'node:url';
 const ROOT = fileURLToPath(new URL('../../..', import.meta.url));
 const rel = (p) => relative(ROOT, p).split(sep).join('/');
 
+/** Parse frontmatter (between the first `---` pair) into a plain object.
+ *  Minimal YAML-subset parser - enough for the `sections` list (Phase 1) and
+ *  existing scalar fields. Handles: scalars, quoted scalars, and `- type: x`
+ *  list items under `sections:`. Returns {} when no frontmatter. */
+function parseFrontmatter(text) {
+  const m = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!m) return {};
+  const body = m[1];
+  const out = {};
+  let currentKey = null;
+  for (const rawLine of body.split('\n')) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith('#')) continue;
+    if (line.startsWith('- ')) {
+      // List item under the current key (e.g. `sections:`).
+      if (currentKey && Array.isArray(out[currentKey])) {
+        out[currentKey].push(line.slice(2).trim());
+      }
+      continue;
+    }
+    const kv = line.match(/^([\w-]+)\s*:\s*(.*)$/);
+    if (!kv) continue;
+    currentKey = kv[1];
+    const val = kv[2].trim();
+    if (val === '' || val === '|' || val === '>') {
+      out[currentKey] = []; // block or list starts on following lines
+    } else if (/^['"]/.test(val)) {
+      out[currentKey] = val.slice(1, -1);
+    } else if (val === 'true') {
+      out[currentKey] = true;
+    } else if (val === 'false') {
+      out[currentKey] = false;
+    } else if (/^-?\d+$/.test(val)) {
+      out[currentKey] = Number(val);
+    } else {
+      out[currentKey] = val;
+    }
+  }
+  return out;
+}
+
+/** Section types declared in a product-info file's `sections` frontmatter.
+ *  Items are `- type: <name>` lines; unknown shapes are skipped. */
+function sectionTypesOf(filePath) {
+  const text = readFileSync(filePath, 'utf8');
+  const fm = parseFrontmatter(text);
+  const list = fm.sections;
+  if (!Array.isArray(list)) return [];
+  const types = [];
+  for (const item of list) {
+    const t = typeof item === 'string' ? item.match(/^type\s*:\s*(\S+)/)?.[1] : null;
+    if (t) types.push(t);
+  }
+  return types;
+}
+
 const issues = { error: [], warning: [], info: [] };
 const add = (level, lines) => issues[level].push(lines);
 
@@ -223,6 +279,23 @@ function checkUnknownProductInfo(locale, files, knownSlugs) {
   }
 }
 
+/** Section types declared in a product-info `sections` list with no registered
+ *  component (warnings). The renderer skips unknown types, so the build stays
+ *  green; this surfaces typos/missing sections at review time. */
+function checkUnknownSectionTypes(files, registered) {
+  for (const f of files) {
+    for (const type of sectionTypesOf(f.path)) {
+      if (registered.has(type)) continue;
+      add('warning', [
+        `product-info (${f.id}): section type '${type}' has no registered component - this section renders nothing`,
+        `  ${rel(f.path)} -> sections -> type -> '${type}'`,
+        `  fix: add src/components/landing-sections/${type}.astro (it is picked up automatically), or`,
+        `       fix the type name, or remove the section entry.`,
+      ]);
+    }
+  }
+}
+
 // --- Run the checks ---------------------------------------------------------
 
 for (const locale of locales) {
@@ -262,6 +335,17 @@ for (const locale of locales) {
     checkParity(`product-info (${locale})`, productInfos[defaultLocale], productInfos[locale], locale);
   }
   checkUnknownProductInfo(locale, productInfos[locale], new Set(products.map((p) => p.slug)));
+}
+
+// Registered section types come from the TypeScript registry, but this script
+// is plain Node (no imports) - derive them from the landing-sections directory
+// so drift between the two is caught by this same gate.
+const sectionsBase = join(ROOT, 'src/components/landing-sections');
+const registeredSections = new Set(
+  walk(sectionsBase, ['.astro']).map((p) => p.replace(/.*\/([^/]+)\.astro$/, '$1')),
+);
+for (const locale of locales) {
+  checkUnknownSectionTypes(productInfos[locale], registeredSections);
 }
 
 // ---------------------------------------------------------------------------

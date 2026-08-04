@@ -18,6 +18,39 @@ features:
 links:
   - label: "官网"
     href: "https://json-server.typicode.com"
+# Section system demo (Phase 1): explicitly declares the same sections the
+# legacy fixed order renders, so this product is the worked example for
+# "MD declares data, code registry maps components". Entries without `data`
+# are filled from the matching field above (tagline/features/highlights/install).
+sections:
+  - type: hero
+  - type: highlights
+  - type: install
+  - type: features
+  - type: stats
+    data:
+      - { label: "GitHub Stars", value: "58k" }
+      - { label: "npm 周下载量", value: "1.2M" }
+      - { label: "许可证", value: "MIT" }
+  - type: testimonials
+    data:
+      - quote: "json-server 让我们一个下午就把原型跑起来了。"
+        author: "陈晓雅"
+        role: "前端工程师,Nimbus"
+      - quote: "为教程和演示 mock 后端的最快方式。"
+        author: "李宇飞"
+        role: "技术写作"
+  - type: docs-preview
+  - type: faq
+    data:
+      - q: "json-server 可以用于生产环境吗?"
+        a: "它面向原型与演示;生产环境请搭配真实后端。"
+      - q: "支持过滤与分页吗?"
+        a: "支持 —— 开箱即用,通过查询参数即可。"
+  - type: cta
+    data:
+      primary: { label: "开始上手", href: "/json-server/docs/getting-started" }
+      secondary: { label: "查看源码", href: "https://github.com/typicode/json-server" }
 ---
 
 `json-server` 监视一个 JSON 文件并将其暴露为 REST API。它是快速原型、
