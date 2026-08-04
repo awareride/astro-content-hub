@@ -207,6 +207,109 @@ pre.astro-code code {
   color: var(--color-text);
 }
 
+.nav-menu-primary a.active {
+  color: var(--color-text);
+}
+
+/* --- Products dropdown (desktop) --- */
+.nav-menu-primary .nav-dropdown {
+  position: relative;
+}
+
+.nav-menu-primary .nav-dropdown-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  transition: color var(--transition);
+}
+
+.nav-menu-primary .nav-dropdown-trigger:hover,
+.nav-menu-primary .nav-dropdown.nav-dropdown-active .nav-dropdown-trigger,
+.nav-menu-primary .nav-dropdown-trigger[aria-expanded='true'] {
+  color: var(--color-text);
+}
+
+.nav-menu-primary .nav-dropdown-caret {
+  transition: transform var(--transition);
+}
+
+.nav-menu-primary .nav-dropdown:hover .nav-dropdown-caret,
+.nav-menu-primary .nav-dropdown:focus-within .nav-dropdown-caret,
+.nav-menu-primary .nav-dropdown.nav-dropdown-open .nav-dropdown-caret {
+  transform: rotate(180deg);
+}
+
+.nav-menu-primary .nav-dropdown-panel {
+  position: absolute;
+  top: calc(100% + 0.75rem);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 300px;
+  padding: 0.5rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--transition), visibility var(--transition);
+}
+
+.nav-menu-primary .nav-dropdown:hover .nav-dropdown-panel,
+.nav-menu-primary .nav-dropdown:focus-within .nav-dropdown-panel,
+.nav-menu-primary .nav-dropdown.nav-dropdown-open .nav-dropdown-panel {
+  opacity: 1;
+  visibility: visible;
+}
+
+.nav-menu-primary .nav-dropdown-item {
+  display: block;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+}
+
+.nav-menu-primary .nav-dropdown-item:hover {
+  background: var(--color-accent-subtle);
+}
+
+.nav-menu-primary .nav-dropdown-name {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.nav-menu-primary .nav-dropdown-desc {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.nav-menu-primary .nav-dropdown-all {
+  display: block;
+  margin-top: 0.35rem;
+  padding: 0.6rem 0.75rem 0.4rem;
+  border-top: 1px solid var(--color-border-light);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-sm);
+}
+
+.nav-menu-primary .nav-dropdown-all:hover {
+  color: var(--color-text);
+}
+
 .nav-cta {
   display: inline-flex;
   align-items: center;
@@ -504,8 +607,8 @@ pre.astro-code code {
   font-size: 0.95rem;
 }
 
-/* --- Project Cards --- */
-.projects-grid {
+/* --- Product Cards --- */
+.products-grid {
   display: grid;
   /* min(100%, 280px) caps the column floor at the container width so cards
      never overflow the container on narrow phones, matching the other grids. */
@@ -1705,6 +1808,63 @@ a.docs-prev-next-item:hover {
     color: var(--color-text);
     line-height: 1.2;
     letter-spacing: -0.01em;
+  }
+
+  /* Products dropdown becomes a static nested list inside the overlay. */
+  .nav-menu-primary .nav-dropdown {
+    position: static;
+  }
+
+  .nav-menu-primary .nav-dropdown-trigger {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 1.25rem 0 0.25rem;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--color-text);
+    letter-spacing: -0.01em;
+  }
+
+  .nav-menu-primary .nav-dropdown-caret {
+    display: none;
+  }
+
+  .nav-menu-primary .nav-dropdown-panel {
+    position: static;
+    transform: none;
+    min-width: 0;
+    padding: 0 0 0.25rem;
+    background: none;
+    border: none;
+    box-shadow: none;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .nav-menu-primary .nav-dropdown-item {
+    padding: 0.5rem 0;
+  }
+
+  .nav-menu-primary .nav-dropdown-item:hover {
+    background: none;
+  }
+
+  .nav-menu-primary .nav-dropdown-name {
+    font-size: 1.05rem;
+    font-weight: 500;
+  }
+
+  .nav-menu-primary .nav-dropdown-desc {
+    font-size: 0.85rem;
+  }
+
+  .nav-menu-primary .nav-dropdown-all {
+    margin-top: 0.25rem;
+    padding: 0.75rem 0;
+    border-top: 1px solid var(--color-border-light);
+    font-size: 1rem;
+    font-weight: 600;
   }
 
   /* GitHub CTA sits right under the links - always visible, no scroll.
