@@ -1,0 +1,38 @@
+---
+// src/components/landing-sections/testimonials.astro
+// Landing section: social-proof quote cards. Data is a list of
+// { quote, author, role } declared in product-info frontmatter under the
+// `testimonials` section type. Renders a centered header + responsive grid
+// of quote cards (styles in global.css).
+import type { LandingSectionProps } from '../../lib/landing-sections';
+
+interface Props extends LandingSectionProps {}
+const { data, locale } = Astro.props as Props;
+const items = (Array.isArray(data) ? data : []) as { quote: string; author: string; role: string }[];
+if (items.length === 0) return null;
+// Localized header copy for the testimonials block.
+const copy = {
+  en: { eyebrow: 'Loved by developers', title: 'What the community says' },
+  'zh-Hans': { eyebrow: '开发者口碑', title: '社区怎么说' },
+}[locale] ?? { en: { eyebrow: 'Loved by developers', title: 'What the community says' } }['en'];
+---
+
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-header">
+      <p class="eyebrow">{copy.eyebrow}</p>
+      <h2>{copy.title}</h2>
+    </div>
+    <div class="testimonials-grid">
+      {items.map((t) => (
+        <blockquote class="testimonial-card">
+          <p class="testimonial-quote">“{t.quote}”</p>
+          <footer class="testimonial-author">
+            <span class="testimonial-name">{t.author}</span>
+            <span class="testimonial-role">{t.role}</span>
+          </footer>
+        </blockquote>
+      ))}
+    </div>
+  </div>
+</section>

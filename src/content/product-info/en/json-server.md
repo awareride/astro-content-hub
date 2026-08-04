@@ -27,6 +27,19 @@ sections:
   - type: highlights
   - type: install
   - type: features
+  - type: stats
+    data:
+      - { label: "GitHub Stars", value: "58k" }
+      - { label: "npm weekly downloads", value: "1.2M" }
+      - { label: "License", value: "MIT" }
+  - type: testimonials
+    data:
+      - quote: "json-server got our prototype off the ground in an afternoon."
+        author: "Ada Chen"
+        role: "Frontend Engineer, Nimbus"
+      - quote: "The fastest way to mock a backend for tutorials and demos."
+        author: "Marcus Lee"
+        role: "Tech Writer"
 ---
 
 `json-server` watches a JSON file and exposes it as a REST API. It is a popular

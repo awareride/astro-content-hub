@@ -27,6 +27,19 @@ sections:
   - type: highlights
   - type: install
   - type: features
+  - type: stats
+    data:
+      - { label: "GitHub Stars", value: "58k" }
+      - { label: "npm 周下载量", value: "1.2M" }
+      - { label: "许可证", value: "MIT" }
+  - type: testimonials
+    data:
+      - quote: "json-server 让我们一个下午就把原型跑起来了。"
+        author: "陈晓雅"
+        role: "前端工程师,Nimbus"
+      - quote: "为教程和演示 mock 后端的最快方式。"
+        author: "李宇飞"
+        role: "技术写作"
 ---
 
 `json-server` 监视一个 JSON 文件并将其暴露为 REST API。它是快速原型、
