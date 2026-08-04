@@ -93,6 +93,9 @@ site looks complete out of the box. Replace it with your own.
   `en`/`zh-Hans` grouping.
 - **RSS feed** at `/rss.xml` (en) and `/zh-Hans/rss.xml` (zh-Hans), with feed-discovery
   `<link>` in the `<head>`.
+- **Machine-readable corpus** at `/llms.txt` and `/llms-full.txt`
+  ([llmstxt.org](https://llmstxt.org/) convention) so AI tools and agents can
+  discover and ingest the aggregated content without scraping.
 - **`robots.txt`** pointing at the sitemap.
 - **Custom 404 page** (excluded from the sitemap).
 
