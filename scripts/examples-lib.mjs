@@ -19,8 +19,8 @@ export const EXAMPLES_DIR = join(ROOT, 'examples');
 export const SHARED_SKILL_DIR = join(EXAMPLES_DIR, '_shared', 'site-content-sync');
 
 /**
- * Per-example sync workflow set (owner decision 2 in
- * .agents/plan/examples-consistency.plan): each example carries exactly the
+ * Per-example sync workflow set (owner decision 2: each example carries one
+ * workflow matching its content type): each example carries exactly the
  * workflows matching its content type, generated from the canonical templates
  * under examples/_shared/site-content-sync/templates/.
  *

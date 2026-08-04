@@ -4,8 +4,8 @@
 // corpus (llms-full.txt) that AI tools and agents can discover and ingest
 // without scraping the site.
 //
-// v1 serves the default locale only - no /[locale]/llms.txt variants (see
-// .agents/plan/agent-facing-content.plan, decision 1). The builders take a
+// v1 serves the default locale only - no /[locale]/llms.txt variants (v1
+// decision: default locale only). The builders take a
 // locale so per-locale variants are a small follow-up, but the routes call
 // them with `defaultLocale` and every URL is a default-locale URL.
 //

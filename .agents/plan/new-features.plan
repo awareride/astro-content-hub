@@ -1,7 +1,9 @@
 # New Features Plan - astro-content-hub
 
-Status: Phases 1-3 COMPLETE and merged. Phase 4 (selective) pending.
-Last updated: 2026-07-24
+Status: Phases 1-3 COMPLETE and merged. Phase 4 (selective) - the og:image
+meta slot landed; the remaining items are optional backlog with no active
+work. Kept only as the Phase 4 backlog reference.
+Last updated: 2026-08-04
 
 This document audits the current feature set, identifies the gaps a typical
 content/docs site should close, and proposes a prioritized roadmap. It is a
@@ -327,6 +329,8 @@ across all of these; the site is now 63 pages (was 50 at the start).
 - Flagged (not removed): `assets/` is referenced nowhere - likely leftover from
   an old static site; `.agents/plan/plan.md` is the pre-plan agent file.
 
-**Remaining for Phase 4 (selective):** admonitions (D1), OG image + JSON-LD
-(A5/A6), reading time (B7), search via Pagefind (C4, the only expensive one),
-analytics (E1), about page (E2).
+**Remaining for Phase 4 (selective, no active work):** admonitions (D1); a
+**default** OG image asset + JSON-LD (A5/A6 - the per-page `og:image` meta slot
+already landed in `Layout.astro`, but no default social image ships yet);
+reading time (B7); search via Pagefind (C4, the only expensive one); analytics
+(E1); about page (E2).

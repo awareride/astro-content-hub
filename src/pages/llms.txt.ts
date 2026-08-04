@@ -1,7 +1,6 @@
 // /llms.txt - machine-readable corpus index (llmstxt.org convention): a
 // plain-text list of the hub's pages so AI tools and agents can discover the
-// aggregated content without scraping. Default locale only (see
-// .agents/plan/agent-facing-content.plan, decision 1).
+// aggregated content without scraping. Default locale only (v1 decision).
 import { defaultLocale } from '../lib/i18n';
 import { buildLlmsIndex } from '../lib/llms';
 
