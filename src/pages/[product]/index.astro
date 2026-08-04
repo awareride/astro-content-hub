@@ -8,7 +8,7 @@ import Footer from '../../components/Footer.astro';
 import ProductLandingDefault from '../../components/ProductLandingDefault.astro';
 import { getProductLanding } from '../../lib/product-landing';
 import { productCopy, localizePath, withBase, buildAlternates, type Locale } from '../../lib/i18n';
-import { products } from '../../config/products';
+import { products } from '../../../site.config';
 
 export function getStaticPaths() {
   return products.map((p) => ({

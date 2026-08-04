@@ -5,7 +5,7 @@
 import DocsLayout from '../../../../components/DocsLayout.astro';
 import { getLocalizedPaths, renderLocalizedPage } from '../../../../lib/content';
 import { buildAlternates, localizePath, withBase, defaultLocale, locales, type Locale } from '../../../../lib/i18n';
-import { products } from '../../../../config/products';
+import { products } from '../../../../../site.config';
 
 export async function getStaticPaths() {
   const paths: { params: { locale: Locale; product: string; slug: string }; props: { product: string; locale: Locale } }[] = [];

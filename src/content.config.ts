@@ -2,7 +2,7 @@ import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { locales, collectionSuffix } from './lib/i18n';
-import { products } from './config/products';
+import { products } from '../site.config';
 
 // Products that ship a localized docs collection. Driven by the `products`
 // array in lib/i18n.ts so the landing page and content collections stay in
