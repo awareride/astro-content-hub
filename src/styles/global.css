@@ -352,6 +352,10 @@ pre.astro-code code {
   padding: 5rem 0 var(--section-gap);
   text-align: center;
   position: relative;
+  /* Clip the decorative hero-glow: it is a 600px-wide absolutely positioned
+     element centered with translateX(-50%), which would stick out past the
+     right edge of a narrow phone viewport and cause horizontal scrolling. */
+  overflow: hidden;
 }
 
 .hero-glow {
@@ -503,7 +507,9 @@ pre.astro-code code {
 /* --- Project Cards --- */
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  /* min(100%, 280px) caps the column floor at the container width so cards
+     never overflow the container on narrow phones, matching the other grids. */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: 1.5rem;
 }
 
