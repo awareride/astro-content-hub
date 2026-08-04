@@ -11,7 +11,9 @@ install: |
 features:
   - title: "零配置 API"
     body: "将 json-server 指向一个 JSON 文件,即可即时获得带路由、分页与过滤的完整 REST API。"
-    icon: "M3 17l6-6 4 4 8-8"
+    image:
+      gradient: "linear-gradient(135deg, #141413 0%, #2a2a26 100%)"
+      cover: true
   - title: "标准 REST"
     body: "GET、POST、PUT、PATCH、DELETE 开箱即用,对 ID 与关联关系有合理的默认处理。"
     icon: "M12 3v12m0 0l-4-4m4 4l4-4"

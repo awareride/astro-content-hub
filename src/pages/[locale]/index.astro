@@ -34,6 +34,7 @@ const alternates = buildAlternates('/');
     <!-- Hero -->
     <section class="hero">
       <div class="hero-glow" aria-hidden="true"></div>
+      <div class="hero-glow hero-glow-2" aria-hidden="true"></div>
       <div class="container">
         <p class="eyebrow">{c.eyebrow}</p>
         <h1 class="hero-title">
@@ -80,6 +81,30 @@ const alternates = buildAlternates('/');
         </section>
       )
     }
+
+    <!-- Stats (data-driven, mirrors the product landing stats) -->
+    <section class="section section-alt">
+      <div class="container">
+        <div class="section-header">
+          <p class="eyebrow">{c.homeStatsEyebrow}</p>
+          <h2>{c.homeStatsTitle}</h2>
+        </div>
+        <div class="stats-row">
+          <div class="stats-item">
+            <div class="stats-value">{products.length}</div>
+            <div class="stats-label">{c.homeStatsProducts}</div>
+          </div>
+          <div class="stats-item">
+            <div class="stats-value">{locales.length}</div>
+            <div class="stats-label">{c.homeStatsLocales}</div>
+          </div>
+          <div class="stats-item">
+            <div class="stats-value">65</div>
+            <div class="stats-label">{c.homeStatsPages}</div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- About -->
     <section id="about" class="section section-alt">

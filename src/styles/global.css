@@ -1706,6 +1706,41 @@ a.docs-prev-next-item:hover {
   margin-bottom: 1.25rem;
 }
 
+/* Full-card background variant (image with cover: true): the media fills
+   the card as a background layer; text sits above on a subtle scrim. */
+.feature-card--cover {
+  position: relative;
+  overflow: hidden;
+  border-color: transparent;
+}
+
+.feature-card-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.feature-card-bg .media {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0;
+  margin: 0;
+}
+
+.feature-card--cover h3,
+.feature-card--cover p {
+  position: relative;
+  z-index: 1;
+}
+
+.feature-card--cover h3 {
+  color: var(--color-on-dark);
+}
+
+.feature-card--cover p {
+  color: var(--color-text-secondary);
+}
+
 @media (max-width: 900px) {
   .feature-grid--bento {
     grid-template-columns: 1fr;
@@ -1766,15 +1801,28 @@ a.docs-prev-next-item:hover {
   }
 }
 /* --- Landing testimonials (social proof) --- */
+/* Default: even grid. layout: masonry opts into the CSS columns waterfall. */
 .testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 1.5rem;
+}
+
+.testimonials-grid--masonry {
+  display: block;
   columns: 2;
   column-gap: 1.5rem;
 }
 
 @media (min-width: 1100px) {
-  .testimonials-grid {
+  .testimonials-grid--masonry {
     columns: 3;
   }
+}
+
+.testimonials-grid--masonry .testimonial-card {
+  margin: 0 0 1.5rem;
+  break-inside: avoid;
 }
 
 .testimonial-card {
@@ -1782,8 +1830,6 @@ a.docs-prev-next-item:hover {
   border: 1px solid var(--color-border-light);
   border-radius: var(--radius);
   padding: 1.75rem;
-  margin: 0 0 1.5rem;
-  break-inside: avoid;
   display: flex;
   flex-direction: column;
   gap: 1rem;

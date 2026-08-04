@@ -81,6 +81,7 @@ const productInfoSchema = z.object({
               src: z.string().optional(),
               fallback: z.string().optional(),
               gradient: z.string().optional(),
+              cover: z.boolean().optional(),
             }),
           ])
           .optional(),

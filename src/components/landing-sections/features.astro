@@ -13,7 +13,8 @@
 //   - `icon`: a vector icon - string shorthand (single SVG path d) or an
 //     IconSpec object ({ paths: [...], strokeWidth?, variant: outline|filled }).
 //   - `image`: a MediaSpec (src | fallback+gradient) rendered as a card
-//     thumbnail via Media.astro - the image/illustration variant.
+//     thumbnail via Media.astro; with `cover: true` it becomes a full-card
+//     background layer (bento lead-card treatment) with the text on top.
 // A feature may carry either, neither, or (rarely) both.
 import type { LandingSectionProps } from '../../lib/landing-sections';
 import Media from '../Media.astro';
@@ -24,7 +25,7 @@ type FeatureItem = {
   title: string;
   body: string;
   icon?: string | IconSpec;
-  image?: string | { src?: string; fallback?: string; gradient?: string };
+  image?: string | { src?: string; fallback?: string; gradient?: string; cover?: boolean };
   span?: number;
 };
 const { data, product } = Astro.props as Props;
@@ -56,16 +57,22 @@ void product;
       {features.map((f, i) => {
         const isWide = f.span === 2 || (layout === 'bento' && i === 0 && features.length > 2);
         const icon = toIconSpec(f.icon);
+        const isCover = typeof f.image === 'object' && f.image?.cover === true;
         return (
-          <div class:list={['feature-card', { 'feature-card--wide': isWide, 'feature-card--lead': isWide }]}>
-            {icon && (
+          <div class:list={['feature-card', { 'feature-card--wide': isWide, 'feature-card--lead': isWide, 'feature-card--cover': isCover }]}>
+            {isCover ? (
+              <div class="feature-card-bg" aria-hidden="true">
+                <Media media={f.image} alt="" shape="card" size={320} />
+              </div>
+            ) : icon ? (
               <div class:list={['card-icon', { 'card-icon--lg': isWide }]} aria-hidden="true">
                 <svg {...iconSvgProps(icon)}>
                   {icon.paths.map((d) => <path d={d} />)}
                 </svg>
               </div>
-            )}
-            {f.image && <Media media={f.image} alt={f.title} shape="card" size={isWide ? 96 : 64} />}
+            ) : f.image ? (
+              <Media media={f.image} alt={f.title} shape="card" size={isWide ? 96 : 64} />
+            ) : null}
             <h3>{f.title}</h3>
             <p>{f.body}</p>
           </div>

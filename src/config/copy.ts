@@ -128,6 +128,11 @@ const homeEn = {
   ctaTitle: 'Start your hub',
   ctaBody: 'Fork the template, point it at your domain, and copy an example repo to begin contributing content.',
   ctaGithubOrg: 'View the template on GitHub',
+  homeStatsEyebrow: 'By the numbers',
+  homeStatsTitle: 'Small, fast, focused',
+  homeStatsProducts: 'Products',
+  homeStatsLocales: 'Locales',
+  homeStatsPages: 'Pages built',
 };
 export type HomeCopy = typeof homeEn;
 export const home: Record<Locale, HomeCopy> = {
@@ -169,6 +174,11 @@ export const home: Record<Locale, HomeCopy> = {
     ctaTitle: '开始你的中心',
     ctaBody: '复刻模板,指向你的域名,并复制一个示例仓库即可开始贡献内容。',
     ctaGithubOrg: '在 GitHub 上查看模板',
+    homeStatsEyebrow: '数据一览',
+    homeStatsTitle: '小巧、快速、专注',
+    homeStatsProducts: '产品数',
+    homeStatsLocales: '语言数',
+    homeStatsPages: '构建页数',
   },
 };
 

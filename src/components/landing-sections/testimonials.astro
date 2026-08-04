@@ -14,29 +14,35 @@ import Media from '../Media.astro';
 
 interface Props extends LandingSectionProps {}
 const { data, locale } = Astro.props as Props;
-const items = (Array.isArray(data) ? data : []) as {
-  quote: string;
-  author: string;
-  role: string;
-  avatar?: string | { src?: string; fallback?: string; gradient?: string };
-  rating?: number;
-  company?: string;
-}[];
+const cfg = (data && typeof data === 'object' && !Array.isArray(data) ? data : {}) as {
+  layout?: 'masonry' | 'grid';
+  eyebrow?: string;
+  title?: string;
+  items?: { quote: string; author: string; role: string; avatar?: unknown; rating?: number; company?: string }[];
+};
+const items = Array.isArray(data)
+  ? (data as { quote: string; author: string; role: string; avatar?: unknown; rating?: number; company?: string }[])
+  : cfg.items ?? [];
 if (items.length === 0) return null;
+const layout = cfg.layout ?? 'masonry';
+const eyebrow = cfg.eyebrow;
+const title = cfg.title;
 // Localized header copy for the testimonials block.
 const copy = {
   en: { eyebrow: 'Loved by developers', title: 'What the community says' },
   'zh-Hans': { eyebrow: '开发者口碑', title: '社区怎么说' },
 }[locale] ?? { en: { eyebrow: 'Loved by developers', title: 'What the community says' } }['en'];
+const headerEyebrow = eyebrow ?? copy.eyebrow;
+const headerTitle = title ?? copy.title;
 ---
 
 <section class="section section-alt">
   <div class="container">
     <div class="section-header">
-      <p class="eyebrow">{copy.eyebrow}</p>
-      <h2>{copy.title}</h2>
+      <p class="eyebrow">{headerEyebrow}</p>
+      <h2>{headerTitle}</h2>
     </div>
-    <div class="testimonials-grid">
+    <div class:list={['testimonials-grid', { 'testimonials-grid--masonry': layout === 'masonry' }]}>
       {items.map((t) => (
         <blockquote class="testimonial-card">
           <p class="testimonial-quote">“{t.quote}”</p>

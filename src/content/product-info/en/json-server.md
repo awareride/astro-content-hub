@@ -11,7 +11,9 @@ install: |
 features:
   - title: "Zero-config API"
     body: "Point json-server at a JSON file and get a full REST API with routes, pagination, and filtering instantly."
-    icon: "M3 17l6-6 4 4 8-8"
+    image:
+      gradient: "linear-gradient(135deg, #141413 0%, #2a2a26 100%)"
+      cover: true
   - title: "Standard REST"
     body: "GET, POST, PUT, PATCH, and DELETE work out of the box, with sensible defaults for IDs and relationships."
     icon: "M12 3v12m0 0l-4-4m4 4l4-4"
