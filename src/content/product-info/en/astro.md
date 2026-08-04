@@ -9,10 +9,13 @@ highlights:
 features:
   - title: "Zero JS by default"
     body: "Pages ship as pure HTML with no JavaScript by default — islands add interactivity only where needed."
+    icon: "M13 2L4.5 12.5H11L9.5 22 19 10.5H12.5L13 2z"
   - title: "Content collections"
     body: "Typed Markdown with schema validation, for docs, blogs, and more, out of the box."
+    icon: "M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"
   - title: "Framework agnostic"
     body: "Bring your own UI framework — React, Vue, Svelte, and more — per component."
+    icon: "M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5"
 links:
   - label: "Website"
     href: "https://astro.build"

@@ -9,10 +9,13 @@ highlights:
 features:
   - title: "默认零 JS"
     body: "页面默认以纯 HTML 交付、不携带任何 JavaScript —— 岛屿仅在需要处加入交互。"
+    icon: "M13 2L4.5 12.5H11L9.5 22 19 10.5H12.5L13 2z"
   - title: "内容集合"
     body: "带类型校验的 Markdown,开箱即用,适合文档、博客等场景。"
+    icon: "M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"
   - title: "框架无关"
     body: "自带 UI 框架 —— React、Vue、Svelte 等,按组件接入。"
+    icon: "M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5"
 links:
   - label: "官网"
     href: "https://astro.build"

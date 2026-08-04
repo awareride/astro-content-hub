@@ -2,24 +2,60 @@
 // src/components/landing-sections/features.astro
 // Landing section: feature card grid (product-info `features`).
 // Rendered by ProductLandingDefault via the section registry.
+//
+// Layout variants (data.layout):
+//   - "grid" (default): even auto-fit columns - the classic 3-col icon grid.
+//   - "bento": first card (or one flagged span: 2) spans two columns,
+//     forming a 1-large + 2-small composition; large card gets an accent
+//     treatment (bigger icon, more breathing room) - Linear/Notion style.
+//
+// Each feature may carry an optional `icon` (a single SVG path `d` string,
+// 24x24 stroke style, matching the .card-icon pattern on the home page).
 import type { LandingSectionProps } from '../../lib/landing-sections';
 
 interface Props extends LandingSectionProps {}
 const { data, product } = Astro.props as Props;
-const features = (Array.isArray(data) ? data : []) as { title: string; body: string }[];
+const cfg = (data && typeof data === 'object' && !Array.isArray(data) ? data : {}) as {
+  layout?: 'grid' | 'bento';
+  eyebrow?: string;
+  title?: string;
+  items?: { title: string; body: string; icon?: string; span?: number }[];
+};
+const features = Array.isArray(data)
+  ? (data as { title: string; body: string; icon?: string; span?: number }[])
+  : cfg.items ?? [];
 if (features.length === 0) return null;
+const layout = cfg.layout ?? 'grid';
+const eyebrow = cfg.eyebrow ?? null;
+const title = cfg.title ?? null;
 void product;
 ---
 
 <section class="section">
   <div class="container">
-    <div class="feature-grid">
-      {features.map((f) => (
-        <div class="feature-card">
-          <h3>{f.title}</h3>
-          <p>{f.body}</p>
-        </div>
-      ))}
+    {title && (
+      <div class="section-header">
+        {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+        <h2>{title}</h2>
+      </div>
+    )}
+    <div class:list={['feature-grid', { 'feature-grid--bento': layout === 'bento' }]}>
+      {features.map((f, i) => {
+        const isWide = f.span === 2 || (layout === 'bento' && i === 0 && features.length > 2);
+        return (
+          <div class:list={['feature-card', { 'feature-card--wide': isWide, 'feature-card--lead': isWide }]}>
+            {f.icon && (
+              <div class:list={['card-icon', { 'card-icon--lg': isWide }]} aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d={f.icon} />
+                </svg>
+              </div>
+            )}
+            <h3>{f.title}</h3>
+            <p>{f.body}</p>
+          </div>
+        );
+      })}
     </div>
   </div>
 </section>

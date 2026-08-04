@@ -11,10 +11,13 @@ install: |
 features:
   - title: "零配置 API"
     body: "将 json-server 指向一个 JSON 文件,即可即时获得带路由、分页与过滤的完整 REST API。"
+    icon: "M3 17l6-6 4 4 8-8"
   - title: "标准 REST"
     body: "GET、POST、PUT、PATCH、DELETE 开箱即用,对 ID 与关联关系有合理的默认处理。"
+    icon: "M12 3v12m0 0l-4-4m4 4l4-4"
   - title: "自定义路由"
     body: "可定义自定义路由与中间件,为原型或演示塑造 API 行为。"
+    icon: "M4 5h16M4 12h16M4 19h10"
 links:
   - label: "官网"
     href: "https://json-server.typicode.com"
@@ -25,13 +28,22 @@ links:
 sections:
   - type: hero
   - type: highlights
+    data:
+      variant: badge
   - type: install
   - type: features
+    data:
+      layout: bento
+      eyebrow: "为什么选择 json-server"
+      title: "为原型而生"
   - type: stats
     data:
-      - { label: "GitHub Stars", value: "58k" }
-      - { label: "npm 周下载量", value: "1.2M" }
-      - { label: "许可证", value: "MIT" }
+      eyebrow: "数据一览"
+      title: "被全球团队广泛采用"
+      items:
+        - { label: "GitHub Stars", value: "58k" }
+        - { label: "npm 周下载量", value: "1.2M" }
+        - { label: "许可证", value: "MIT" }
   - type: testimonials
     data:
       - quote: "json-server 让我们一个下午就把原型跑起来了。"

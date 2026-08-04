@@ -11,10 +11,13 @@ install: |
 features:
   - title: "Zero-config API"
     body: "Point json-server at a JSON file and get a full REST API with routes, pagination, and filtering instantly."
+    icon: "M3 17l6-6 4 4 8-8"
   - title: "Standard REST"
     body: "GET, POST, PUT, PATCH, and DELETE work out of the box, with sensible defaults for IDs and relationships."
+    icon: "M12 3v12m0 0l-4-4m4 4l4-4"
   - title: "Custom routes"
     body: "Define custom routes and middleware to shape the API for your prototype or demo."
+    icon: "M4 5h16M4 12h16M4 19h10"
 links:
   - label: "Website"
     href: "https://json-server.typicode.com"
@@ -25,13 +28,22 @@ links:
 sections:
   - type: hero
   - type: highlights
+    data:
+      variant: badge
   - type: install
   - type: features
+    data:
+      layout: bento
+      eyebrow: "Why json-server"
+      title: "Built for prototyping"
   - type: stats
     data:
-      - { label: "GitHub Stars", value: "58k" }
-      - { label: "npm weekly downloads", value: "1.2M" }
-      - { label: "License", value: "MIT" }
+      eyebrow: "By the numbers"
+      title: "Adopted by teams everywhere"
+      items:
+        - { label: "GitHub Stars", value: "58k" }
+        - { label: "npm weekly downloads", value: "1.2M" }
+        - { label: "License", value: "MIT" }
   - type: testimonials
     data:
       - quote: "json-server got our prototype off the ground in an afternoon."

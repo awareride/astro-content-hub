@@ -217,7 +217,7 @@ export interface ProductInfoSection {
 export interface ProductInfo {
   tagline: string;
   description: string;
-  features: { title: string; body: string }[];
+  features: { title: string; body: string; icon?: string; span?: number }[];
   install?: string;
   highlights: { label: string; value: string }[];
   links: { label: string; href: string }[];
