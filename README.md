@@ -306,8 +306,9 @@ export const site = {
       { title: { en: 'Connect', 'zh-Hans': '联系' }, items: [
         { label: { en: 'GitHub', 'zh-Hans': 'GitHub' }, href: 'https://github.com', external: true },
       ]},
-      // Auto-generated Products column; `limit` caps how many show, and a
-      // "All products" link to /products appears when there are more.
+      // Auto-generated Products column (featured products by default);
+      // `limit` caps how many show, and a "All products" link to /products
+      // appears when there are more. `all: true` lists every product.
       { type: 'products', limit: 5 },
     ],
   },
@@ -320,8 +321,10 @@ export const site = {
   on any page whose path contains one (a dropdown lights up when any child
   matches). Labels are per-locale (`Record<Locale, string>`).
 - `footer.links` entries: a custom column is `{ title, items }`; the Products
-  column is `{ type: 'products', limit? }` (omit `limit` to list every
-  product). The footer renders columns in array order after the brand block.
+  column is `{ type: 'products', all?, limit? }` - it lists featured products
+  by default (`all: true` for every product); `limit` caps the list and a
+  "All products" link to /products appears when there are more. The footer
+  renders columns in array order after the brand block.
 - All internal hrefs are auto-prefixed with the locale/base; use absolute
   `https://...` for external links.
 

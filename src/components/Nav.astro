@@ -4,11 +4,12 @@
 // page composes <Nav /> without passing a locale prop. Links are prefixed
 // with the current locale (default locale has no prefix).
 //
-// Desktop: logo ... [Posts][Products ▾ (featured products)][GitHub][locale][theme]
-// Mobile (<= 768px): a borderless hamburger toggles a full-screen overlay
-// panel with spacious, large links; the Products dropdown renders as an
-// always-visible nested list. The locale switcher stays in the header bar,
-// left of the hamburger, so it is reachable without opening the menu.
+// Desktop: logo ... [Posts][Products ▾][custom links ▾][GitHub CTA][locale][theme]
+// Custom entries come from site.config.ts `site.nav.links` (plain links or
+// dropdowns). Mobile (<= 768px): a borderless hamburger toggles a full-screen
+// overlay; dropdown panels are collapsed by default and toggle via the
+// trigger. The locale switcher stays in the header bar, left of the
+// hamburger, so it is reachable without opening the menu.
 import { localeFromPath, localizePath, withBase, stripBase, t, siteName, defaultLocale, type Locale } from '../lib/i18n';
 import { products, site } from '../../site.config';
 import LocaleSwitcher from './LocaleSwitcher.astro';
@@ -70,6 +71,7 @@ const isNavLinkActive = (l: (typeof navLinks)[number]): boolean =>
             <button
               type="button"
               class="nav-dropdown-trigger"
+              aria-haspopup="menu"
               aria-expanded="false"
               aria-controls="nav-products-panel"
             >
@@ -100,6 +102,7 @@ const isNavLinkActive = (l: (typeof navLinks)[number]): boolean =>
                 <button
                   type="button"
                   class="nav-dropdown-trigger"
+                  aria-haspopup="menu"
                   aria-expanded="false"
                   aria-controls={`nav-link-panel-${i}`}
                 >
@@ -186,25 +189,45 @@ const isNavLinkActive = (l: (typeof navLinks)[number]): boolean =>
       if (!header.contains(e.target as Node)) setOpen(false);
     });
 
-    // Nav dropdowns (Products + any custom dropdown links). On mobile the
-    // panels are always visible, so toggling is a no-op there. Each dropdown
-    // opens/closes independently.
+    // Nav dropdowns (Products + any custom dropdown links). Desktop: opens
+    // on hover/click (hover is pure CSS); mobile: the panel is collapsed by
+    // default and toggles open via click. Each dropdown is independent.
+    // Keyboard: Enter/Space on the trigger toggles; Escape closes and
+    // returns focus to the trigger; Tab moves into the panel when open.
     header.querySelectorAll<HTMLElement>('.nav-dropdown').forEach((dropdown) => {
       const trigger = dropdown.querySelector<HTMLButtonElement>('.nav-dropdown-trigger');
-      if (!trigger) return;
+      const panel = dropdown.querySelector<HTMLElement>('.nav-dropdown-panel');
+      if (!trigger || !panel) return;
+      trigger.setAttribute('aria-haspopup', 'menu');
       const setDropdownOpen = (open: boolean) => {
         dropdown.classList.toggle('nav-dropdown-open', open);
         trigger.setAttribute('aria-expanded', String(open));
+        if (open) panel.style.visibility = 'visible';
+        else panel.style.visibility = '';
       };
+      // Click toggles (works on desktop and mobile).
       trigger.addEventListener('click', (e) => {
         e.stopPropagation();
         setDropdownOpen(!dropdown.classList.contains('nav-dropdown-open'));
       });
+      // Open on Enter/Space (keyboard parity with click).
+      trigger.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          e.stopPropagation();
+          setDropdownOpen(!dropdown.classList.contains('nav-dropdown-open'));
+        }
+      });
+      // Close on outside click.
       document.addEventListener('click', (e) => {
         if (!dropdown.contains(e.target as Node)) setDropdownOpen(false);
       });
+      // Close on Escape and return focus to the trigger.
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') setDropdownOpen(false);
+        if (e.key === 'Escape' && dropdown.classList.contains('nav-dropdown-open')) {
+          setDropdownOpen(false);
+          trigger.focus();
+        }
       });
     });
   }

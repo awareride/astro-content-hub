@@ -79,10 +79,12 @@ export type FooterColumn =
     }
   | {
       type: 'products';
-      /** Optional cap on how many products render in this column. When
-       *  products exceed the limit, a trailing "All products" link to the
-       *  /products catalog is shown (the catalog always lists everything).
-       *  Omit for an uncapped column. */
+      /** Which products this column lists. Defaults to featured-only, matching
+       *  the nav Products dropdown. Set `all: true` to list every product.
+       *  `limit` caps how many render (featured or all); when products exceed
+       *  the limit a trailing "All products" link to the /products catalog is
+       *  shown. */
+      all?: boolean;
       limit?: number;
     };
 
@@ -109,11 +111,9 @@ export const site = {
     ] as NavLink[],
   },
   // Footer columns. Each renders as one column after the brand block.
-  // `showProducts` toggles the auto-generated Products column (from the
-  // footer columns. Each renders as one column after the brand block.
   // A custom column is a titled list of links; { type: 'products' } renders
-  // the auto-generated Products column (from the products registry) at that
-  // position. Omit it to hide the Products column entirely.
+  // the auto-generated Products column (featured products by default,
+  // `all: true` for every product). Omit it to hide the Products column.
   footer: {
     links: [
       {
