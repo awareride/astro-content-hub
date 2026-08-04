@@ -288,10 +288,23 @@ All resolved by the human on 2026-08-04:
 
 ## 8. Execution log
 
-- **Phase 1 (section system core)** — status: in progress.
-- **Phase 2 (social proof)** — pending.
-- **Phase 3 (content preview & CTA funnel)** — pending (home preview scoped).
-- **Phase 4 (FAQ & completion)** — pending (`maintenance` dropped).
+- **Phase 1 (section system core)** — COMPLETE, committed `5e4825e`.
+- **Phase 2 (social proof)** — COMPLETE, committed `2e0c5fb` (stats,
+  testimonials).
+- **Phase 3 (content preview & CTA funnel)** — COMPLETE, committed `8224d22`
+  (docs-preview, cta overrides; home preview block left scoped/undone per
+  review).
+- **Phase 4 (FAQ & completion)** — COMPLETE, committed `cd1341e` (faq,
+  breadcrumb, astro + astro-content-hub product-info; `maintenance` badge
+  dropped per review). Also fixed a renderer bug found during Phase 4: an
+  explicit `- type: cta` double-rendered with the auto-appended CTA and the
+  curated overview landed after the CTA - declared sections are now split
+  into pre-CTA body + closing CTA, overview always sits before the CTA.
+
+All phases verified: `npm run validate:content` 0/0/0, `npm run build`
+(65 pages) 0 errors, `npm run check:examples` consistent, dist spot-checks
+per phase. All committed locally on `main` - **not pushed** (push is the
+human's step). Awaiting human review of the full diff.
 
 ---
 
