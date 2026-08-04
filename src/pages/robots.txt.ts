@@ -16,6 +16,8 @@ export function GET(context: APIContext) {
   const body = `User-agent: *
 Allow: /
 
+# Machine-readable corpus for AI tools: /llms.txt (index) and /llms-full.txt (full text).
+
 Sitemap: ${sitemap}
 `;
   return new Response(body, {

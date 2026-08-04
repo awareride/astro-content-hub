@@ -24,6 +24,8 @@ export interface MarkdownHeading {
 }
 export interface PostEntryLike {
   id: string;
+  /** Raw markdown body (glob loader exposes it); used by the llms.txt corpus builders. */
+  body?: string;
   data: {
     title: string; date: Date; description: string; tags: string[];
     author?: string; source?: string; draft?: boolean;
