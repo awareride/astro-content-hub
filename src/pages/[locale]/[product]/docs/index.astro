@@ -21,7 +21,11 @@ export function getStaticPaths() {
 const { product, locale } = Astro.props;
 const basePath = localizePath(`/${product}/docs`, locale);
 const page = await getLocalizedDocIndex(product, locale, basePath);
-if (!page) return Astro.redirect(withBase(basePath));
+// Resolve the redirect target outside the `return` so astro check counts
+// `withBase` as used (refs inside a frontmatter `return` are ignored by the
+// checker — see withastro/astro#14684).
+const redirectTarget = withBase(basePath);
+if (!page || !redirectTarget) return Astro.redirect(redirectTarget);
 const { Content, title, description, navItems, isFallback, headings } = page;
 const alternates = buildAlternates(`/${product}/docs`);
 ---
