@@ -48,10 +48,25 @@ sections:
     data:
       - quote: "json-server 让我们一个下午就把原型跑起来了。"
         author: "陈晓雅"
-        role: "前端工程师,Nimbus"
+        role: "前端工程师"
+        company: "Nimbus"
+        rating: 5
+        avatar:
+          github: "n8n-io"
       - quote: "为教程和演示 mock 后端的最快方式。"
         author: "李宇飞"
         role: "技术写作"
+        company: "OpenLab"
+        rating: 4
+        avatar:
+          github: "torvalds"
+      - quote: "它用一个 JSON 文件就替换了我们内部的 mock 服务。"
+        author: "金诺亚"
+        role: "QA 负责人"
+        company: "Broadleaf"
+        rating: 5
+        avatar:
+          github: "dev-bobsong"
   - type: docs-preview
   - type: faq
     data:

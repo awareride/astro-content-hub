@@ -200,7 +200,13 @@ export interface ProductInfoEntryLike {
   data: {
     tagline: string;
     description: string;
-    features: { title: string; body: string }[];
+    features: {
+      title: string;
+      body: string;
+      icon?: string | { paths: string[]; strokeWidth?: number; variant?: 'outline' | 'filled' };
+      image?: string | { src?: string; fallback?: string; gradient?: string };
+      span?: number;
+    }[];
     install?: string;
     highlights: { label: string; value: string }[];
     links: { label: string; href: string }[];
@@ -217,7 +223,13 @@ export interface ProductInfoSection {
 export interface ProductInfo {
   tagline: string;
   description: string;
-  features: { title: string; body: string; icon?: string; span?: number }[];
+  features: {
+    title: string;
+    body: string;
+    icon?: string | { paths: string[]; strokeWidth?: number; variant?: 'outline' | 'filled' };
+    image?: string | { src?: string; fallback?: string; gradient?: string };
+    span?: number;
+  }[];
   install?: string;
   highlights: { label: string; value: string }[];
   links: { label: string; href: string }[];

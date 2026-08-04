@@ -69,7 +69,24 @@ const productInfoSchema = z.object({
   tagline: z.string(),
   description: z.string(),
   features: z
-    .array(z.object({ title: z.string(), body: z.string(), icon: z.string().optional(), span: z.number().optional() }))
+    .array(
+      z.object({
+        title: z.string(),
+        body: z.string(),
+        icon: z.union([z.string(), z.object({ paths: z.array(z.string()), strokeWidth: z.number().optional(), variant: z.enum(['outline', 'filled']).optional() })]).optional(),
+        image: z
+          .union([
+            z.string(),
+            z.object({
+              src: z.string().optional(),
+              fallback: z.string().optional(),
+              gradient: z.string().optional(),
+            }),
+          ])
+          .optional(),
+        span: z.number().optional(),
+      }),
+    )
     .default([]),
   install: z.string().optional(),
   highlights: z.array(z.object({ label: z.string(), value: z.string() })).default([]),

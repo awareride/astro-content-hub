@@ -1,14 +1,27 @@
 ---
 // src/components/landing-sections/testimonials.astro
 // Landing section: social-proof quote cards. Data is a list of
-// { quote, author, role } declared in product-info frontmatter under the
-// `testimonials` section type. Renders a centered header + responsive grid
-// of quote cards (styles in global.css).
+// { quote, author, role, avatar?, rating?, company? } declared in
+// product-info frontmatter under the `testimonials` section type.
+//
+// `avatar` uses the shared media model (src | fallback+gradient), rendered
+// as a round chip by Media.astro - the zero-asset treatment needs no image
+// files. Optional extra fields: `rating` (1-5, renders star glyphs) and
+// `company` (a one-line org label under the role). All optional - a card
+// works with just quote + author.
 import type { LandingSectionProps } from '../../lib/landing-sections';
+import Media from '../Media.astro';
 
 interface Props extends LandingSectionProps {}
 const { data, locale } = Astro.props as Props;
-const items = (Array.isArray(data) ? data : []) as { quote: string; author: string; role: string }[];
+const items = (Array.isArray(data) ? data : []) as {
+  quote: string;
+  author: string;
+  role: string;
+  avatar?: string | { src?: string; fallback?: string; gradient?: string };
+  rating?: number;
+  company?: string;
+}[];
 if (items.length === 0) return null;
 // Localized header copy for the testimonials block.
 const copy = {
@@ -28,9 +41,21 @@ const copy = {
         <blockquote class="testimonial-card">
           <p class="testimonial-quote">“{t.quote}”</p>
           <footer class="testimonial-author">
-            <span class="testimonial-name">{t.author}</span>
-            <span class="testimonial-role">{t.role}</span>
+            {t.avatar && (
+              <Media media={t.avatar} alt={t.author} shape="round" size={44} />
+            )}
+            <div class="testimonial-author-text">
+              <span class="testimonial-name">{t.author}</span>
+              {t.company && <span class="testimonial-company">{t.company}</span>}
+              <span class="testimonial-role">{t.role}</span>
+            </div>
           </footer>
+          {t.rating && t.rating > 0 && (
+            <p class="testimonial-rating" aria-label={`${t.rating} out of 5`}>
+              {'★'.repeat(Math.min(5, t.rating))}
+              {'☆'.repeat(Math.max(0, 5 - Math.min(5, t.rating)))}
+            </p>
+          )}
         </blockquote>
       ))}
     </div>

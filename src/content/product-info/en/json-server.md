@@ -48,10 +48,25 @@ sections:
     data:
       - quote: "json-server got our prototype off the ground in an afternoon."
         author: "Ada Chen"
-        role: "Frontend Engineer, Nimbus"
+        role: "Frontend Engineer"
+        company: "Nimbus"
+        rating: 5
+        avatar:
+          github: "n8n-io"
       - quote: "The fastest way to mock a backend for tutorials and demos."
         author: "Marcus Lee"
         role: "Tech Writer"
+        company: "OpenLab"
+        rating: 4
+        avatar:
+          github: "torvalds"
+      - quote: "It replaced our in-house mock service with a single JSON file."
+        author: "Noah Kim"
+        role: "QA Lead"
+        company: "Broadleaf"
+        rating: 5
+        avatar:
+          github: "dev-bobsong"
   - type: docs-preview
   - type: faq
     data:

@@ -9,13 +9,19 @@ highlights:
 features:
   - title: "默认零 JS"
     body: "页面默认以纯 HTML 交付、不携带任何 JavaScript —— 岛屿仅在需要处加入交互。"
-    icon: "M13 2L4.5 12.5H11L9.5 22 19 10.5H12.5L13 2z"
+    icon:
+      paths:
+        - "M13 2L4.5 12.5H11L9.5 22 19 10.5H12.5L13 2z"
   - title: "内容集合"
     body: "带类型校验的 Markdown,开箱即用,适合文档、博客等场景。"
-    icon: "M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"
+    image:
+      fallback: "MD"
+      gradient: "linear-gradient(135deg, #2a9d8f 0%, #1f7a6f 100%)"
   - title: "框架无关"
     body: "自带 UI 框架 —— React、Vue、Svelte 等,按组件接入。"
-    icon: "M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5"
+    icon:
+      paths:
+        - "M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5"
 links:
   - label: "官网"
     href: "https://astro.build"
@@ -24,13 +30,44 @@ links:
 sections:
   - type: hero
   - type: highlights
+    data:
+      variant: card
+      eyebrow: "核心信息"
+      title: "开源、开箱即用"
   - type: install
   - type: features
+    data:
+      layout: grid
+      eyebrow: "为什么选择 Astro"
+      title: "为内容而生,而非配置"
   - type: stats
     data:
       - { label: "GitHub Stars", value: "48k" }
       - { label: "npm 周下载量", value: "900k" }
       - { label: "许可证", value: "MIT" }
+  - type: testimonials
+    data:
+      - quote: "Astro 几乎没花什么力气就让我们的文档站明显更快了。"
+        author: "Priya Sharma"
+        role: "平台工程师"
+        company: "Atlas"
+        rating: 5
+        avatar:
+          fallback: "PS"
+      - quote: "内容集合正是我们把博客迁过来的原因。"
+        author: "Tom Nguyen"
+        role: "创始人"
+        company: "Dune"
+        rating: 5
+        avatar:
+          fallback: "TN"
+      - quote: "默认零 JS 是一种真正不同的发布思路。"
+        author: "Sofia Reyes"
+        role: "前端负责人"
+        company: "Halcyon"
+        rating: 4
+        avatar:
+          fallback: "SR"
   - type: docs-preview
   - type: faq
     data:

@@ -9,20 +9,33 @@
 //     forming a 1-large + 2-small composition; large card gets an accent
 //     treatment (bigger icon, more breathing room) - Linear/Notion style.
 //
-// Each feature may carry an optional `icon` (a single SVG path `d` string,
-// 24x24 stroke style, matching the .card-icon pattern on the home page).
+// Visual anchors per feature (via the shared media model):
+//   - `icon`: a vector icon - string shorthand (single SVG path d) or an
+//     IconSpec object ({ paths: [...], strokeWidth?, variant: outline|filled }).
+//   - `image`: a MediaSpec (src | fallback+gradient) rendered as a card
+//     thumbnail via Media.astro - the image/illustration variant.
+// A feature may carry either, neither, or (rarely) both.
 import type { LandingSectionProps } from '../../lib/landing-sections';
+import Media from '../Media.astro';
+import { toIconSpec, iconSvgProps, type IconSpec } from '../../lib/media';
 
 interface Props extends LandingSectionProps {}
+type FeatureItem = {
+  title: string;
+  body: string;
+  icon?: string | IconSpec;
+  image?: string | { src?: string; fallback?: string; gradient?: string };
+  span?: number;
+};
 const { data, product } = Astro.props as Props;
 const cfg = (data && typeof data === 'object' && !Array.isArray(data) ? data : {}) as {
   layout?: 'grid' | 'bento';
   eyebrow?: string;
   title?: string;
-  items?: { title: string; body: string; icon?: string; span?: number }[];
+  items?: FeatureItem[];
 };
 const features = Array.isArray(data)
-  ? (data as { title: string; body: string; icon?: string; span?: number }[])
+  ? (data as FeatureItem[])
   : cfg.items ?? [];
 if (features.length === 0) return null;
 const layout = cfg.layout ?? 'grid';
@@ -42,15 +55,17 @@ void product;
     <div class:list={['feature-grid', { 'feature-grid--bento': layout === 'bento' }]}>
       {features.map((f, i) => {
         const isWide = f.span === 2 || (layout === 'bento' && i === 0 && features.length > 2);
+        const icon = toIconSpec(f.icon);
         return (
           <div class:list={['feature-card', { 'feature-card--wide': isWide, 'feature-card--lead': isWide }]}>
-            {f.icon && (
+            {icon && (
               <div class:list={['card-icon', { 'card-icon--lg': isWide }]} aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d={f.icon} />
+                <svg {...iconSvgProps(icon)}>
+                  {icon.paths.map((d) => <path d={d} />)}
                 </svg>
               </div>
             )}
+            {f.image && <Media media={f.image} alt={f.title} shape="card" size={isWide ? 96 : 64} />}
             <h3>{f.title}</h3>
             <p>{f.body}</p>
           </div>
