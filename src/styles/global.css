@@ -1729,21 +1729,6 @@ a.docs-prev-next-item:hover {
   color: var(--color-text-secondary);
 }
 
-/* --- Product hero breadcrumb --- */
-.product-breadcrumb {
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
-  margin-bottom: 1.25rem;
-}
-
-.product-breadcrumb a {
-  color: var(--color-text-secondary);
-  transition: color var(--transition);
-}
-
-.product-breadcrumb a:hover {
-  color: var(--color-text);
-}
 
 /* --- Usage Section --- */
 .usage-grid {

@@ -228,8 +228,11 @@ example (`primary: Get Started -> /json-server/docs/`) in the same file.
 Goal: fill remaining trust/decision gaps, product-agnostic.
 
 11. **`faq` section** — accordion (details/summary, no JS) or plain list.
-12. **Breadcrumb on product hero** — `Home / <product>` (mirrors docs
-    breadcrumb pattern) so users can navigate back without the nav.
+12. **Breadcrumb on product hero** — DROPPED during review: the product
+    landing is a top-level page (no deeper level), so `Home / <product>` was
+    a false hierarchy - redundant with the nav logo and visual noise. The
+    real depth (docs pages) already has breadcrumbs in DocsLayout. Removed
+    (ProductBreadcrumb.astro + .product-breadcrumb styles).
 13. **fill missing product-info** — add `product-info` for `astro` and
     `astro-content-hub` (en + zh-Hans) so every product's landing is rich and
     consistent — kills the vite/astro quality gap. Mock data by definition
