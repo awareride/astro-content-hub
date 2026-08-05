@@ -9,7 +9,8 @@
 // This module wraps that bundle behind a small API used by SearchModal.astro:
 //   - scoped search: pass `scope` ('' | 'posts' | 'docs' | 'products') and it
 //     is merged into every query as a Pagefind filter, so the results are
-//     confined to the selected content type.
+//     confined to the selected content type. An optional `productScope`
+//     (e.g. 'product:vite') narrows the docs scope to a single product.
 //   - locale isolation: Pagefind keeps one index per language (keyed on the
 //     page's <html lang>). init() delegates to pagefind.init() which loads the
 //     index matching the current page's language, so search on a /zh-Hans/...
@@ -20,6 +21,20 @@
 
 /** Content-type scopes available in the search UI. '' = entire index. */
 export type SearchScope = '' | 'posts' | 'docs' | 'products';
+
+/** Scope chips that narrow to a single product: docs of that product only. */
+export type ProductScope = `product:${string}`;
+
+/**
+ * Active search context. `scope` is the content-type pill; `productScope`
+ * (when set) further narrows that scope to one product's docs — the
+ * page-derived default on a `/docs` page, matching GitHub's repo-scoped
+ * search. Merged into every Pagefind query as filters.
+ */
+export interface SearchContext {
+  scope: SearchScope;
+  productScope?: ProductScope;
+}
 
 /** Localized copy the modal renders with (injected from Astro frontmatter). */
 export interface SearchCopy {
@@ -129,13 +144,14 @@ function debounce<A extends unknown[], R>(
 export const search = debounce(
   async (
     term: string,
-    scope: SearchScope,
+    context: SearchContext,
     opts: { signal?: AbortSignal } = {},
   ): Promise<SearchResult[] | null> => {
     if (!term.trim()) return [];
     const pf = await ensurePagefind();
     if (opts.signal?.aborted) return null;
-    const filters = scope ? { scope } : undefined;
+    const { scope, productScope } = context;
+    const filters = scope ? { scope, ...(productScope ? { product: productScope.slice('product:'.length) } : {}) } : undefined;
     const res = await pf.search(term, { filters });
     if (opts.signal?.aborted) return null;
     const results = await Promise.all(

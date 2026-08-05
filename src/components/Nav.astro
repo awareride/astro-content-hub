@@ -41,6 +41,20 @@ const featured = products.filter((p) => p.featured);
 const onProductsPage = segs[0] === 'products';
 const onProductPage = products.some((p) => p.slug === currentSlug);
 const productsActive = onProductsPage || onProductPage;
+
+// GitHub-style search scope: derive the initial scope from the page the user
+// is on. 'posts' on a blog article, 'docs' (narrowed to the current product's
+// docs) on a product docs page, 'products' on the catalog or a product
+// landing, otherwise All.
+const initialSearchScope = segs.includes('docs')
+  ? 'docs'
+  : segs[0] === 'posts'
+    ? 'posts'
+    : onProductsPage || onProductPage
+      ? 'products'
+      : '';
+// The product whose docs the current page belongs to, when it is one.
+const currentDocProduct = segs.includes('docs') && currentSlug ? currentSlug : undefined;
 // Resolve a nav link href: internal links are base- and locale-prefixed,
 // external links (http) are used as-is.
 const navLinkHref = (l: { href?: string }) =>
@@ -162,6 +176,8 @@ const isNavLinkActive = (l: (typeof navLinks)[number]): boolean =>
             { value: 'docs', label: ui.searchScopeDocs },
             { value: 'products', label: ui.searchScopeProducts },
           ]}
+          initialScope={initialSearchScope}
+          initialProduct={currentDocProduct}
         />
         <div class="nav-locale">
           <LocaleSwitcher alternates={alternates} current={locale} />
