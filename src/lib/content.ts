@@ -6,6 +6,20 @@
 import { getCollection, render } from 'astro:content';
 import { defaultLocale, collectionSuffix, type Locale } from './i18n';
 import { buildNav, type NavItem } from './docs';
+import {
+  tagSlug,
+  tagsOfEntries,
+  filterEntriesByTagSlug,
+  relatedEntries,
+  type TagInfo,
+  type TagPostEntry,
+} from './tags';
+
+// Re-export the pure tag helpers so existing consumers importing them from
+// './content' (TagPage.astro, post routes) keep working unchanged. The
+// implementations now live in ./tags, which is unit-testable standalone.
+export { tagSlug, tagsOfEntries, filterEntriesByTagSlug, relatedEntries };
+export type { TagInfo, TagPostEntry };
 
 /** Minimal entry shape consumed by helpers and route files. We use this instead of
  *  `CollectionEntry<string>` (which collapses `data` to `never`) because the
@@ -367,51 +381,16 @@ export async function renderLocalizedPost(
 // ---------------------------------------------------------------------------
 // Tags - aggregate over the localized-posts set (incl. fallback), so a tag
 // page lists every post a reader would see on /posts, regardless of whether a
-// localized version exists. Tag slugs are normalized (lowercase, kebab-case,
-// ASCII) so `i18n` / `meta-architecture` are stable, display-friendly URLs.
+// localized version exists. The pure logic (tagSlug, aggregation, related-post
+// ranking) lives in ./tags; this module wires it to the localized-posts set.
 // ---------------------------------------------------------------------------
-
-/** Normalize a tag into a URL-safe slug (lowercase, kebab-case, ASCII-only).
- *  Mirrors the slug a reader can type, and keeps tags that share text on the
- *  same page across locales (ASCII tags collapse onto one page). */
-export function tagSlug(tag: string): string {
-  return tag
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
-
-export interface TagInfo {
-  /** URL slug for the tag page. */
-  slug: string;
-  /** Original (display) tag text, from the first post that used it. */
-  label: string;
-  /** Number of posts with this tag (in this locale, incl. fallback). */
-  count: number;
-}
 
 /** Every tag across the localized-posts set (incl. fallback), with counts.
  *  The label shown is from the first post encountered that uses the tag, so it
  *  reflects the locale's own wording when present. */
 export async function getAllTags(locale: Locale): Promise<TagInfo[]> {
   const posts = await getLocalizedPosts(locale);
-  const map = new Map<string, TagInfo>();
-  for (const { entry } of posts) {
-    for (const tag of entry.data.tags) {
-      const slug = tagSlug(tag);
-      const existing = map.get(slug);
-      if (existing) {
-        existing.count += 1;
-      } else {
-        map.set(slug, { slug, label: tag, count: 1 });
-      }
-    }
-  }
-  // Most-used first, then alphabetical by label for a stable order.
-  return [...map.values()].sort(
-    (a, b) => b.count - a.count || a.label.localeCompare(b.label),
-  );
+  return tagsOfEntries(posts.map(({ entry }) => entry));
 }
 
 /** Posts that carry a given tag (by slug), in the given locale (with fallback).
@@ -420,11 +399,16 @@ export async function getPostsByTag(
   locale: Locale,
   tag: string,
 ): Promise<{ entry: PostEntryLike; isFallback: boolean }[]> {
-  const slug = tagSlug(tag);
   const posts = await getLocalizedPosts(locale);
-  return posts
-    .filter(({ entry }) => entry.data.tags.some((t) => tagSlug(t) === slug))
-    .sort((a, b) => b.entry.data.date.getTime() - a.entry.data.date.getTime());
+  const slug = tagSlug(tag);
+  const isFallbackById = new Map(posts.map((p) => [p.entry.id, p.isFallback]));
+  return filterEntriesByTagSlug(
+    posts.map(({ entry }) => entry),
+    slug,
+  ).map((entry) => ({
+    entry: entry as PostEntryLike,
+    isFallback: isFallbackById.get(entry.id) ?? false,
+  }));
 }
 
 /** Up to `limit` posts sharing the most tags with `slug`, excluding itself.
@@ -436,17 +420,14 @@ export async function getRelatedPosts(
   limit = 3,
 ): Promise<{ entry: PostEntryLike; isFallback: boolean }[]> {
   const posts = await getLocalizedPosts(locale);
-  const current = posts.find((p) => p.entry.id === slug);
-  const currentTags = current
-    ? new Set(current.entry.data.tags.map(tagSlug))
-    : new Set<string>();
-  const others = posts.filter((p) => p.entry.id !== slug);
-  return others
-    .map((p) => ({
-      p,
-      score: p.entry.data.tags.filter((t) => currentTags.has(tagSlug(t))).length,
-    }))
-    .sort((a, b) => b.score - a.score || b.p.entry.data.date.getTime() - a.p.entry.data.date.getTime())
-    .slice(0, limit)
-    .map(({ p }) => p);
+  const related = relatedEntries(
+    posts.map(({ entry }) => entry),
+    slug,
+    limit,
+  );
+  const byId = new Map(posts.map((p) => [p.entry.id, p.isFallback]));
+  return related.map((entry) => ({
+    entry: entry as PostEntryLike,
+    isFallback: byId.get(entry.id) ?? false,
+  }));
 }
