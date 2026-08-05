@@ -177,11 +177,20 @@ pre.astro-code code {
 }
 
 /* Right cluster of the header: nav menu (desktop inline / mobile overlay),
-   locale switcher, and hamburger. They share a single flex gap. */
+   search, locale switcher, theme toggle, and hamburger. They share a single
+   flex gap. */
 .nav-right {
   display: flex;
   align-items: center;
   gap: 1.5rem;
+}
+
+/* Search + locale + theme sit together; the search trigger collapses to an
+   icon-only button before the locale switcher does, so the two never collide. */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .nav-menu {
@@ -413,6 +422,28 @@ pre.astro-code code {
   font-weight: 600;
   color: var(--color-text);
   background: var(--color-accent-subtle);
+}
+
+@media (max-width: 960px) {
+  /* Mid-size: the nav menu still fits, but the search trigger's label + kbd
+     (~130px) would push the right cluster past the viewport. Collapse the
+     trigger to icon-only here; it expands again on very wide screens. */
+  .search-open-label,
+  .search-open-kbd {
+    display: none;
+  }
+  .search-open {
+    padding: 0.4rem 0.6rem;
+  }
+}
+
+/* Lock background scroll while the search modal is open (SearchModal adds
+   .search-open-lock to <html> on open, removes on close). Stops the page
+   behind the dialog from scrolling — including wheel chaining past the end
+   of the results list. */
+html.search-open-lock,
+html.search-open-lock body {
+  overflow: hidden;
 }
 
 /* --- Theme toggle (in nav) --- */
@@ -2321,6 +2352,19 @@ a.docs-prev-next-item:hover {
     margin: 0;
   }
 
+  /* On mobile the header bar holds logo + search + locale + theme +
+     hamburger. Search collapses to icon-only (label hidden) so it fits next
+     to the locale switcher without overlapping. The locale switcher text is
+     also hidden below 480px (see the media query further down). */
+  .search-open-label,
+  .search-open-kbd {
+    display: none;
+  }
+
+  .nav-actions {
+    gap: 0.4rem;
+  }
+
   /* On mobile the header bar holds logo + locale switcher + theme toggle +
      hamburger. Hide the wordmark (keep the logo mark) so the bar doesn't get
      crowded on narrow screens, and tighten the right cluster's gap. */
@@ -2363,5 +2407,14 @@ a.docs-prev-next-item:hover {
   }
   .article {
     padding: 2.5rem 1.25rem;
+  }
+
+  /* Very narrow screens: hide the locale label, keep the globe icon, so
+     search + locale + theme fit in the header bar without overlap. */
+  .locale-switcher-btn > span:not(.locale-switcher-globe) {
+    display: none;
+  }
+  .locale-switcher-btn {
+    padding: 0.4rem 0.5rem;
   }
 }

@@ -14,6 +14,7 @@ import { localeFromPath, localizePath, withBase, stripBase, t, siteName, default
 import { products, site } from '../../site.config';
 import LocaleSwitcher from './LocaleSwitcher.astro';
 import ThemeToggle from './ThemeToggle.astro';
+import SearchModal from './SearchModal.astro';
 
 export interface Props {
   alternates?: Partial<Record<Locale, string>>;
@@ -144,10 +145,29 @@ const isNavLinkActive = (l: (typeof navLinks)[number]): boolean =>
           {ui.ctaGitHub}
         </a>
       </nav>
-      <div class="nav-locale">
-        <LocaleSwitcher alternates={alternates} current={locale} />
+      <div class="nav-actions">
+        <SearchModal
+          placeholder={ui.searchPlaceholder}
+          hint={ui.searchHint}
+          noResults={ui.searchNoResults}
+          loading={ui.searchLoading}
+          error={ui.searchError}
+          resultsFor={ui.searchResultsFor}
+          matchCount={ui.searchMatchCount}
+          matchCountPlural={ui.searchMatchCountPlural}
+          openLabel={ui.searchOpen}
+          scopes={[
+            { value: '', label: ui.searchScopeAll },
+            { value: 'posts', label: ui.searchScopePosts },
+            { value: 'docs', label: ui.searchScopeDocs },
+            { value: 'products', label: ui.searchScopeProducts },
+          ]}
+        />
+        <div class="nav-locale">
+          <LocaleSwitcher alternates={alternates} current={locale} />
+        </div>
+        <ThemeToggle />
       </div>
-      <ThemeToggle />
       <button
         class="nav-toggle"
         type="button"

@@ -61,7 +61,7 @@ const nextDoc = navIdx >= 0 && navIdx < navItems.length - 1 ? navItems[navIdx + 
 <Layout title={title} description={description} locale={locale} alternates={alternates} productSlug={productSlug}>
   <Nav alternates={alternates} />
 
-  <main>
+  <main data-pagefind-body>
     <div class="docs-page">
       <aside class="docs-sidebar" id="docs-sidebar">
         <button
@@ -100,8 +100,8 @@ const nextDoc = navIdx >= 0 && navIdx < navItems.length - 1 ? navItems[navIdx + 
             <a href={homeHref}>{ui.home}</a> / <a href={localizedProductHref}>{productName}</a> / <span>{title}</span>
           </div>
 
-          <article class="prose">
-            <h1>{title}</h1>
+          <article class="prose" data-pagefind-filter="scope:docs">
+            <h1 data-pagefind-filter={productSlug ? `product:${productSlug}` : undefined}>{title}</h1>
             {isFallback && ui.fallbackNotice && (
               <p class="fallback-notice" role="note">{ui.fallbackNotice}</p>
             )}

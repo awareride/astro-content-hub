@@ -30,7 +30,8 @@ const Override = getProductLanding(product.slug);
 <Layout title={product.name} description={c.metaDescription.replace('{name}', product.name)} locale={locale} alternates={alternates} productSlug={product.slug}>
   <Nav alternates={alternates} />
 
-  <main>
+  <main data-pagefind-body data-pagefind-filter="scope:products">
+    <span data-pagefind-filter={`product:${product.slug}`} hidden aria-hidden="true"></span>
     {Override ? (
       <Override product={product} locale={locale} c={c} docsHref={docsHref} />
     ) : (
