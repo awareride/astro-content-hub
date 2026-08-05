@@ -25,6 +25,8 @@ for how that works.
   from a separate repository via the PR-based sync Action.
 - [Deployment](./deployment.md) — point the template at
   GitHub Pages and/or Cloudflare Pages.
+- [Upgrading](./upgrading.md) — update a rebranded fork to a new template
+  release with minimal migration (git merge + `npm run check:upstream`).
 
 ## Why this template
 

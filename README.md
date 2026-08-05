@@ -485,6 +485,7 @@ mirror in [`docs/zh-Hans/`](./docs/zh-Hans)). It is also rendered on the live si
 | [Authoring content](./docs/en/authoring.md) | Write posts and docs in the hub: i18n, slug contract, fallback, adding a product/locale. |
 | [Content sync](./docs/en/content-sync.md) | Contribute content from a separate repo via the PR-based sync Action. |
 | [Deployment](./docs/en/deployment.md) | Point the template at GitHub Pages and/or Cloudflare Pages. |
+| [Upgrading](./docs/en/upgrading.md) | Update a rebranded fork to a new template release with minimal migration (`git merge` + `npm run check:upstream`). |
 
 The [`skills/site-content/SKILL.md`](./skills/site-content/SKILL.md) file is a
 condensed authoring reference for working inside a hub repo.

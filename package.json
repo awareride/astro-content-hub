@@ -11,6 +11,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "validate:content": "node skills/site-content/scripts/validate-hub-content.mjs",
+    "check:upstream": "node scripts/check-upstream.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "sync:examples": "node scripts/sync-examples.mjs",

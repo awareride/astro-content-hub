@@ -22,6 +22,8 @@ order: 0
   Action 从独立仓库贡献内容。
 - [部署](./deployment.md) —— 将模板指向 GitHub Pages
   和/或 Cloudflare Pages。
+- [升级](./upgrading.md) —— 以最少迁移将 rebrand 后的 fork
+  更新到新模板版本(git merge + `npm run check:upstream`)。
 
 ## 为何选择此模板
 

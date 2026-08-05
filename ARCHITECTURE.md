@@ -36,6 +36,7 @@ discussion.
 | Routes | `src/pages/**` | thin delegation to `lib/` (en routes + universal `[locale]/` routes) |
 | Authoring contract | `skills/site-content/SKILL.md` | per-hub content authoring skill |
 | Template CI | `.github/workflows/deploy.yml` | build + GitHub Pages / Cloudflare Pages deploy |
+| Upgrade guard | `scripts/check-upstream.mjs` | Machinery drift guard: byte-compares contract files against the latest release tag so adopters know if an upgrade merge is routine or needs reconciliation (see UPGRADING.md) |
 
 ## Your site (edit to rebrand)
 
@@ -68,6 +69,7 @@ discussion.
 | Add a language | `src/lib/i18n.ts` (`locales` + `localeLabel`/`localeCode`) and add the locale tables in `src/config/copy.ts` | Machinery + Your site |
 | Change the look | `src/components/*`, `src/styles/*` | Your site |
 | Fix routing / fallback behavior | `src/lib/content.ts`, `src/lib/i18n.ts`, `src/pages/**` | Machinery |
+| Upgrade a fork to a new release | `npm run check:upstream` + merge `upstream/<tag>` (see UPGRADING.md) | Machinery (tooling) |
 | Custom landing for one product | `src/components/product-landing/<slug>.astro` | Extensions |
 | Theme one product | `src/styles/product-themes/<slug>.css` + barrel line | Extensions |
 | Rich auto landing data | `src/content/product-info/<locale>/<slug>.md` | Extensions |
@@ -96,6 +98,7 @@ discussion.
 ## Related docs
 
 - `AGENTS.md` - conduct, git/deploy boundaries, coding conventions
+- `UPGRADING.md` - how adopters update a rebranded fork to a new release
 - `THEMING.md` - theming (site theme, per-product themes, `data-product`)
 - `README.md` - what the template is + quick start
 - `skills/site-content/SKILL.md` - authoring content inside the hub
