@@ -145,32 +145,28 @@ const {
   // and vh units are measured against the full layout viewport — so without
   // this the results list would run behind the keyboard on a real phone
   // (desktop device emulation has no keyboard and cannot reproduce it).
-  // The baseline is captured on open, when the modal is fully visible.
   let modalMaxHeight: number | null = null;
-  let modalBaseline: number | null = null;
 
   function syncModalMaxHeight() {
-    if (!isOpen) return; // no-op when the modal is hidden
-    if (window.visualViewport) {
-      const vv = window.visualViewport;
-      if (modalBaseline === null) modalBaseline = vv.height;
-      if (modalMaxHeight !== Math.round(vv.height)) {
-        modalMaxHeight = Math.round(vv.height);
-        rootEl.style.setProperty('--search-modal-maxh', `${modalMaxHeight}px`);
-      }
-    } else {
-      // No visualViewport support: fall back to the layout viewport, which is
-      // the same viewport CSS units use — no change in behaviour.
-      const h = Math.round(window.innerHeight);
-      if (modalMaxHeight !== h) {
-        modalMaxHeight = h;
-        rootEl.style.setProperty('--search-modal-maxh', `${h}px`);
-      }
+    // Mobile-only (narrow viewport). On desktop the CSS 70vh cap already fits;
+    // overriding it with the full window height would make the panel taller.
+    if (!isOpen || !window.matchMedia('(max-width: 768px)').matches) return;
+    const available = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    // The panel sits inside the modal's padded box, so its max height is the
+    // visible height MINUS the modal's own vertical padding. Padding values
+    // are read from computed style so env(safe-area-inset-bottom) (the Android
+    // home-indicator inset) and the vh paddings resolve to px automatically.
+    const cs = getComputedStyle(rootEl);
+    const padTop = parseFloat(cs.paddingTop) || 0;
+    const padBottom = parseFloat(cs.paddingBottom) || 0;
+    const maxh = Math.max(0, Math.round(available - padTop - padBottom));
+    if (modalMaxHeight !== maxh) {
+      modalMaxHeight = maxh;
+      rootEl.style.setProperty('--search-modal-maxh', `${maxh}px`);
     }
   }
 
   function resetModalMaxHeight() {
-    modalBaseline = null;
     modalMaxHeight = null;
     rootEl.style.removeProperty('--search-modal-maxh');
   }
@@ -323,7 +319,8 @@ const {
     setScope('');
     input.focus();
     // Size the modal against the current visual viewport BEFORE the input
-    // focus brings the keyboard up (the baseline must be keyboard-free).
+    // focus brings the keyboard up (the measured height must be keyboard-free
+    // so the keyboard's later shrink leaves the panel above it).
     syncModalMaxHeight();
     // Push a history entry so back (gesture/key) closes the modal instead of
     // navigating away. Must happen after the modal is shown.
@@ -678,7 +675,7 @@ const {
 
   @media (max-width: 768px) {
     .search-modal {
-      padding: 2vh 0.5rem 1rem;
+      padding: 2vh 0.5rem calc(1rem + env(safe-area-inset-bottom, 0px));
       /* Keep the panel hugging its content: `stretch` would force it to fill
          the viewport height even with no results (the modal looked full-
          screen when empty). The body scrolls within max-height below. */
