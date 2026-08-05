@@ -68,6 +68,68 @@ draft: false                                 # 可选;草稿会被排除
 4. 运行 `npm run build`。无需改动路由 —— 默认路由(`src/pages/posts/...`)
    与通用非默认路由(`src/pages/[locale]/posts/...`)已服务所有语言。
 
+## Markdown 中的交互
+
+普通 `.md` 文件就能承载真正的交互:直接写在 Markdown 里的 `<script>` 标签会
+原样输出并在浏览器中执行。这是给 docs 与 posts 添加交互的**推荐**方式 ——
+包括从外部仓库同步的内容,因为交互就住在内容文件本身(自包含,无需 hub
+侧代码、无需框架)。
+
+### 你能做什么
+
+参考页 [`docs/en/interactive-md.md`](./interactive-md.md)(渲染于
+`/astro-content-hub/docs/interactive-md/`)演示了这些模式,全部带可复制的
+源码:
+
+| 能力 | 模式 | 参考 |
+|-----------|---------|-----------|
+| **按钮** | `onclick` 处理器修改 `<span>` | 计数器(增 / 减 / 加倍 / 重置) |
+| **标签页** | 标签栏 + 面板,用 class 切换 | npm / pnpm / yarn 面板 |
+| **图标** | 内联 SVG,静态或点击切换 | 太阳 ↔ 月亮切换 |
+| **图表** | JS 函数生成数据,画成 SVG | 随机游走折线/柱状图,可重新生成 |
+
+任何能表达为 DOM 读写 + 数学的事情都可以做:表单校验、计算器、带排序的
+数据表、简单的可视化。脚本是纯 JS —— 无模块、无框架、无构建步骤。
+
+### 模式
+
+一个带 `onclick` 的按钮,加一小段修改页面的脚本:
+
+```html
+<button class="btn btn-secondary" onclick="myCounter('plus')">+</button>
+<span id="my-counter">0</span>
+
+<script>
+  var n = 0;
+  function myCounter(action) {
+    if (action === 'plus') n++;
+    document.getElementById('my-counter').textContent = String(n);
+  }
+</script>
+```
+
+### 最佳实践(由中心的内容校验强制)
+
+- **自包含**:样式与脚本都在 `.md` 文件里;给 class/id 加前缀(如 `demo-`
+  或你的产品 slug)避免冲突。
+- **无外部请求**:避免 `fetch`/`XMLHttpRequest`、`eval` 与 cookie 访问 ——
+  中心的 review 与校验会把关。
+- **末尾放一个 `<script>`** 定义所有函数,而非散落的内联处理器。
+- **复用中心的 CSS 类**(`btn`、`btn-primary`、`btn-secondary`),让控件
+  与站点一致;只为自定义部分加一个小 `<style>` 块。
+
+## Markdown 与 MDX(最小支持)
+
+模板在 docs 与 posts 中也接受 **`.mdx`** —— 可导入组件的 Markdown。模板
+**不内置组件库**;支持 `.mdx` 是为了让你可以:
+
+- 在 `.mdx` 文件里写纯 Markdown 内容(与 `.md` 完全一样);
+- 为更丰富的交互导入**你自己的** `.astro` 组件(MDX 集成注册了 `.mdx`
+  内容类型;import 相对于文件解析)。
+
+交互式文档请优先使用带内联 `<script>` 的纯 `.md`(更简单、无需 import、
+处处可用)。只有当你确实需要在内容页中嵌入组件时,才用 `.mdx`。
+
 ## 为已有产品编写文档
 
 文档位于 `src/content/docs/<product>/<locale>/`。产品来自 `products` 数组

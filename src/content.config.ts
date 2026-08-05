@@ -36,7 +36,7 @@ function makeDocCollections(): Record<string, ReturnType<typeof defineCollection
       const dir = `${baseDir}/${locale}`;
       if (!hasDocDir(product.slug, product.base, locale)) continue; // no docs for this locale
       out[`${product.slug}Docs${collectionSuffix(locale)}`] = defineCollection({
-        loader: glob({ pattern: '**/*.md', base: dir }),
+        loader: glob({ pattern: '**/*.{md,mdx}', base: dir }),
         schema: docSchema,
       });
     }

@@ -81,6 +81,75 @@ which lists every post carrying that tag. Tag slugs are ASCII-normalized
 page. Heading anchors (`id` attributes on h1-h4) are generated automatically,
 so you can deep-link to any section.
 
+## Interactivity in Markdown
+
+Plain `.md` files can host real interactivity: a `<script>` tag written
+directly in the Markdown is shipped verbatim and runs in the browser. This is
+the **recommended** way to add interaction to docs and posts — including
+content synced from external repositories, because the interaction lives
+inside the content file itself (self-contained, no hub-side code, no
+framework).
+
+### What you can do
+
+The reference page [`docs/en/interactive-md.md`](./interactive-md.md)
+(rendered at `/astro-content-hub/docs/interactive-md/`) demonstrates the
+patterns, all with copy-paste source:
+
+| Capability | Pattern | Reference |
+|-----------|---------|-----------|
+| **Buttons** | `onclick` handler mutating a `<span>` | counter (increment / decrement / double / reset) |
+| **Tabs** | tab bar + panels toggled by class | npm / pnpm / yarn panels |
+| **Icons** | inline SVG, static or swapped on click | sun ↔ moon toggle |
+| **Charts** | JS function generates data, drawn as SVG | random-walk line/bar chart, re-rollable |
+
+Anything expressible as DOM reads/writes and math works: form validation,
+calculators, data tables with sorting, simple visualizations. The script is
+plain JS — no modules, no framework, no build step.
+
+### The pattern
+
+A button with an `onclick`, plus a small script that mutates the page:
+
+```html
+<button class="btn btn-secondary" onclick="myCounter('plus')">+</button>
+<span id="my-counter">0</span>
+
+<script>
+  var n = 0;
+  function myCounter(action) {
+    if (action === 'plus') n++;
+    document.getElementById('my-counter').textContent = String(n);
+  }
+</script>
+```
+
+### Best practices (enforced by the hub's content validation)
+
+- **Self-contained**: styles and scripts live in the `.md` file; prefix
+  classes/ids (e.g. `demo-` or your product slug) to avoid collisions.
+- **No external requests**: avoid `fetch`/`XMLHttpRequest`, `eval`, and
+  cookie access — the hub's review and validation gate this.
+- **One `<script>` at the end** defining all functions, rather than scattered
+  inline handlers.
+- **Reuse the hub's CSS classes** (`btn`, `btn-primary`, `btn-secondary`) so
+  controls match the site; add a small `<style>` block for custom bits.
+
+## Markdown & MDX (minimal)
+
+The template also accepts **`.mdx`** in docs and posts — Markdown that can
+import components. The template ships **no built-in component library**;
+`.mdx` is supported so you can:
+
+- write plain Markdown content in an `.mdx` file (works exactly like `.md`);
+- import your **own** `.astro` components for richer interactivity (the MDX
+  integration registers the `.mdx` content type; imports resolve relative to
+  the file).
+
+For interactive docs, prefer plain `.md` with inline `<script>` (simpler, no
+imports, works everywhere). Use `.mdx` only when you genuinely need to embed
+a component in a content page.
+
 ## Docs for an existing product
 
 Docs live in `src/content/docs/<product>/<locale>/`. Products come from the
