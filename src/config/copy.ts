@@ -245,3 +245,34 @@ export const productCopy: Record<Locale, ProductCopy> = {
     ctaSecondary: '阅读文档',
   },
 };
+
+/** Organization copy - the front door of the hub. This is the *organization's*
+ *  story (who you are, what you build, how to reach you), shown on the landing
+ *  page's mission section and available to any page that wants an org intro.
+ *  Rebrand by editing THIS block; per-locale like every other copy table. */
+const orgEn = {
+  eyebrow: 'The Organization',
+  title: 'Who we are',
+  mission:
+    'We build open-source developer tools and documentation in the open. Every project in this hub ships its own docs and product page — and everything lands here through a reviewed pull request.',
+  linksLabel: 'Connect',
+  links: [
+    { label: 'GitHub', href: 'https://github.com' },
+    { label: 'Contact', href: 'https://github.com/awareride/astro-content-hub/issues' },
+  ],
+};
+export type OrgCopy = typeof orgEn;
+export const org: Record<Locale, OrgCopy> = {
+  en: orgEn,
+  'zh-Hans': {
+    eyebrow: '组织',
+    title: '我们是谁',
+    mission:
+      '我们以开放方式构建开源开发者工具与文档。本中心里的每个项目都自带文档与产品页 —— 而所有内容都通过经审阅的拉取请求汇聚到这里。',
+    linksLabel: '联系我们',
+    links: [
+      { label: 'GitHub', href: 'https://github.com' },
+      { label: '联系我们', href: 'https://github.com/awareride/astro-content-hub/issues' },
+    ],
+  },
+};

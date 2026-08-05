@@ -602,6 +602,23 @@ html.search-open-lock body {
   font-size: 1.05rem;
 }
 
+/* --- Org mission (front door) ---
+   Reuses .section-header; the lead is a bit roomier and the link row centers
+   below it. All tokens come from global.css - no new colors here. */
+.mission-lead {
+  max-width: 720px;
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+.mission-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
 /* --- Cards Grid --- */
 .cards-grid {
   display: grid;

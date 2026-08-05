@@ -95,5 +95,5 @@ export const localeCode: Record<Locale, string> = {
 // src/config/copy.ts - edit that file to rebrand. Re-exported here so every
 // existing `from './i18n'` import keeps working unchanged.
 // ---------------------------------------------------------------------------
-export { siteName, t, home, productCopy } from '../config/copy';
-export type { UIStrings, HomeCopy, ProductCopy } from '../config/copy';
+export { siteName, t, home, productCopy, org } from '../config/copy';
+export type { UIStrings, HomeCopy, ProductCopy, OrgCopy } from '../config/copy';

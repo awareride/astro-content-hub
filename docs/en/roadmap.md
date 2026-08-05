@@ -4,10 +4,9 @@ description: "A phased plan to close the gaps between the current template and i
 order: 5
 ---
 
-> This page is a **plan**, not a promise. It captures the gaps between where
-> the template is today and where the [vision](./vision.md) says it should go,
-> ordered by value. Each phase is a self-contained chunk that can be done,
-> reviewed, and shipped on its own. Nothing here is implemented yet.
+> This page is a **plan** that tracks implementation. Each phase is a
+> self-contained chunk that was (or will be) done, reviewed, and shipped on
+> its own. A ✓ next to a phase means it is merged.
 
 ## Why this roadmap exists
 
@@ -24,12 +23,35 @@ it — but two gaps keep it from *feeling* like the vision:
    promises "write docs, get a good-looking page" — today that is only true
    once a product also ships a `product-info` file (or a custom landing).
 
-## Phase 1 — Org front door (highest value, smallest surface)
+## Phase 1 — Org front door (highest value, smallest surface) ✅ DONE
 
 **Goal:** the landing page introduces the *organization*, not just the
 products.
 
-### Tasks
+**Status:** merged. Implemented as:
+
+- `src/config/copy.ts` gains an `org` block (`eyebrow`, `title`, `mission`,
+  `linksLabel`, `links`), per-locale like every other copy table.
+- Both landings (`src/pages/index.astro` and its `[locale]/` twin) render a
+  **#mission** section between the hero and the latest posts: eyebrow, title,
+  mission lead, and a centered link row.
+- The copy is re-exported from `src/lib/i18n.ts` (the single import surface
+  for copy), so no page needs to import from `config/copy` directly.
+- Styles reuse the existing `.section-header`/`.eyebrow`/`.btn` primitives;
+  only `.mission-lead` and `.mission-links` were added to `global.css`.
+
+All of it lives in the "Your site" tier (`copy.ts` + landing pages + one
+style block) — no Machinery changes.
+
+### Acceptance
+
+- ✓ Landing page shows org mission and links from `copy.ts`, localized
+  (both locales render the mission section in the hero → mission → posts
+  order).
+- ✓ Changing the `org` block in `copy.ts` updates the landing without
+  touching components.
+
+### Tasks (as originally scoped)
 
 - Add an `org` block to `src/config/copy.ts`:
   `name`, `tagline`, `mission`, `cta` (label + href), `links` (GitHub, contact,
@@ -41,12 +63,6 @@ products.
   only. Product landings stay product-focused.
 - Keep everything in the "Your site" tier: `copy.ts` + `index.astro` are
   instance files. No Machinery changes required.
-
-### Acceptance
-
-- Landing page shows org mission and links from `copy.ts`, localized.
-- Changing the `org` block in `copy.ts` updates the landing without touching
-  components.
 
 ## Phase 2 — Stronger default product landing
 

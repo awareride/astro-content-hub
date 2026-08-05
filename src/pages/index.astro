@@ -7,10 +7,11 @@ import Footer from '../components/Footer.astro';
 import PostCard from '../components/PostCard.astro';
 import Media from '../components/Media.astro';
 import { getLocalizedPosts } from '../lib/content';
-import { home, localizePath, withBase, buildAlternates, locales } from '../lib/i18n';
+import { home, org, localizePath, withBase, buildAlternates, locales } from '../lib/i18n';
 import { products } from '../../site.config';
 
 const c = home.en;
+const o = org.en;
 const items = await getLocalizedPosts('en');
 const latestPosts = items
   .sort((a, b) => b.entry.data.date.getTime() - a.entry.data.date.getTime())
@@ -38,6 +39,24 @@ const alternates = buildAlternates('/');
             {c.ctaGithub}
           </a>
           <a href={withBase(localizePath('/astro-content-hub/docs', 'en'))} class="btn btn-secondary">{c.ctaProjects}</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mission: the organization's front door (driven by the `org` block in copy.ts) -->
+    <section id="mission" class="section">
+      <div class="container">
+        <div class="section-header">
+          <p class="eyebrow">{o.eyebrow}</p>
+          <h2>{o.title}</h2>
+          <p class="section-lead mission-lead">{o.mission}</p>
+        </div>
+        <div class="mission-links">
+          {o.links.map((link: { label: string; href: string }) => (
+            <a href={link.href} class="btn btn-secondary" target={link.href.startsWith('http') ? '_blank' : undefined} rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}>
+              {link.label}
+            </a>
+          ))}
         </div>
       </div>
     </section>
