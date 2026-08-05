@@ -17,7 +17,12 @@ const { title, description, ogImage, locale = defaultLocale, alternates = {}, pr
 // Per-product theme axis: when set, <html data-product="<slug>"> lets a
 // product-themes/<slug>.css override the same color tokens. Omitted on
 // non-product pages so the site theme applies untouched.
-const htmlAttrs = { ...(productSlug ? { 'data-product': productSlug } : {}) };
+const htmlAttrs = {
+  ...(productSlug ? { 'data-product': productSlug } : {}),
+  // Deploy base the Pagefind bundle is served from; read by the search module
+  // at runtime (see lib/search.ts) to locate base/pagefind/pagefind.js.
+  'data-search-base': withBase('/'),
+};
 const fullTitle = title === siteName ? title : `${title} - ${siteName}`;
 const site = Astro.site?.toString().replace(/\/$/, '') ?? '';
 const abs = (p: string) => (p.startsWith('http') ? p : `${site}${p}`);
