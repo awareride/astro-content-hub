@@ -22,6 +22,13 @@ interface Props {
   matchCount?: string; // '{n}' placeholder
   matchCountPlural?: string; // '{n}' placeholder (plural form)
   scopes: { value: SearchScope; label: string }[];
+  /** Page-derived scope selected when the modal opens ('' = All, 'docs' with
+   *  `initialProduct` narrows to that product's docs). Optional — falls back
+   *  to All, keeping the default behavior when not provided. */
+  initialScope?: SearchScope;
+  /** Product the initialScope applies to (e.g. 'vite'), rendered as a
+   *  secondary chip label. Only meaningful when initialScope is 'docs'. */
+  initialProduct?: string;
   openLabel?: string;
 }
 
@@ -35,6 +42,8 @@ const {
   matchCount,
   matchCountPlural,
   scopes,
+  initialScope,
+  initialProduct,
   openLabel = 'Open search',
 } = Astro.props;
 
@@ -63,6 +72,8 @@ const {
   data-search-match-count={matchCount}
   data-search-match-count-plural={matchCountPlural}
   data-search-error={error}
+  data-search-initial-scope={initialScope}
+  data-search-initial-product={initialProduct}
 >
   <div class="search-modal-backdrop" data-search-backdrop></div>
   <div class="search-modal-panel" role="document">
@@ -72,6 +83,18 @@ const {
           <circle cx="11" cy="11" r="7" />
           <path d="M21 21l-4.35-4.35" />
         </svg>
+        {initialScope === 'docs' && initialProduct && (
+          <button
+            type="button"
+            class="search-product-chip"
+            data-search-product={initialProduct}
+            aria-pressed="true"
+            title="Click to clear the product filter"
+          >
+            <span class="search-product-chip-dot" aria-hidden="true"></span>
+            <span class="search-product-chip-label">{initialProduct}</span>
+          </button>
+        )}
         <input
           type="search"
           class="search-modal-input"
@@ -119,6 +142,8 @@ const {
     search,
     preload,
     type SearchScope,
+    type SearchContext,
+    type ProductScope,
   } from '../lib/search';
 
   const root = document.querySelector<HTMLElement>('[data-search-modal]');
@@ -194,6 +219,13 @@ const {
   }
 
   let activeScope: SearchScope = '';
+  // Page-derived product scope (e.g. 'product:vite') when the modal opened on
+  // a docs page; empty otherwise. Selecting a non-docs pill clears it.
+  let initialProductScope: ProductScope | undefined;
+  // Set when the user clears the product chip during this session; while set,
+  // re-entering the docs scope does NOT re-adopt the product narrowing (the
+  // chip stays off until the user toggles it back).
+  let chipCleared = false;
   let highlighted = -1;
   let lastQuery = '';
   let isOpen = false;
@@ -202,6 +234,20 @@ const {
   // the page. The flag marks the pushed entry; popstate from that entry
   // closes the modal without another push.
   let pushedState = false;
+
+  // Compute the initial context from the current page: 'posts' on a blog
+  // article, 'docs' (narrowed to the current product's docs when present) on
+  // a docs page, 'products' on the catalog or a product landing, '' otherwise
+  // — GitHub-style "search within what you're looking at". The Nav bakes the
+  // values into the markup at build time.
+  const initialScope = (root.dataset.searchInitialScope ?? '') as SearchScope;
+  const initialProduct = root.dataset.searchInitialProduct;
+  const initialContext: SearchContext = {
+    scope: initialScope,
+    ...(initialScope === 'docs' && initialProduct
+      ? { productScope: `product:${initialProduct}` as ProductScope }
+      : {}),
+  };
 
   // Localized copy — injected from the Astro frontmatter.
   const copy = {
@@ -217,7 +263,35 @@ const {
   function setScope(scope: SearchScope) {
     activeScope = scope;
     scopeBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.searchScope === scope)));
+    syncProductChipVisibility();
     if (isOpen && input.value.trim()) runSearch(input.value);
+  }
+
+  /** A product-scoped chip ('docs · vite') is a toggle for the current
+   *  product filter: click to clear it (back to all docs), click again to
+   *  restore. A type pill ('docs') re-adopts the page-derived product scope
+   *  unless the chip was manually cleared; any other pill clears the product
+   *  filter (it only applies to docs). */
+  function setScopeWithProduct(scope: SearchScope, productScope?: ProductScope) {
+    if (scope === 'docs') {
+      if (productScope && productScope !== initialProductScope) {
+        // Re-entering docs from another pill: restore the page-derived
+        // product scope (unless the chip was cleared during this session).
+        if (!chipCleared) initialProductScope = productScope;
+      }
+    } else {
+      initialProductScope = undefined;
+    }
+    setScope(scope);
+  }
+
+  /** Set the initial context on first open (also used by the docs chip when
+   *  its current product filter was cleared). */
+  function setInitialContext() {
+    activeScope = initialContext.scope;
+    initialProductScope = initialContext.productScope;
+    chipCleared = false;
+    scopeBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.searchScope === initialContext.scope)));
   }
 
   function esc(s: string) {
@@ -229,7 +303,8 @@ const {
   function runSearch(term: string) {
     lastQuery = term;
     highlighted = -1;
-    search(term, activeScope)
+    const context: SearchContext = { scope: activeScope, productScope: initialProductScope };
+    search(term, context)
       .then((results) => {
         if (lastQuery !== term || !isOpen) return; // stale
         renderResults(term, results);
@@ -316,7 +391,7 @@ const {
     highlighted = -1;
     statusEl.textContent = '';
     resultsEl.innerHTML = '';
-    setScope('');
+    setInitialContext();
     input.focus();
     // Size the modal against the current visual viewport BEFORE the input
     // focus brings the keyboard up (the measured height must be keyboard-free
@@ -400,7 +475,25 @@ const {
     }
   });
 
-  scopeBtns.forEach((b) => b.addEventListener('click', () => setScope(b.dataset.searchScope as SearchScope)));
+  scopeBtns.forEach((b) => b.addEventListener('click', () => setScopeWithProduct(b.dataset.searchScope as SearchScope)));
+
+  const productChip = root.querySelector<HTMLButtonElement>('[data-search-product]');
+  function syncProductChipVisibility() {
+    // The product chip only applies to the docs scope; hide it under
+    // Posts/Products/All so it never implies a filter that isn't active.
+    if (productChip) productChip.hidden = activeScope !== 'docs';
+  }
+  productChip?.addEventListener('click', () => {
+    // Toggle the product filter: on -> off (all docs), off -> on (restore
+    // the page-derived product scope). aria-pressed mirrors the state so the
+    // chip is a clear on/off control, not a one-way disable.
+    const on = initialProductScope != null;
+    initialProductScope = on ? undefined : initialContext.productScope;
+    chipCleared = !on; // a manual clear sticks until the chip is toggled back
+    productChip.setAttribute('aria-pressed', String(initialProductScope != null));
+    setScope('docs');
+    if (input.value.trim()) runSearch(input.value);
+  });
 
   // Clear (×) button: visible only while there is input.
   const syncClear = () => { clearBtn.hidden = !input.value; };
@@ -589,6 +682,47 @@ const {
     background: var(--color-bg-dark);
     color: var(--color-on-dark);
     border-color: var(--color-bg-dark);
+  }
+  .search-product-chip {
+    /* Inline scope chip inside the search input row (GitHub style): fixed
+       left position, the input text starts after it and scrolls beneath it
+       as it grows — the chip is not compressed (flex: none, min-width: 0 on
+       the input). */
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.12rem 0.5rem;
+    border: 1px solid var(--color-accent);
+    border-radius: 100px;
+    background: var(--color-accent-subtle);
+    color: var(--color-accent);
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1.3;
+    cursor: pointer;
+    transition: color var(--transition), background var(--transition), border-color var(--transition);
+  }
+  .search-product-chip:hover {
+    background: var(--color-accent);
+    color: var(--color-on-dark);
+  }
+  .search-product-chip[aria-pressed='false'] {
+    opacity: 0.55;
+    text-decoration: line-through;
+  }
+  .search-product-chip-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    flex: none;
+  }
+  .search-product-chip-label {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .search-modal-hint {
     margin-top: 0.5rem;
