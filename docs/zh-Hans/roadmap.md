@@ -56,12 +56,35 @@ Machinery 改动。
 - 一切都在 "Your site" 层:`copy.ts` + `index.astro` 都是实例文件。
   不需要改 Machinery。
 
-## 阶段 2 — 更强的默认产品落地页
+## 阶段 2 — 更强的默认产品落地页 ✅ 已完成
 
 **目标:** 只有**文档**的产品也能得到像样的产品页;提供 `product-info`
 的产品得到更好的页面 —— 除写内容外零额外工作。
 
-### 现状
+**状态:** 已合并。实现为:
+
+- `ProductLandingDefault.astro` 的回退分支(无 `product-info`)现在直接从
+  `Product` 注册表条目渲染真正的产品页:**hero**(名称 + 本地化
+  `description` 导语 + 文档/仓库按钮)、**徽章**(highlight-badge 信任条)、
+  **关于** section(description + 阅读文档/查看源码)、以及 CTA。只注册
+  (且可选地提供文档)的产品现在也能得到像样的页面 —— 无需任何
+  `product-info`,"写文档,得页面"的承诺成立。
+- `product-info` 路径不变(仍是经由区块注册表的丰富落地页);回退升级
+  纯粹是增量。
+- `docs/en/authoring.md`(及 zh-Hans)现在记录三级解析:自定义覆盖 →
+  `product-info` 结构化落地页 → 注册表回退,并在"添加一个新产品"下新增
+  "product-info 文件"小节。
+
+### 验收
+
+- ✓ 只注册(文档可选)的产品渲染出的页面读起来是产品 —— hero 带描述
+  导语、徽章、关于、CTA(已用临时无 `product-info` 产品验证;双语都渲染)。
+- ✓ `product-info` 文件成为通往丰富页面的、有文档的路径(authoring.md
+  现在解释了这条阶梯)。
+- ✓ 对现有产品无破坏性变更(所有示例产品保持 `product-info` 驱动的落地页;
+  构建保持 0 错误 / 0 警告)。
+
+### 现状(改动前)
 
 - 默认(`ProductLandingDefault.astro`):极简 hero + 文档链接 + 仓库链接。
   读起来像文档索引。
@@ -69,7 +92,7 @@ Machinery 改动。
   features、install、highlights)。
 - 有自定义覆盖:`src/components/product-landing/<slug>.astro`。
 
-### 任务
+### 任务(最初范围)
 
 - **升级默认落地页**(`ProductLandingDefault.astro`),利用 `Product`
   注册表已有的 `description`、`badges`、`logo`,渲染真正的产品卡 ——
@@ -81,11 +104,12 @@ Machinery 改动。
   更新 `docs/en/authoring.md` 说明:"有文档 → 好页面;加 product-info →
   更好页面。"
 
-### 验收
+### 范围说明
 
-- 只有文档的产品渲染出的页面读起来是产品,而不是文档索引。
-- `product-info` 文件成为通往丰富页面的、有文档、有样例的路径。
-- 对现有产品无破坏性变更。
+- 最初的"把 product-info 提升为推荐默认"任务通过**在 authoring.md 中
+  文档化阶梯**解决,而不是给 `Product` 接口加 `landing:` 字段 —— 保持
+  Machinery 接口稳定(对采用者更少破坏性变更)。示例产品已全部携带
+  `product-info` 文件,因此无需改动示例内容。
 
 ## 阶段 3 — 定位与文档
 

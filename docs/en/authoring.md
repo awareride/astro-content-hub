@@ -130,6 +130,23 @@ The only authoring task that touches config:
 3. Routes are automatic (product pages are dynamic). Run `npm run build` and
    verify `/mytool/docs/` and `/zh-Hans/mytool/docs/` render.
 
+### product-info files
+
+A registered product renders a **rich landing** automatically once it ships a
+structured `product-info` file per locale:
+
+```
+src/content/product-info/<locale>/<slug>.md
+```
+
+Its frontmatter (`tagline`, `description`, `highlights`, `features`, `install`,
+`links`, and an optional `sections` list) drives the landing's sections via the
+registry in `src/lib/landing-sections.ts`. Without a `product-info` file the
+product still gets the generic fallback landing (hero + badges + about + CTA)
+from its registry entry — so a bare product is presentable, and a
+`product-info` file makes it *rich*. See the sample files under
+`src/content/product-info/` (e.g. `en/astro.md`) for the full shape.
+
 ## Configure the nav & footer
 
 The top nav and footer are data-driven from the `site` block in
@@ -157,9 +174,22 @@ tab).
 
 ## Customize a product landing
 
-By default every product landing (`/<product>/`) renders the shared generic
-hero + CTA in `src/components/ProductLandingDefault.astro`. To ship a custom
-landing for one product, add a single component keyed by the product **slug**:
+Every product landing (`/<product>/`) is resolved in this order:
+
+1. **Custom override** — a component at
+   `src/components/product-landing/<slug>.astro` wins outright.
+2. **Structured landing** — a `product-info` Markdown file at
+   `src/content/product-info/<locale>/<slug>.md` renders a rich, data-driven
+   landing (tagline, highlights, features, install, ...) via the section
+   registry. See [product-info files](#product-info-files) below.
+3. **Fallback** — no override and no `product-info`: the generic
+   `ProductLandingDefault.astro` renders a presentable page straight from the
+   `Product` registry entry (name, description, badges, github, docs link) —
+   hero + badges + about + CTA. So **a product with only a registry entry (and
+   optionally docs) still gets a decent public page with zero extra content**.
+
+To ship a custom landing for one product, add a single component keyed by the
+product **slug**:
 
 ```
 src/components/product-landing/<slug>.astro     # e.g. src/components/product-landing/vite.astro
