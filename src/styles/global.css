@@ -43,6 +43,12 @@
 html {
   font-size: 16px;
   scroll-behavior: smooth;
+  /* Offset anchor jumps (TOC links, sidebar links, in-page #hrefs) below the
+     sticky header (60px) plus a small breathing gap. Without this, the target
+     heading lands flush under the header and is hidden. 80px also matches the
+     TOC IntersectionObserver rootMargin, so the highlighted entry lines up
+     with where the page actually lands. */
+  scroll-padding-top: 80px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   /* Remove the blue/gray highlight flash that Android Chrome paints on the
