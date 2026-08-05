@@ -10,19 +10,18 @@ name: Examples consistency check
 # Runs `npm run check:examples` - pure Node stdlib, no npm ci / astro build,
 # which keeps this job cheap.
 #
-# NOTE: PR detection is implemented but DISABLED by default (owner decision):
-# manual builds stay manual. To gate drift on pull requests, uncomment the
-# `pull_request:` block below.
-
+# Drift gating on pull requests: any PR touching the canonical skill tree,
+# the sync generator, or the examples themselves must keep the per-example
+# copies in sync, or this job fails. Manual runs stay available via
+# workflow_dispatch.
 on:
   workflow_dispatch:
-  # Enable drift gating on pull requests by uncommenting this block:
-  # pull_request:
-  #   branches: [main]
-  #   paths:
-  #     - 'examples/**'
-  #     - 'skills/**'
-  #     - 'scripts/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'examples/**'
+      - 'skills/**'
+      - 'scripts/**'
 
 permissions:
   contents: read
