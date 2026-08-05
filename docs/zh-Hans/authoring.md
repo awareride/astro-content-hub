@@ -117,6 +117,21 @@ order: 2                     # 可选,控制侧边栏排序(默认 0)
 3. 路由是自动生成的(产品页面是动态的)。运行 `npm run build` 并验证
    `/mytool/docs/` 与 `/zh-Hans/mytool/docs/` 能正常渲染。
 
+### product-info 文件
+
+注册的产品在提供每语言的结构化 `product-info` 文件后,会自动渲染**丰富落地页**:
+
+```
+src/content/product-info/<locale>/<slug>.md
+```
+
+其 frontmatter(`tagline`、`description`、`highlights`、`features`、`install`、
+`links`,以及可选的 `sections` 列表)通过 `src/lib/landing-sections.ts` 中的
+注册表驱动落地页的各区块。没有 `product-info` 文件时,产品仍会从注册表条目
+获得通用回退落地页(hero + 徽章 + 关于 + CTA) —— 因此裸产品也像样,而有
+`product-info` 文件则让它*更丰富*。完整结构参见 `src/content/product-info/`
+下的示例文件(如 `en/astro.md`)。
+
 ## 配置导航与页脚
 
 顶部导航与页脚由 `site.config.ts`(仓库根目录)中的 `site` 段数据驱动。内置骨架
@@ -137,7 +152,20 @@ order: 2                     # 可选,控制侧边栏排序(默认 0)
 
 ## 自定义产品落地页
 
-默认情况下,每个产品落地页(`/<product>/`)都渲染 `src/components/ProductLandingDefault.astro` 中的共享通用 hero + CTA。要为某个产品提供自定义落地页,只需添加一个以产品 **slug** 命名的组件:
+每个产品落地页(`/<product>/`)按以下顺序解析:
+
+1. **自定义覆盖** —— `src/components/product-landing/<slug>.astro` 处的组件
+   优先胜出。
+2. **结构化落地页** —— `src/content/product-info/<locale>/<slug>.md` 处的
+   `product-info` Markdown 文件通过区块注册表渲染丰富、数据驱动的落地页
+   (tagline、highlights、features、install 等)。参见下方
+   [product-info 文件](#product-info-文件)。
+3. **回退** —— 无覆盖且无 `product-info`:`ProductLandingDefault.astro`
+   直接从 `Product` 注册表条目(name、description、badges、github、文档链接)
+   渲染像样的页面 —— hero + 徽章 + 关于 + CTA。因此**只注册(且可选地提供
+   文档)的产品,零额外内容也能得到体面的公开页面**。
+
+要为某个产品提供自定义落地页,只需添加一个以产品 **slug** 命名的组件:
 
 ```
 src/components/product-landing/<slug>.astro     # 例如 src/components/product-landing/vite.astro

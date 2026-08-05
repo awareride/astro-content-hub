@@ -131,12 +131,20 @@ function resolveData(section: ProductInfoSection): unknown {
   </Fragment>
 ) : (
   <Fragment>
+    <!-- Hero: product name + one-line description + badges + actions.
+         Unlike the product-info path (which pulls tagline/links from MD),
+         this fallback is fully data-driven from the Product registry -
+         name, description, badges, github - so any registered product gets
+         a presentable landing with zero extra content. -->
     <section class="product-hero">
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="hero-glow hero-glow-2" aria-hidden="true"></div>
       <div class="container">
         <div class="hero-badge" style="display:inline-block; font-size:0.85rem; font-weight:600; padding:0.25rem 0.9rem; border-radius:100px; background:var(--color-accent-subtle); color:var(--color-accent); margin-bottom:1.25rem;">
           {c.heroBadge}
         </div>
         <h1>{product.name}</h1>
+        <p class="hero-lead">{product.description[locale]}</p>
         <div class="hero-actions">
           <a href={product.github} class="btn btn-primary" target="_blank" rel="noopener">{c.viewSource}</a>
           <a href={docsHref} class="btn btn-secondary">{c.documentation}</a>
@@ -144,19 +152,38 @@ function resolveData(section: ProductInfoSection): unknown {
       </div>
     </section>
 
+    <!-- Badges as a compact trust strip (reuses .highlight-badges) -->
+    {
+      product.badges.length > 0 && (
+        <section class="section">
+          <div class="container">
+            <div class="highlight-badges">
+              {product.badges.map((b: string) => (
+                <span class="highlight-badge">
+                  <span class="highlight-badge-value">{b}</span>
+                </span>
+              ))}
+            </div>
+          </div>
+        </section>
+      )
+    }
+
+    <!-- About: the product description, presented as a real section rather
+         than a lone hero line. Falls back to localized generic copy when the
+         product has no description of its own. -->
     <section class="section section-alt">
       <div class="container">
         <div class="section-header">
           <p class="eyebrow">{c.docsEyebrow}</p>
-          <h2>{c.docsTitle}</h2>
+          <h2>{product.name}</h2>
         </div>
-        <div class="cta-box">
-          <h2>{c.ctaTitle}</h2>
-          <p>{c.ctaBody}</p>
-          <div class="cta-actions">
-            <a href={product.github} class="btn btn-primary btn-large" target="_blank" rel="noopener">{c.ctaPrimary}</a>
-            <a href={docsHref} class="btn btn-secondary btn-large">{c.readDocs}</a>
-          </div>
+        <div class="prose product-overview">
+          <p>{product.description[locale]}</p>
+        </div>
+        <div class="cta-actions" style="margin-top:2rem;">
+          <a href={docsHref} class="btn btn-primary btn-large">{c.readDocs}</a>
+          <a href={product.github} class="btn btn-secondary btn-large" target="_blank" rel="noopener">{c.viewSource}</a>
         </div>
       </div>
     </section>
