@@ -45,6 +45,10 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Remove the blue/gray highlight flash that Android Chrome paints on the
+     pressed element when tapping (press state). iOS Safari does not paint
+     one by default. */
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
