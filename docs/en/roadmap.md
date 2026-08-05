@@ -64,13 +64,39 @@ style block) — no Machinery changes.
 - Keep everything in the "Your site" tier: `copy.ts` + `index.astro` are
   instance files. No Machinery changes required.
 
-## Phase 2 — Stronger default product landing
+## Phase 2 — Stronger default product landing ✅ DONE
 
 **Goal:** a product with **only docs** gets a presentable product page, and a
 product with `product-info` gets an even better one — with zero extra work
 beyond writing content.
 
-### Current state
+**Status:** merged. Implemented as:
+
+- `ProductLandingDefault.astro`'s fallback branch (no `product-info`) now
+  renders a real product page straight from the `Product` registry entry:
+  **hero** (name + localized `description` lead + docs/repo buttons),
+  **badges** as a highlight-badge trust strip, an **about** section
+  (description + Read Docs / View Source), and a CTA. A product with only a
+  registry entry (and optionally docs) now gets a presentable page — the
+  "write docs, get a page" promise holds without any `product-info`.
+- The `product-info` path is unchanged (still the rich landing via the section
+  registry); the fallback upgrade is purely additive.
+- `docs/en/authoring.md` (+ zh-Hans) now documents the three-tier resolution:
+  custom override → `product-info` structured landing → registry fallback,
+  and adds a "product-info files" subsection under "Add a new product".
+
+### Acceptance
+
+- ✓ A product with only a registry entry (docs optional) renders a page that
+  reads as a product — hero with description lead, badges, about, CTA
+  (verified with a temporary no-`product-info` product; the fallback renders
+  in both locales).
+- ✓ `product-info` files are the documented path to a rich page (authoring.md
+  now explains the ladder).
+- ✓ No breaking change to existing products (all sample products keep their
+  `product-info`-driven landings; build stays 0 errors / 0 warnings).
+
+### Current state (before the change)
 
 - Default (`ProductLandingDefault.astro`): minimal hero + docs link + repo
   link. Reads like a docs index.
@@ -78,7 +104,7 @@ beyond writing content.
   via `src/components/landing-sections/*`.
 - With a custom override: `src/components/product-landing/<slug>.astro`.
 
-### Tasks
+### Tasks (as originally scoped)
 
 - **Upgrade the default landing** (`ProductLandingDefault.astro`) so it uses
   the product's `description`, `badges`, `logo` (already available from the
@@ -93,12 +119,14 @@ beyond writing content.
   `docs/en/authoring.md` to say "docs → good page; add product-info → great
   page."
 
-### Acceptance
+### Notes on scope
 
-- A product with only docs renders a page that reads as a product, not a docs
-  index.
-- `product-info` files are the documented, sample-covered path to a rich page.
-- No breaking change to existing products.
+- The original "promote product-info to recommended default" task was
+  resolved by **documenting the ladder** in authoring.md rather than adding a
+  `landing:` field to the `Product` interface — keeping the Machinery
+  interface stable (fewer breaking changes for adopters). Sample products
+  already all ship `product-info` files, so no sample-content change was
+  needed.
 
 ## Phase 3 — Positioning & docs
 

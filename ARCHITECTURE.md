@@ -28,6 +28,7 @@ discussion.
 |---|---|---|
 | i18n machinery | `src/lib/i18n.ts` | locales, `defaultLocale`, base/locale helpers (`withBase`, `localizePath`, `buildAlternates`, `localeFromPath`), `localeLabel`/`localeCode`. Re-exports the instance copy from `src/config/copy.ts` so imports stay unchanged. |
 | Content plumbing | `src/lib/content.ts` | localized path generation + fallback rendering (docs / posts / product-info) |
+| Docs-dir resolution | `src/lib/doc-dirs.ts` | single source of truth for which product × locale has a docs dir (content.config.ts registers collections; content.ts / llms.ts skip empty ones - no "empty collection" build warnings for docs-less products) |
 | Sidebar | `src/lib/docs.ts` | `buildNav` (index -> base path, sort by `order` then title) |
 | Feeds | `src/lib/feed.ts` | RSS builder |
 | Landing resolver | `src/lib/product-landing.ts` | per-product landing-override resolver (the Extensions mechanism) |
