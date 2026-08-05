@@ -154,6 +154,11 @@ const {
   let highlighted = -1;
   let lastQuery = '';
   let isOpen = false;
+  // When the modal opens it pushes a history entry so that the browser's
+  // back button (mobile gesture / key) closes the dialog instead of leaving
+  // the page. The flag marks the pushed entry; popstate from that entry
+  // closes the modal without another push.
+  let pushedState = false;
 
   // Localized copy — injected from the Astro frontmatter.
   const copy = {
@@ -270,6 +275,10 @@ const {
     resultsEl.innerHTML = '';
     setScope('');
     input.focus();
+    // Push a history entry so back (gesture/key) closes the modal instead of
+    // navigating away. Must happen after the modal is shown.
+    history.pushState({ searchModalOpen: true }, '');
+    pushedState = true;
     try {
       await initSearch();
       preload(''); // warm the index
@@ -283,11 +292,30 @@ const {
     isOpen = false;
     rootEl.hidden = true;
     document.documentElement.classList.remove('search-open-lock');
+    if (pushedState) {
+      // Undo the entry we pushed when opening, so closing never leaves a
+      // stale entry that would require an extra back press later.
+      pushedState = false;
+      try {
+        history.back();
+      } catch {
+        /* history.back is never blocking; guard for exotic embedders */
+      }
+    }
     openBtnEl.focus();
   }
 
   openBtnEl.addEventListener('click', open);
   backdrop.addEventListener('click', close);
+
+  // The back button (mobile gesture / key) hits the entry pushed when the
+  // modal opened; popstate closes the modal without re-pushing.
+  window.addEventListener('popstate', () => {
+    if (isOpen) {
+      pushedState = false;
+      close();
+    }
+  });
 
   // Global '/' shortcut (when not typing in another field).
   document.addEventListener('keydown', (e) => {
@@ -592,9 +620,13 @@ const {
   @media (max-width: 768px) {
     .search-modal {
       padding: 2vh 0.5rem 1rem;
-      align-items: stretch;
+      /* Keep the panel hugging its content: `stretch` would force it to fill
+         the viewport height even with no results (the modal looked full-
+         screen when empty). The body scrolls within max-height below. */
+      align-items: flex-start;
     }
     .search-modal-panel {
+      width: 100%;
       max-height: 92vh;
     }
   }

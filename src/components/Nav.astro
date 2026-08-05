@@ -222,8 +222,12 @@ const isNavLinkActive = (l: (typeof navLinks)[number]): boolean =>
       const setDropdownOpen = (open: boolean) => {
         dropdown.classList.toggle('nav-dropdown-open', open);
         trigger.setAttribute('aria-expanded', String(open));
-        if (open) panel.style.visibility = 'visible';
-        else panel.style.visibility = '';
+        // data-state mirrors the open state as an explicit attribute so the
+        // CSS can key off it with higher specificity than :hover. On touch
+        // devices the tap's click is followed by a synthetic mouseover, and
+        // without this the :hover rule would re-hide the just-opened panel
+        // (blank until a second tap). See global.css for the selectors.
+        dropdown.dataset.state = open ? 'open' : '';
       };
       // Click toggles (works on desktop and mobile).
       trigger.addEventListener('click', (e) => {
