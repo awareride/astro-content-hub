@@ -38,23 +38,35 @@ free to GitHub Pages and Cloudflare Pages.
 
 ## What it is
 
-`astro-content-hub` is a **content-hub template**. Instead of scattering docs
-and blog posts across every repository, you run one hub site that aggregates
+`astro-content-hub` is an **org & product portal template**: one branded,
+localized, free-to-deploy site that gives an organization a **front door**,
+gives every project a **product landing page**, and aggregates each project's
+**docs and posts** into a single searchable place.
+
+Instead of scattering docs and blog posts across every repository (or running
+a separate GitHub Pages site per project), you run one hub site that aggregates
 content from many sources. Each source repo keeps its own `posts/` and `docs/`
-and syncs them into the hub through a pull request - so a human reviews every
+and syncs them into the hub through a pull request — so a human reviews every
 change before it publishes.
 
 The result is a single, fast, localized static site with:
 
+- **An org front door** — a landing page that introduces the organization
+  itself (mission, links, brand).
+- **A product page per project** — every registered product gets a landing
+  page (what it is, features, install, highlights) plus its docs, all under
+  one roof.
 - **Aggregated content** from many repos, reviewed before it ships.
 - **Per-page internationalization** with graceful fallback (never a 404 on a
   missing translation).
-- **Data-driven products** - add a product with one line of config and its
+- **Data-driven products** — add a product with one line of config and its
   routes, sidebar, and landing card are generated automatically.
 - **Free deployment** to GitHub Pages and Cloudflare Pages.
 
 The template ships with sample content (Vite, Astro, JSON Server docs) so the
 site looks complete out of the box. Replace it with your own.
+
+See [Vision & product philosophy](./docs/en/vision.md) for the full "why".
 
 ## Features
 
@@ -481,11 +493,13 @@ mirror in [`docs/zh-Hans/`](./docs/zh-Hans)). It is also rendered on the live si
 | Page | What it covers |
 |------|----------------|
 | [Overview](./docs/en/index.md) | What the template is and why. |
+| [Vision & product philosophy](./docs/en/vision.md) | Why it exists: an org & product portal, not just a docs aggregator. |
 | [Architecture](./docs/en/architecture.md) | Site layout, routing, content collections, key modules. |
 | [Authoring content](./docs/en/authoring.md) | Write posts and docs in the hub: i18n, slug contract, fallback, adding a product/locale. |
 | [Content sync](./docs/en/content-sync.md) | Contribute content from a separate repo via the PR-based sync Action. |
 | [Deployment](./docs/en/deployment.md) | Point the template at GitHub Pages and/or Cloudflare Pages. |
 | [Upgrading](./docs/en/upgrading.md) | Update a rebranded fork to a new template release with minimal migration (`git merge` + `npm run check:upstream`). |
+| [Optimization roadmap](./docs/en/roadmap.md) | A phased plan to close the gaps between the template and its vision. |
 
 The [`skills/site-content/SKILL.md`](./skills/site-content/SKILL.md) file is a
 condensed authoring reference for working inside a hub repo.
