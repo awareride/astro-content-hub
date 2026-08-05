@@ -140,6 +140,53 @@ const {
   const rootEl: HTMLElement = root;
   const openBtnEl: HTMLButtonElement = openBtn;
 
+  // On mobile the modal is sized against the VISUAL viewport (the area the
+  // user actually sees): the on-screen keyboard shrinks it, but position:fixed
+  // and vh units are measured against the full layout viewport — so without
+  // this the results list would run behind the keyboard on a real phone
+  // (desktop device emulation has no keyboard and cannot reproduce it).
+  // The baseline is captured on open, when the modal is fully visible.
+  let modalMaxHeight: number | null = null;
+  let modalBaseline: number | null = null;
+
+  function syncModalMaxHeight() {
+    if (!isOpen) return; // no-op when the modal is hidden
+    if (window.visualViewport) {
+      const vv = window.visualViewport;
+      if (modalBaseline === null) modalBaseline = vv.height;
+      if (modalMaxHeight !== Math.round(vv.height)) {
+        modalMaxHeight = Math.round(vv.height);
+        rootEl.style.setProperty('--search-modal-maxh', `${modalMaxHeight}px`);
+      }
+    } else {
+      // No visualViewport support: fall back to the layout viewport, which is
+      // the same viewport CSS units use — no change in behaviour.
+      const h = Math.round(window.innerHeight);
+      if (modalMaxHeight !== h) {
+        modalMaxHeight = h;
+        rootEl.style.setProperty('--search-modal-maxh', `${h}px`);
+      }
+    }
+  }
+
+  function resetModalMaxHeight() {
+    modalBaseline = null;
+    modalMaxHeight = null;
+    rootEl.style.removeProperty('--search-modal-maxh');
+  }
+
+  if (window.visualViewport) {
+    // Re-sync whenever the visible area changes while the modal is open:
+    // keyboard open/close, rotation, URL bar collapse. iOS fires scroll on
+    // the visual viewport, Android fires resize — listen to both. Also sync
+    // right after opening (the keyboard may already be up from the previous
+    // session, or the URL bar may be collapsed).
+    window.visualViewport.addEventListener('resize', syncModalMaxHeight);
+    window.visualViewport.addEventListener('scroll', syncModalMaxHeight);
+  } else {
+    window.addEventListener('resize', syncModalMaxHeight);
+  }
+
   // Portal the modal to <body>. The trigger lives inside <header class="site-header">
   // which has backdrop-filter — and backdrop-filter makes the header a
   // containing block for position:fixed descendants, so a modal rendered
@@ -275,6 +322,9 @@ const {
     resultsEl.innerHTML = '';
     setScope('');
     input.focus();
+    // Size the modal against the current visual viewport BEFORE the input
+    // focus brings the keyboard up (the baseline must be keyboard-free).
+    syncModalMaxHeight();
     // Push a history entry so back (gesture/key) closes the modal instead of
     // navigating away. Must happen after the modal is shown.
     history.pushState({ searchModalOpen: true }, '');
@@ -292,6 +342,7 @@ const {
     isOpen = false;
     rootEl.hidden = true;
     document.documentElement.classList.remove('search-open-lock');
+    resetModalMaxHeight();
     if (pushedState) {
       // Undo the entry we pushed when opening, so closing never leaves a
       // stale entry that would require an extra back press later.
@@ -427,6 +478,14 @@ const {
     align-items: flex-start;
     justify-content: center;
     padding: 12vh 1rem 2rem;
+    /* Modal height cap. Fixed-size vh so the cap does not grow when the
+       browser chrome (URL bar, on-screen keyboard) shrinks the visual
+       viewport on a real phone: on iOS Safari 100vh units and position:fixed
+       are still measured against the full layout viewport, so a dvh/100%
+       cap would let the results list run behind the keyboard. On mobile the
+       script below overrides this with the actual visual-viewport height in
+       px (visualViewport API). */
+    --search-modal-maxh: 70vh;
   }
   .search-modal[hidden] {
     display: none;
@@ -624,10 +683,11 @@ const {
          the viewport height even with no results (the modal looked full-
          screen when empty). The body scrolls within max-height below. */
       align-items: flex-start;
+      --search-modal-maxh: 92vh;
     }
     .search-modal-panel {
       width: 100%;
-      max-height: 92vh;
+      max-height: var(--search-modal-maxh);
     }
   }
 </style>
