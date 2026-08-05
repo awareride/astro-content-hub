@@ -14,6 +14,8 @@ order: 0
 
 ## 本文档包含
 
+- [愿景与产品理念](./vision.md) —— 这个模板为何存在:
+  一个组织与产品门户,而不仅是文档聚合器。
 - [架构](./architecture.md) —— Astro 站点的布局、路由、
   内容集合与核心模块。
 - [编写内容](./authoring.md) —— 在中心内直接撰写文章与
@@ -24,6 +26,8 @@ order: 0
   和/或 Cloudflare Pages。
 - [升级](./upgrading.md) —— 以最少迁移将 rebrand 后的 fork
   更新到新模板版本(git merge + `npm run check:upstream`)。
+- [优化路线图](./roadmap.md) —— 弥合模板与愿景之间差距的
+  分阶段计划。
 
 ## 为何选择此模板
 

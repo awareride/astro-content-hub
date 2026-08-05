@@ -16,6 +16,8 @@ for how that works.
 
 ## What's in these docs
 
+- [Vision & product philosophy](./vision.md) — why this template
+  exists: an org & product portal, not just a docs aggregator.
 - [Architecture](./architecture.md) — the Astro site
   layout, routing, content collections, and key modules.
 - [Authoring content](./authoring.md) — write posts and
@@ -27,6 +29,8 @@ for how that works.
   GitHub Pages and/or Cloudflare Pages.
 - [Upgrading](./upgrading.md) — update a rebranded fork to a new template
   release with minimal migration (git merge + `npm run check:upstream`).
+- [Optimization roadmap](./roadmap.md) — a phased plan to close the
+  gaps between the template and its vision.
 
 ## Why this template
 
