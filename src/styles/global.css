@@ -278,6 +278,14 @@ pre.astro-code code {
   opacity: 1;
   visibility: visible;
 }
+/* JS-open state wins over the :hover rule above: on touch devices the tap
+   that opened the panel is followed by a synthetic mouseover, and :hover
+   would re-hide the panel (blank until a second tap). Both rules have equal
+   specificity, so the later one in the source wins. */
+.nav-menu-primary .nav-dropdown[data-state='open'] .nav-dropdown-panel {
+  opacity: 1;
+  visibility: visible;
+}
 
 .nav-menu-primary .nav-dropdown-item {
   display: block;
@@ -2303,13 +2311,18 @@ a.docs-prev-next-item:hover {
     background: none;
     border: none;
     box-shadow: none;
-    /* Collapsed by default in the mobile overlay; expanded when the
-       trigger toggles .nav-dropdown-open (JS). */
-    opacity: 0;
-    visibility: hidden;
+    /* Collapsed by default in the mobile overlay. display:none removes the
+       panel from the layout entirely, so it leaves no blank gap under the
+       trigger (visibility:hidden would keep the box occupying its height).
+       The desktop :hover/:focus-within rules can't show it either — they
+       only flip opacity/visibility, which don't apply to a display:none
+       box. */
+    display: none;
   }
 
-  .nav-menu-primary .nav-dropdown.nav-dropdown-open .nav-dropdown-panel {
+  .nav-menu-primary .nav-dropdown.nav-dropdown-open .nav-dropdown-panel,
+  .nav-menu-primary .nav-dropdown[data-state='open'] .nav-dropdown-panel {
+    display: block;
     opacity: 1;
     visibility: visible;
   }
@@ -2361,8 +2374,27 @@ a.docs-prev-next-item:hover {
     display: none;
   }
 
+  /* Uniform control cluster: search, locale, and theme buttons get the same
+     fixed square footprint (based on --nav-control-h) so they sit level
+     next to the hamburger. Their default padding is reset here; borders are
+     kept so all three look like sibling buttons. */
   .nav-actions {
     gap: 0.4rem;
+  }
+  .nav-actions .search-open.search-open {
+    width: var(--nav-control-h);
+    padding: 0;
+    justify-content: center;
+  }
+  .locale-switcher-btn {
+    min-width: var(--nav-control-h);
+    height: var(--nav-control-h);
+    padding: 0 0.7rem;
+    justify-content: center;
+  }
+  .nav-actions .theme-toggle {
+    width: var(--nav-control-h);
+    height: var(--nav-control-h);
   }
 
   /* On mobile the header bar holds logo + locale switcher + theme toggle +
