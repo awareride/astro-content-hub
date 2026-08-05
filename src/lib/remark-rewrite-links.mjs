@@ -45,7 +45,7 @@ const ROOT = resolve(__dirname, '..', '..');
 const CONTENT = join(ROOT, 'src', 'content');
 
 /** URL prefix for a locale: '' for the default locale, '/<locale>' otherwise. */
-function localePrefix(locale) {
+export function localePrefix(locale) {
   return locale === defaultLocale ? '' : `/${locale}`;
 }
 
@@ -64,7 +64,7 @@ function localePrefix(locale) {
  * Posts have no index.md and their catch-all does not exclude it, so no
  * special-casing is applied there.
  */
-function urlForContentPath(rel) {
+export function urlForContentPath(rel) {
   const p = rel.split(sep).join('/');
   let m = p.match(/^posts\/([^/]+)\/(.+)\.md$/);
   if (m) {
@@ -90,7 +90,7 @@ function urlForContentPath(rel) {
  * the standard src/content layout, the <product> segment is NOT in the path;
  * it is supplied by the owning product. Same index special-casing applies.
  */
-function urlForBaseDoc(productSlug, rel) {
+export function urlForBaseDoc(productSlug, rel) {
   const p = rel.split(sep).join('/');
   const m = p.match(/^([^/]+)\/(.+)\.md$/);
   if (!m) return null;
@@ -123,7 +123,7 @@ function listMdRel(base) {
 }
 
 /** True if a link URL is a relative `.md` link we should try to rewrite. */
-function isRewritable(url) {
+export function isRewritable(url) {
   if (typeof url !== 'string' || url === '') return false;
   if (/^[a-z][a-z0-9+.-]*:/i.test(url)) return false; // scheme: http(s):, mailto:, ...
   if (url.startsWith('#')) return false;               // same-page anchor
