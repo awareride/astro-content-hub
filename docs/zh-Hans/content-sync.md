@@ -39,6 +39,11 @@ GitHub Action 校验内容,并向中心的 `main` 分支发起一个**拉取请�
 **并非**存在于外部仓库中 —— 这样相对 markdown 链接在 GitHub 上仍能针对
 `docs/` 解析。
 
+**交互也会同步。** 因为是直接的文件复制,Markdown 里任何内联 `<script>`
+都会随之进入中心 —— 因此你仓库 `docs/en/foo.md` 里写的按钮、标签页或图表
+在中心上零额外配置即可交互。遵循[编写指南](./authoring.md#markdown-中的交互)
+(自包含、无外部请求)即可原样通过 review。
+
 ## Frontmatter schemas
 
 文章(`posts/<locale>/<slug>.md`):

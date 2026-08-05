@@ -93,6 +93,13 @@ See [Vision & product philosophy](./docs/en/vision.md) for the full "why".
 - **Typed content collections.** Posts and docs are Markdown loaded from the
   filesystem with [zod](https://zod.dev/)-validated frontmatter, so malformed
   content fails the build before it reaches the site.
+- **Interactive docs without a framework.** A plain `.md` file can host real
+  interactivity — buttons, tabs, icon toggles, and SVG charts drawn from a JS
+  data function — via inline `<script>` tags that run as-is in the browser.
+  The interaction lives inside the content file, so docs synced from external
+  repositories are interactive too, with no hub-side code. See
+  [Interactive Markdown](./docs/en/interactive-md.md) for a copy-paste
+  reference (rendered live at `/astro-content-hub/docs/interactive-md/`).
 - **Relative links that just work.** A build-time Markdown plugin rewrites
   GitHub-friendly relative `.md` links (`./getting-started.md`) into the
   correct hub routes, so source files keep working on GitHub *and* on the site.

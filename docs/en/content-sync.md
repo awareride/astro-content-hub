@@ -42,6 +42,12 @@ directly** — content is reviewed first.
 `PRODUCT` env var, **not** present in the external repo — this keeps relative
 markdown links resolving against `docs/` on GitHub.
 
+**Interactivity syncs too.** Because the copy is a straight file copy, any
+inline `<script>` inside your Markdown ships with it — so a button, tab, or
+chart written in your repo's `docs/en/foo.md` is interactive on the hub with
+zero extra setup. Follow the [authoring guidance](./authoring.md#interactivity-in-markdown)
+(self-contained, no external requests) and it passes review as-is.
+
 ## Frontmatter schemas
 
 Posts (`posts/<locale>/<slug>.md`):
