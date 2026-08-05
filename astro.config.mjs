@@ -1,6 +1,7 @@
 import { defineConfig } from 'astro/config';
 import { satteri } from '@astrojs/markdown-satteri';
 import sitemap from '@astrojs/sitemap';
+import mdx from '@astrojs/mdx';
 import { rewriteRelativeMdLinks } from './src/lib/remark-rewrite-links.mjs';
 import { addHeadingIds } from './src/lib/heading-ids.mjs';
 
@@ -38,6 +39,13 @@ export default defineConfig({
   },
 
   integrations: [
+    // MDX support: registers the `.mdx` content entry type (via
+    // addContentEntryType) so docs/posts collections can contain MDX files.
+    // The template ships no built-in component library for MDX; authors who
+    // want interactive docs can import their own .astro components (or use
+    // plain .md with inline <script>). See docs/en/authoring.md
+    // "Markdown & MDX".
+    mdx(),
     // Generates /sitemap-index.xml from the build. Uses `site` for absolute
     // URLs and respects `base`. Automatically embeds hreflang alternates for
     // each page (Layout.astro already emits <link rel="alternate" hreflang>).
