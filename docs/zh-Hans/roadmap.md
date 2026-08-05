@@ -1,0 +1,119 @@
+---
+title: "优化路线图"
+description: "分阶段计划,弥合当前模板与其愿景之间的差距:组织前门、更强的默认产品落地页,以及定位。"
+order: 5
+---
+
+> 本页是**计划**,不是承诺。它记录了当前模板与[愿景](./vision.md)所述
+> 目标之间的差距,按价值排序。每个阶段都是可独立完成、可审阅、可单独
+> 上线的自包含块。这里的任何内容都尚未实现。
+
+## 为什么会有这份路线图
+
+[愿景](./vision.md)描述了一个**组织与产品门户**:组织前门、每个产品一个
+品牌落地页、聚合文档,全部免费且可升级。模板已经具备其中大部分机制 ——
+但有两个缺口让它**看起来**还不像那个愿景:
+
+1. **没有组织介绍。** 落地页是 hero + 产品网格 + 最新文章。组织自身的故事
+   (使命、团队、链接)缺失了,而这正是组织站点访客最先期待的。
+2. **默认产品落地页太单薄。** 只有文档的产品得到一个极简页面,读起来像
+   文档索引,而不是产品页。愿景承诺"写文档,得好看的页面" —— 今天只有在
+   产品同时提供 `product-info` 文件(或自定义落地页)时才成立。
+
+## 阶段 1 — 组织前门(价值最高、改动面最小)
+
+**目标:** 落地页介绍的是*组织*,而不只是产品。
+
+### 任务
+
+- 在 `src/config/copy.ts` 中新增 `org` 块:
+  `name`、`tagline`、`mission`、`cta`(label + href)、`links`(GitHub、
+  联系方式等)。按语言,遵循现有 `Record<Locale, …>` 模式。
+- 在 `src/pages/index.astro` 中新增**"关于组织" section**(位于 hero 与
+  最新文章之间):使命文字 + 一行链接。
+- 在 `ProductLandingDefault.astro` 中加 `mission`/`org` section?**不** ——
+  组织文案只属于组织落地页。产品落地页保持产品导向。
+- 一切都在 "Your site" 层:`copy.ts` + `index.astro` 都是实例文件。
+  不需要改 Machinery。
+
+### 验收
+
+- 落地页展示来自 `copy.ts` 的、按语言本地化的组织使命与链接。
+- 修改 `copy.ts` 中的 `org` 块即可更新落地页,无需触碰组件。
+
+## 阶段 2 — 更强的默认产品落地页
+
+**目标:** 只有**文档**的产品也能得到像样的产品页;提供 `product-info`
+的产品得到更好的页面 —— 除写内容外零额外工作。
+
+### 现状
+
+- 默认(`ProductLandingDefault.astro`):极简 hero + 文档链接 + 仓库链接。
+  读起来像文档索引。
+- 有 `product-info`:`landing-sections/*` 提供丰富落地页(tagline、
+  features、install、highlights)。
+- 有自定义覆盖:`src/components/product-landing/<slug>.astro`。
+
+### 任务
+
+- **升级默认落地页**(`ProductLandingDefault.astro`),利用 `Product`
+  注册表已有的 `description`、`badges`、`logo`,渲染真正的产品卡 ——
+  是什么、为什么用、快捷链接(文档、仓库、GitHub)。
+- **把 `product-info` 从"扩展"提升为"推荐的默认"。** 在 `site.config.ts`
+  中允许产品声明 `landing: 'default' | 'info' | 'custom'`(或只文档化
+  升级路径)。保持 Machinery 不变;这是文档 + 示例内容的改动。
+- **为每个示例产品添加 `product-info` 样例**,让采用者看到推荐模式,并
+  更新 `docs/en/authoring.md` 说明:"有文档 → 好页面;加 product-info →
+  更好页面。"
+
+### 验收
+
+- 只有文档的产品渲染出的页面读起来是产品,而不是文档索引。
+- `product-info` 文件成为通往丰富页面的、有文档、有样例的路径。
+- 对现有产品无破坏性变更。
+
+## 阶段 3 — 定位与文档
+
+**目标:** 仓库*清晰讲述*组织门户的故事,让对的人找到它。
+
+### 任务
+
+- **README** —— 从"内容中心模板"重构为"组织与产品门户":以组织前门 +
+  每产品落地页 + 聚合文档开头,再把同步/PR 机制作为手段。
+- **`docs/en/vision.md`** —— "为什么"(理念的家;从 README 和文档索引
+  链接它)。
+- **文档索引/表格** —— 在 `README.md` 和 `docs/en/index.md` 的文档表
+  中加入 `Vision` 与这份路线图(附 zh-Hans 镜像)。
+- **仓库描述与 topics** —— 若需要,更新 GitHub 仓库描述/topics 以匹配
+  重构("org & product portal"、"multi-project docs"、"landing pages")。
+
+### 验收
+
+- README 与文档以组织门户的价值主张开头。
+- `vision.md` 和 `roadmap.md` 已从文档索引链接,双语。
+
+## 阶段 4(延后)— 版本化文档
+
+**目标:** 每个产品支持 `v1.x`、`v2.x` 文档(如
+[MultiDocumenter.jl](https://github.com/juliacomputing/multidocumenter.jl/) 与
+[DocBuilder](https://github.com/inful/docbuilder) 所做),面向 SDK/API 型
+产品。
+
+延后是因为核心愿景(组织 + 产品落地页 + 文档聚合)并不需要它。若要做,
+应遵循扩展模式:产品上的 `versions` 字段 + 文档布局中的版本切换器 ——
+作为可选能力加入,而非破坏性变更。
+
+## 每个阶段的验证
+
+- `npm run validate:content` —— 0 错误(slug parity、index、
+  product-info 检查)。
+- `npm test` —— 全套通过。
+- `npm run build` —— 0 错误,0 警告。
+- 抽查 `dist/` 中受影响的路线。
+- 若 `examples/` 或 `skills/` 有改动:`npm run check:examples`。
+
+## 如何开始
+
+每个阶段都是独立的、PR 大小的块。阶段 1 最小、杠杆最高(组织前门正是
+愿景**最核心**的东西)。阶段 2 对"写文档,得页面"的承诺是最大的用户可见
+胜利。阶段 3 基本是文案。按顺序做;每个都能独立上线。
