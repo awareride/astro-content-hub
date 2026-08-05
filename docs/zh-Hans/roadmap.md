@@ -4,9 +4,8 @@ description: "分阶段计划,弥合当前模板与其愿景之间的差距:组�
 order: 5
 ---
 
-> 本页是**计划**,不是承诺。它记录了当前模板与[愿景](./vision.md)所述
-> 目标之间的差距,按价值排序。每个阶段都是可独立完成、可审阅、可单独
-> 上线的自包含块。这里的任何内容都尚未实现。
+> 本页是**计划**,跟踪实现进度。每个阶段都是可独立完成、可审阅、可单独
+> 上线的自包含块。阶段旁的 ✓ 表示已合并。
 
 ## 为什么会有这份路线图
 
@@ -20,11 +19,32 @@ order: 5
    文档索引,而不是产品页。愿景承诺"写文档,得好看的页面" —— 今天只有在
    产品同时提供 `product-info` 文件(或自定义落地页)时才成立。
 
-## 阶段 1 — 组织前门(价值最高、改动面最小)
+## 阶段 1 — 组织前门(价值最高、改动面最小)✅ 已完成
 
 **目标:** 落地页介绍的是*组织*,而不只是产品。
 
-### 任务
+**状态:** 已合并。实现为:
+
+- `src/config/copy.ts` 新增 `org` 块(`eyebrow`、`title`、`mission`、
+  `linksLabel`、`links`),与其他文案表一样按语言。
+- 两个落地页(`src/pages/index.astro` 及其 `[locale]/` 孪生)在 hero 与
+  最新文章之间渲染 **#mission** section:eyebrow、标题、使命导语、
+  居中的链接行。
+- 文案从 `src/lib/i18n.ts` re-export(唯一的文案导入面),因此没有页面
+  需要直接导入 `config/copy`。
+- 样式复用现有 `.section-header`/`.eyebrow`/`.btn` 原语;仅向
+  `global.css` 添加了 `.mission-lead` 与 `.mission-links`。
+
+全部位于 "Your site" 层(`copy.ts` + 落地页 + 一个样式块) —— 无
+Machinery 改动。
+
+### 验收
+
+- ✓ 落地页展示来自 `copy.ts` 的、按语言本地化的组织使命与链接(两个
+  语言都按 hero → mission → posts 的顺序渲染 mission section)。
+- ✓ 修改 `copy.ts` 中的 `org` 块即可更新落地页,无需触碰组件。
+
+### 任务(最初范围)
 
 - 在 `src/config/copy.ts` 中新增 `org` 块:
   `name`、`tagline`、`mission`、`cta`(label + href)、`links`(GitHub、
@@ -35,11 +55,6 @@ order: 5
   组织文案只属于组织落地页。产品落地页保持产品导向。
 - 一切都在 "Your site" 层:`copy.ts` + `index.astro` 都是实例文件。
   不需要改 Machinery。
-
-### 验收
-
-- 落地页展示来自 `copy.ts` 的、按语言本地化的组织使命与链接。
-- 修改 `copy.ts` 中的 `org` 块即可更新落地页,无需触碰组件。
 
 ## 阶段 2 — 更强的默认产品落地页
 
