@@ -5,6 +5,8 @@
 
 import { getCollection, render } from 'astro:content';
 import { defaultLocale, collectionSuffix, type Locale } from './i18n';
+import { hasDocDir } from './doc-dirs';
+import { products } from '../../site.config';
 import { buildNav, type NavItem } from './docs';
 import {
   tagSlug,
@@ -69,6 +71,16 @@ function collectionName(productName: string, locale: Locale): string {
   return `${productName}Docs${collectionSuffix(locale)}`;
 }
 
+/** Docs for a product + locale, or [] when the product has no docs dir for
+ *  that locale. Mirrors what content.config.ts registers: a docs-less product
+ *  has no collection, and calling getCollection() on it would warn - so we
+ *  skip the call entirely (same directory check as the collection generator). */
+async function getProductDocs(productName: string, locale: Locale): Promise<DocEntryLike[]> {
+  const product = products.find((p) => p.slug === productName);
+  if (!product || !hasDocDir(product.slug, product.base, locale)) return [];
+  return (await getCollection(collectionName(productName, locale) as any)) as DocEntryLike[];
+}
+
 /**
  * Build static paths for a product's docs in one locale.
  *
@@ -87,14 +99,14 @@ export async function getLocalizedPaths(
   basePath: string,
   locale: Locale,
 ): Promise<{ params: { slug: string }; props: LocalizedPathProps }[]> {
-  const primary: DocEntryLike[] = await getCollection(collectionName(productName, locale) as any);
+  const primary: DocEntryLike[] = await getProductDocs(productName, locale);
   const primarySlugs = new Set(primary.map((d) => d.id));
 
   let source: { doc: DocEntryLike; isFallback: boolean }[];
   if (locale === defaultLocale) {
     source = primary.map((doc) => ({ doc, isFallback: false }));
   } else {
-    const fallback: DocEntryLike[] = await getCollection(collectionName(productName, defaultLocale) as any);
+    const fallback: DocEntryLike[] = await getProductDocs(productName, defaultLocale);
     source = [
       ...primary.map((doc) => ({ doc, isFallback: false })),
       ...fallback
@@ -128,12 +140,12 @@ export async function renderLocalizedPage(
   slug: string,
   basePath: string,
 ): Promise<RenderedPage | null> {
-  const primary: DocEntryLike[] = await getCollection(collectionName(productName, locale) as any);
+  const primary: DocEntryLike[] = await getProductDocs(productName, locale);
   let entry = primary.find((d) => d.id === slug);
   let isFallback = false;
 
   if (!entry && locale !== defaultLocale) {
-    const fallback: DocEntryLike[] = await getCollection(collectionName(productName, defaultLocale) as any);
+    const fallback: DocEntryLike[] = await getProductDocs(productName, defaultLocale);
     entry = fallback.find((d) => d.id === slug);
     isFallback = true;
   }
@@ -141,7 +153,7 @@ export async function renderLocalizedPage(
 
   // Nav matches the rendered body's source language.
   const navSource: DocEntryLike[] = isFallback
-    ? await getCollection(collectionName(productName, defaultLocale) as any)
+    ? await getProductDocs(productName, defaultLocale)
     : primary;
   const navItems = buildNav(navSource, basePath);
 
@@ -168,19 +180,19 @@ export async function getLocalizedDocIndex(
   locale: Locale,
   basePath: string,
 ): Promise<RenderedPage | null> {
-  const primary: DocEntryLike[] = await getCollection(collectionName(productName, locale) as any);
+  const primary: DocEntryLike[] = await getProductDocs(productName, locale);
   let entry = primary.find((d) => d.id === 'index');
   let isFallback = false;
 
   if (!entry && locale !== defaultLocale) {
-    const fallback: DocEntryLike[] = await getCollection(collectionName(productName, defaultLocale) as any);
+    const fallback: DocEntryLike[] = await getProductDocs(productName, defaultLocale);
     entry = fallback.find((d) => d.id === 'index');
     isFallback = true;
   }
   if (!entry) return null;
 
   const navSource: DocEntryLike[] = isFallback
-    ? await getCollection(collectionName(productName, defaultLocale) as any)
+    ? await getProductDocs(productName, defaultLocale)
     : primary;
   const navItems = buildNav(navSource, basePath);
 

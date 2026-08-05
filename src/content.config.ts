@@ -2,6 +2,7 @@ import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { locales, collectionSuffix } from './lib/i18n';
+import { hasDocDir } from './lib/doc-dirs';
 import { products } from '../site.config';
 
 // Products that ship a localized docs collection. Driven by the `products`
@@ -11,6 +12,12 @@ import { products } from '../site.config';
 // collection at a non-default directory (a path relative to the repo root,
 // e.g. './docs' => ./docs/<locale>/, used by content synced in from an
 // external repo); otherwise docs live under ./src/content/docs/<slug>/<locale>/.
+//
+// A collection is only generated for a product × locale whose docs directory
+// actually exists. Products with no docs at all (a pure landing page) then
+// have no Docs collections, and the call sites in lib/content.ts / lib/llms.ts
+// skip getCollection() for them (guarded by the same directory check) - so a
+// docs-less product builds cleanly with no "collection is empty" warnings.
 
 const docSchema = z.object({
   title: z.string(),
@@ -26,8 +33,10 @@ function makeDocCollections(): Record<string, ReturnType<typeof defineCollection
     // => ./docs/<locale>/, used by content synced in from an external repo).
     const baseDir = product.base ?? `./src/content/docs/${product.slug}`;
     for (const locale of locales) {
+      const dir = `${baseDir}/${locale}`;
+      if (!hasDocDir(product.slug, product.base, locale)) continue; // no docs for this locale
       out[`${product.slug}Docs${collectionSuffix(locale)}`] = defineCollection({
-        loader: glob({ pattern: '**/*.md', base: `${baseDir}/${locale}` }),
+        loader: glob({ pattern: '**/*.md', base: dir }),
         schema: docSchema,
       });
     }

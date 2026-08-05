@@ -21,6 +21,7 @@ import {
   withBase,
   type Locale,
 } from './i18n';
+import { hasDocDir } from './doc-dirs';
 import { products } from '../../site.config';
 
 interface DocEntry {
@@ -43,8 +44,12 @@ function productInfoCollectionName(locale: Locale): string {
   return `productInfo${collectionSuffix(locale)}`;
 }
 
-/** Docs for one product + locale, in sidebar order (index first, then order, then title). */
+/** Docs for one product + locale, in sidebar order (index first, then order, then title).
+ *  Returns [] for a docs-less product (no directory => no collection registered;
+ *  calling getCollection() on it would warn, so we skip via the same check). */
 async function getProductDocs(productSlug: string, locale: Locale): Promise<DocEntry[]> {
+  const product = products.find((p) => p.slug === productSlug);
+  if (!product || !hasDocDir(product.slug, product.base, locale)) return [];
   const entries = (await getCollection(
     docsCollectionName(productSlug, locale) as any,
   )) as DocEntry[];
