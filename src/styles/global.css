@@ -1951,6 +1951,16 @@ a.docs-prev-next-item:hover {
   }
 }
 
+/* Phones: one full-width column. Below ~640px of viewport (minus container
+   padding) two masonry columns leave ~140px cards - quote text wraps after
+   almost every word and the author row (avatar + name) overflows the card.
+   Matches the other grids' single-column mobile convention. */
+@media (max-width: 640px) {
+  .testimonials-grid--masonry {
+    columns: 1;
+  }
+}
+
 .testimonials-grid--masonry .testimonial-card {
   margin: 0 0 1.5rem;
   break-inside: avoid;
@@ -1965,6 +1975,10 @@ a.docs-prev-next-item:hover {
   flex-direction: column;
   gap: 1rem;
   position: relative;
+  /* Let the card shrink inside grid/multicol tracks and wrap long
+     unbreakable tokens (URLs, handles) instead of overflowing. */
+  min-width: 0;
+  overflow-wrap: break-word;
 }
 
 /* Large decorative quote glyph, gold on subtle, behind the quote text. */
@@ -1992,12 +2006,17 @@ a.docs-prev-next-item:hover {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  min-width: 0;
 }
 
 .testimonial-author-text {
   display: flex;
   flex-direction: column;
   gap: 0.1rem;
+  /* Shrink to fit beside the fixed-size avatar and break long names /
+     handles mid-word rather than pushing past the card's right border. */
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .testimonial-name {
