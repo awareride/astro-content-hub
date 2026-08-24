@@ -128,10 +128,25 @@ beyond writing content.
   already all ship `product-info` files, so no sample-content change was
   needed.
 
-## Phase 3 — Positioning & docs
+## Phase 3 — Positioning & docs ✅ DONE
 
 **Goal:** the repo *tells* the org-portal story clearly, so the right people
 find it.
+
+**Status:** merged. Implemented as:
+
+- **README** reframed from "content-hub template" to "org & product portal":
+  it leads with the org front door + per-product landing + aggregated docs,
+  then describes the sync/PR mechanism as the means.
+- **`docs/en/vision.md`** (+ zh-Hans) added as the "why" — the philosophy
+  home — and linked from the README and both docs indexes.
+- The docs table in `README.md` and `docs/en/index.md` (+ zh-Hans mirrors)
+  now lists Vision and this roadmap.
+- The optional **repository description + topics** item is left to the
+  maintainer (needs GitHub access; it is a repo-settings change, not code or
+  docs).
+
+All of it is copy/docs — no Machinery changes.
 
 ### Tasks
 
@@ -148,8 +163,8 @@ find it.
 
 ### Acceptance
 
-- README and docs lead with the org-portal value proposition.
-- `vision.md` and `roadmap.md` are linked from the docs index, in both
+- ✓ README and docs lead with the org-portal value proposition.
+- ✓ `vision.md` and `roadmap.md` are linked from the docs index, in both
   locales.
 
 ## Phase 4 (deferred) — Versioned docs
@@ -175,7 +190,7 @@ added as an opt-in, not a breaking change.
 
 ## How to pick this up
 
-Each phase is an independent PR-sized chunk. Phase 1 is the smallest and
-highest-leverage (the org front door is the thing the vision is *most* about).
-Phase 2 is the biggest user-facing win for the "write docs, get a page"
-promise. Phase 3 is mostly copy. Do them in order; each ships on its own.
+Phases 1–3 are merged and shipped. The only remaining item is the deferred
+Phase 4 (versioned docs), which the core vision does not require — pick it up
+only if an SDK/API-heavy product needs it, and follow the extension pattern
+described above.
