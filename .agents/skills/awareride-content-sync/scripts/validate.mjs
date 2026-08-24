@@ -155,9 +155,42 @@ function validateDocs() {
   console.log(`docs: ${locales.length} locale(s), ${Object.values(byLocale).flat().length} file(s)`);
 }
 
+/** Validate product landing info files (optional). One file per locale at
+ *  landing/<locale>.md; the product slug is injected at sync time from the
+ *  PRODUCT env var (same as docs), so the external file has no slug in its
+ *  name. Shallow frontmatter check: `tagline` and `description` are required;
+ *  deep schema (features/highlights/links arrays of objects) is validated by
+ *  the hub's zod schema at build time. */
+function validateLanding() {
+  const base = join(ROOT, 'landing');
+  if (!existsSync(base)) return; // landing is optional; silent skip
+
+  const locales = SUPPORTED_LOCALES.filter(l => existsSync(join(base, `${l}.md`)));
+  if (locales.length === 0) {
+    warn('landing/ exists but has no <locale>.md files (expected landing/en.md)');
+    return;
+  }
+
+  if (!locales.includes(DEFAULT_LOCALE)) {
+    fail(`landing/${DEFAULT_LOCALE}.md is missing - the default locale must exist for fallback`);
+  }
+
+  for (const l of locales) {
+    const file = join(base, `${l}.md`);
+    const fm = parseFrontmatter(file);
+    if (!fm) { fail(`${relative(ROOT, file)}: missing frontmatter`); continue; }
+    for (const key of ['tagline', 'description']) {
+      if (!fm[key]) fail(`${relative(ROOT, file)}: missing required '${key}'`);
+    }
+  }
+
+  console.log(`landing: ${locales.length} locale(s)`);
+}
+
 console.log('Validating content for AwareRide sync...\n');
 validatePosts();
 validateDocs();
+validateLanding();
 
 console.log('');
 if (errors) { console.error(`✗ ${errors} error(s), ${warnings} warning(s)`); process.exit(1); }
