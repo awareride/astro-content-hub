@@ -73,8 +73,25 @@ jobs:
           mkdir -p "$DEST"
           rsync -a docs/ "$DEST/"
 
+          # Sync landing/ (optional, one file per locale) ->
+          # src/content/product-info/<locale>/${PRODUCT}.md. Landing files are
+          # product-namespaced on the hub (filename = PRODUCT), so the external
+          # repo stays product-agnostic (PRODUCT is injected at sync, like
+          # docs). Merge-copy: only files this repo provides are overwritten;
+          # removing landing/<locale>.md here does NOT remove it from the hub
+          # - use sync-delete.list with `landing/<locale>.md` for that.
+          for locale in en zh-Hans; do
+            if [ -f "landing/${locale}.md" ]; then
+              DEST_LANDING="$CLONE_DIR/src/content/product-info/${locale}"
+              mkdir -p "$DEST_LANDING"
+              cp "landing/${locale}.md" "$DEST_LANDING/${PRODUCT}.md"
+            fi
+          done
+
           node .agents/skills/awareride-content-sync/scripts/apply-delete-list.mjs \
             "$DEST" docs
+          node .agents/skills/awareride-content-sync/scripts/apply-delete-list.mjs \
+            "$CLONE_DIR/src/content/product-info" landing
 
           cd "$CLONE_DIR"
           git checkout -b "$BRANCH"
