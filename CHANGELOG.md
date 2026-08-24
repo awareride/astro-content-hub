@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Nothing yet.
 
-## [1.0.0] - 2025-08-21
+## [1.0.0] - 2026-08-24
 
 First release of `astro-content-hub`, an **org & product portal** template:
 one branded, localized, free-to-deploy static site that gives an organization
