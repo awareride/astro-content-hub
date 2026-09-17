@@ -1,13 +1,13 @@
 ---
 title: "Hello, world"
 date: 2026-07-21
-description: "A first post introducing the content hub template and how it is meant to be used."
+description: "A first post introducing the org & product portal template and how it is meant to be used."
 tags: ["announcement"]
 ---
 
 ## Hello, world
 
-This is a sample post shipped with the content hub template. It exists so the site
+This is a sample post shipped with the `astro-content-hub` template. It exists so the site
 looks complete out of the box — replace it with your own writing.
 
 The hub is meant to aggregate content from many repositories. Each project contributes

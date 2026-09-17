@@ -148,8 +148,8 @@ export const products: Product[] = [
     base: './docs',
     featured: true,
     description: {
-      en: 'This template - a content hub that aggregates docs and posts from many repositories.',
-      'zh-Hans': '本模板 —— 聚合多个仓库文档与文章的内容中心。',
+      en: 'This template - an org & product portal that aggregates docs and posts from many repositories.',
+      'zh-Hans': '本模板 —— 组织与产品门户,聚合多个仓库的文档与文章。',
     },
   },
   {

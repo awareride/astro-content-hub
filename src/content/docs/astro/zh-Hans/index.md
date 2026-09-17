@@ -9,4 +9,4 @@ JavaScript**,并允许你使用 React、Vue、Svelte 等组件 —— 仅对需�
 
 Astro 在构建时将组件渲染为 HTML,因此访客下载的 JavaScript 更少,页面加载更快。
 
-本文档是内容中心模板的示例内容。权威参考请见 [Astro 官方文档](https://docs.astro.build/)。
+本文档是 `astro-content-hub` 模板的示例内容。权威参考请见 [Astro 官方文档](https://docs.astro.build/)。
