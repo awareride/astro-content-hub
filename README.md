@@ -10,7 +10,7 @@
   <a href="https://nodejs.org/"><img alt="Node" src="https://img.shields.io/badge/Node-22-339933?logo=node.js&logoColor=white"></a>
 </p>
 
-<p align="center">A content-hub template: aggregate documentation and blog posts from many<br>repositories into one <strong>localized, auto-deployed static site</strong>.</p>
+<p align="center">An <strong>org &amp; product portal</strong> template: one localized, auto-deployed Astro site that gives every<br>project a landing page and aggregates docs and posts from many repositories.</p>
 
 ---
 
