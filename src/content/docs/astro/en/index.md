@@ -12,5 +12,5 @@ interactive parts.
 Astro renders your components to HTML at build time, so visitors download less
 JavaScript and pages load faster.
 
-This documentation is sample content for the content hub template. For the
+This documentation is sample content for the `astro-content-hub` template. For the
 authoritative reference, see the [official Astro docs](https://docs.astro.build/).

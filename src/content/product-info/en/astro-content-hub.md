@@ -1,6 +1,6 @@
 ---
 tagline: "One hub for docs and posts from many repositories — localized, auto-deployed."
-description: "A content-hub template: aggregate documentation and blog posts from many open-source repositories into one fast, localized static site."
+description: "An org & product portal template: aggregate documentation and blog posts from many open-source repositories into one fast, localized static site."
 highlights:
   - label: "License"
     value: "MIT"
@@ -79,10 +79,12 @@ sections:
       secondary: { label: "View Source", href: "https://github.com/awareride/astro-content-hub" }
 ---
 
-`astro-content-hub` is a content-hub template: it aggregates documentation
-and blog posts from many open-source repositories into one **localized,
-auto-deployed static site**. Content ships through pull requests, so nothing
-lands on main without review.
+`astro-content-hub` is an **org & product portal** template built on a
+content-hub model: it aggregates documentation and blog posts from many
+open-source repositories into one **localized, auto-deployed static site**,
+gives the organization a front door, and gives every project a product
+landing page. Content ships through pull requests, so nothing lands on main
+without review.
 
 ## Why this template
 

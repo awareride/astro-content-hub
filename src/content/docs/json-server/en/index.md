@@ -11,5 +11,5 @@ real backend is not ready yet.
 Given a `db.json` describing your resources, JSON Server serves CRUD endpoints
 that persist changes back to the file.
 
-This documentation is sample content for the content hub template. For the
+This documentation is sample content for the `astro-content-hub` template. For the
 authoritative reference, see the [official JSON Server repo](https://github.com/typicode/json-server).

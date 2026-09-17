@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Nothing yet.
+### Changed
+
+- Reframed the remaining "content-hub template" copy to the **org & product
+  portal** story: the README hero tagline, the docs index (both locales), the
+  hub's own `product-info` landing copy, the sample docs/posts, and AGENTS.md.
+- Aligned repository metadata with that story: the GitHub repository
+  description and 19 discovery topics were set on the repo, and
+  `package.json` `description`/`keywords` were updated to match (keywords:
+  6 → 15).
 
 ## [1.0.0] - 2026-08-24
 

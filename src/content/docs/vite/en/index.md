@@ -11,5 +11,5 @@ It serves source files over native ES modules during development, so the browser
 loads only the modules you actually import — no bundling step on every edit. For
 production, Vite bundles your code with [Rollup](https://rollupjs.org/).
 
-This documentation is sample content for the content hub template. For the
+This documentation is sample content for the `astro-content-hub` template. For the
 authoritative reference, see the [official Vite docs](https://vite.dev/).

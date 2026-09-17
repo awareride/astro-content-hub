@@ -60,8 +60,10 @@ When in doubt, ask. "I think this is safe" is not authorization.
 
 `astro-content-hub` is a static site built with **Astro 7** (static output),
 deployed to GitHub Pages and Cloudflare Pages from `main` via GitHub Actions.
-It is a **content-hub template**: the site aggregates docs and posts from many
-repositories, synced in via pull requests.
+It is an **org & product portal template** built on a content-hub model: the
+site gives the organization a front door and every project a landing page,
+and aggregates docs and posts from many repositories, synced in via pull
+requests.
 
 For the codebase tier map - which files are **Machinery** (fix a bug), which
 are **Your site** (edit to rebrand), and which are **Extensions** (optional
